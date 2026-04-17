@@ -6,6 +6,17 @@ An all-in-one workspace application built with modern web technologies.
 
 Nexus is a comprehensive workspace solution designed to centralize your workflow. It features a modern dark theme UI with smooth animations and a professional design.
 
+> **Note**: This is version 1 of the Nexus project.
+
+## Features
+
+- **Modern UI**: Dark theme with GitHub-inspired color palette
+- **Task Management**: Create, organize, and track tasks
+- **Notes System**: Quick note-taking functionality
+- **Dashboard**: Overview of all activities and metrics
+- **Responsive**: Works on desktop and mobile devices
+- **Keyboard Shortcuts**: Quick actions for power users
+
 ## Files Included
 
 ### 1. Nexus.html
@@ -22,14 +33,6 @@ Contains the model strategy and architecture documentation for the Nexus system.
 ### 3. Nexus_Claude_Model_Strategy.html
 Detailed model strategy implementation using Claude AI integration.
 
-## Features
-
-- **Modern UI**: Dark theme with GitHub-inspired color palette
-- **Task Management**: Create, organize, and track tasks
-- **Notes System**: Quick note-taking functionality
-- **Dashboard**: Overview of all activities and metrics
-- **Responsive**: Works on desktop and mobile devices
-
 ## Tech Stack
 
 - HTML5
@@ -37,13 +40,21 @@ Detailed model strategy implementation using Claude AI integration.
 - JavaScript (ES6+)
 - Google Fonts (DM Sans, IBM Plex Sans)
 
-## Usage
+## Getting Started
 
 Simply open `Nexus.html` in any modern web browser to start using the application.
 
-## Version
+```bash
+# To view locally
+open Nexus.html
+# or simply double-click the file
+```
 
-v1.0 - Initial release
+## Version History
+
+| Version | Date | Description |
+|---------|------|------------|
+| v1.0 | Current | Initial release with core workspace features |
 
 ## License
 
