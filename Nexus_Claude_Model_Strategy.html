@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Claude Model Strategy & Day-by-Day Build Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #090b12;
+  --bg2:        #0e1120;
+  --bg3:        #131626;
+  --card:       #141728;
+  --border:     #1d2238;
+  --border2:    #252a45;
+  --text:       #dde1f5;
+  --text2:      #8892b5;
+  --text3:      #565e80;
+  --nexus:      #6366f1;
+  --nexus-lt:   #818cf8;
+  --nexus-dim:  rgba(99,102,241,0.12);
+  --opus:       #f59e0b;
+  --opus-dim:   rgba(245,158,11,0.12);
+  --opus-lt:    #fbbf24;
+  --sonnet:     #14b8a6;
+  --sonnet-dim: rgba(20,184,166,0.12);
+  --sonnet-lt:  #2dd4bf;
+  --p1:         #22c55e;
+  --p1-dim:     rgba(34,197,94,0.10);
+  --p2:         #3b82f6;
+  --p2-dim:     rgba(59,130,246,0.10);
+  --p3:         #a855f7;
+  --p3-dim:     rgba(168,85,247,0.10);
+  --p4:         #f97316;
+  --p4-dim:     rgba(249,115,22,0.10);
+  --warn:       #ef4444;
+  --warn-dim:   rgba(239,68,68,0.10);
+  --tip:        #06b6d4;
+  --tip-dim:    rgba(6,182,212,0.10);
+  --radius:     10px;
+  --radius-sm:  6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 230px;
+  min-width: 230px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 28px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.sidebar-logo .brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--nexus-lt);
+  letter-spacing: -0.5px;
+}
+
+.sidebar-logo .sub {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.nav-section {
+  padding: 6px 20px 2px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 12.5px;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-link:hover { color: var(--text); background: var(--nexus-dim); border-left-color: var(--nexus); }
+.nav-link.phase1 { border-left-color: transparent; }
+.nav-link.phase1:hover { border-left-color: var(--p1); background: var(--p1-dim); color: var(--p1); }
+.nav-link.phase2:hover { border-left-color: var(--p2); background: var(--p2-dim); color: var(--p2); }
+.nav-link.phase3:hover { border-left-color: var(--p3); background: var(--p3-dim); color: var(--p3); }
+.nav-link.phase4:hover { border-left-color: var(--p4); background: var(--p4-dim); color: var(--p4); }
+
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-nexus { background: var(--nexus); }
+.dot-p1 { background: var(--p1); }
+.dot-p2 { background: var(--p2); }
+.dot-p3 { background: var(--p3); }
+.dot-p4 { background: var(--p4); }
+.dot-rules { background: var(--opus); }
+
+/* ── MAIN CONTENT ─────────────────────────────────────────────────────── */
+.main { flex: 1; padding: 40px 48px; max-width: 1060px; min-width: 0; }
+
+/* ── COVER ─────────────────────────────────────────────────────────────── */
+.cover {
+  background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 48px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cover-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--nexus-dim);
+  border: 1px solid var(--nexus);
+  color: var(--nexus-lt);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 18px;
+}
+
+.cover h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+
+.cover h1 span { color: var(--nexus-lt); }
+
+.cover-desc {
+  font-size: 14.5px;
+  color: var(--text2);
+  max-width: 620px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.cover-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.pill-nexus  { background: var(--nexus-dim); color: var(--nexus-lt); border: 1px solid rgba(99,102,241,0.3); }
+.pill-opus   { background: var(--opus-dim);  color: var(--opus-lt);  border: 1px solid rgba(245,158,11,0.3); }
+.pill-sonnet { background: var(--sonnet-dim);color: var(--sonnet-lt);border: 1px solid rgba(20,184,166,0.3); }
+.pill-gray   { background: rgba(255,255,255,0.05); color: var(--text2); border: 1px solid var(--border2); }
+
+/* ── SECTION HEADERS ──────────────────────────────────────────────────── */
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  margin-top: 44px;
+}
+.section-sub {
+  color: var(--text2);
+  font-size: 13.5px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* ── BUDGET CARDS ─────────────────────────────────────────────────────── */
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.budget-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.budget-card .num {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--nexus-lt);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.budget-card .label { font-size: 11px; color: var(--text2); line-height: 1.4; }
+
+/* ── MODEL LEGEND ────────────────────────────────────────────────────── */
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.legend-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.legend-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.legend-icon.opus   { background: var(--opus-dim);   color: var(--opus);   border: 1px solid rgba(245,158,11,0.3); }
+.legend-icon.sonnet { background: var(--sonnet-dim); color: var(--sonnet); border: 1px solid rgba(20,184,166,0.3); }
+.legend-card h3 { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.legend-card p  { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── COPY PROMPT BLOCKS ───────────────────────────────────────────────── */
+.prompt-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.prompt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prompt-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.prompt-tag {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--nexus-dim);
+  color: var(--nexus-lt);
+  border: 1px solid rgba(99,102,241,0.25);
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--nexus);
+  color: #fff;
+  border: none;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.copy-btn:hover { background: var(--nexus-lt); transform: translateY(-1px); }
+.copy-btn.copied { background: var(--sonnet); }
+.copy-btn svg { width: 13px; height: 13px; }
+
+.prompt-body {
+  padding: 20px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--bg);
+  border-top: none;
+}
+
+.prompt-body.expanded { max-height: none; }
+
+.prompt-expand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: var(--bg3);
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text3);
+  gap: 6px;
+  transition: color 0.15s;
+}
+.prompt-expand:hover { color: var(--nexus-lt); }
+
+.prompt-highlight { color: var(--nexus-lt); }
+.prompt-comment  { color: var(--text3); }
+.prompt-key      { color: var(--opus-lt); }
+.prompt-val      { color: var(--sonnet-lt); }
+
+/* ── PHASE HEADER ────────────────────────────────────────────────────── */
+.phase-header {
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  margin-top: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.phase-header.p1 { background: var(--p1-dim); border: 1px solid rgba(34,197,94,0.25); }
+.phase-header.p2 { background: var(--p2-dim); border: 1px solid rgba(59,130,246,0.25); }
+.phase-header.p3 { background: var(--p3-dim); border: 1px solid rgba(168,85,247,0.25); }
+.phase-header.p4 { background: var(--p4-dim); border: 1px solid rgba(249,115,22,0.25); }
+
+.phase-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.phase-header.p1 .phase-title { color: var(--p1); }
+.phase-header.p2 .phase-title { color: var(--p2); }
+.phase-header.p3 .phase-title { color: var(--p3); }
+.phase-header.p4 .phase-title { color: var(--p4); }
+.phase-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.phase-meta { text-align: right; }
+.phase-meta .weeks { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; }
+.phase-meta .weeks-label { font-size: 10px; color: var(--text3); }
+
+/* ── TABLES ──────────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+th {
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+tr:hover td { background: rgba(99,102,241,0.04); }
+
+td.days-col {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+td.tasks-col { color: var(--text); min-width: 300px; }
+td.tasks-col strong { color: #fff; font-weight: 600; }
+td.tasks-col ul { list-style: none; margin-top: 4px; }
+td.tasks-col ul li { padding: 1px 0; display: flex; gap: 6px; }
+td.tasks-col ul li::before { content: '›'; color: var(--text3); flex-shrink: 0; margin-top: 0px; }
+
+td.model-col { white-space: nowrap; min-width: 100px; }
+td.why-col { color: var(--text2); min-width: 220px; font-size: 12px; line-height: 1.5; }
+
+/* Model badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+.badge-opus   { background: var(--opus-dim);   color: var(--opus-lt);   border: 1px solid rgba(245,158,11,0.3); }
+.badge-sonnet { background: var(--sonnet-dim); color: var(--sonnet-lt); border: 1px solid rgba(20,184,166,0.3); }
+.badge-fresh  { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); font-size: 9px; margin-left: 4px; }
+
+/* ── NOTICE BOXES ─────────────────────────────────────────────────────── */
+.notice {
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 12px 0 20px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.notice-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.notice.warning { background: var(--warn-dim); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+.notice.tip     { background: var(--tip-dim);  border: 1px solid rgba(6,182,212,0.3);  color: #67e8f9; }
+.notice.opus-note { background: var(--opus-dim); border: 1px solid rgba(245,158,11,0.3); color: var(--opus-lt); }
+.notice strong { font-weight: 700; }
+
+/* ── GOLDEN RULES ────────────────────────────────────────────────────── */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.rule-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.rule-card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.rule-card p { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.rule-card.highlight { border-color: rgba(99,102,241,0.4); background: var(--nexus-dim); }
+.rule-card.highlight h4 { color: var(--nexus-lt); }
+
+/* ── TOKEN TRAPS ─────────────────────────────────────────────────────── */
+.traps-table { margin-bottom: 40px; }
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: 60px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer span { color: var(--nexus-lt); }
+
+/* ── SCROLLBAR ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── PASTE ROW ───────────────────────────────────────────────────────── */
+.paste-row {
+  background: rgba(239,68,68,0.08);
+  border-top: 2px solid var(--warn);
+  border-bottom: 2px solid var(--warn);
+}
+.paste-row td {
+  padding: 14px 14px;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: 24px 20px; }
+  .budget-grid { grid-template-columns: repeat(2, 1fr); }
+  .legend-grid { grid-template-columns: 1fr; }
+  .rules-grid  { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">NEXUS</div>
+    <div class="sub">MODEL STRATEGY v1.0</div>
+  </div>
+  <span class="nav-section">Overview</span>
+  <a href="#cover"   class="nav-link"><span class="dot dot-nexus"></span>Cover &amp; Intro</a>
+  <a href="#budget"  class="nav-link"><span class="dot dot-nexus"></span>Budget Summary</a>
+  <a href="#models"  class="nav-link"><span class="dot dot-nexus"></span>Model Legend</a>
+  <a href="#token-limit" class="nav-link"><span class="dot dot-nexus"></span>Token Limit Statement</a>
+  <a href="#starter" class="nav-link"><span class="dot dot-nexus"></span>Session Starter</a>
+  <a href="#arch-prompt" class="nav-link"><span class="dot dot-nexus"></span>Architecture Prompt</a>
+
+  <span class="nav-section">Phases</span>
+  <a href="#phase1" class="nav-link phase1"><span class="dot dot-p1"></span>Phase 1 — Foundation</a>
+  <a href="#phase2" class="nav-link phase2"><span class="dot dot-p2"></span>Phase 2 — Core</a>
+  <a href="#phase3" class="nav-link phase3"><span class="dot dot-p3"></span>Phase 3 — Real-Time</a>
+  <a href="#phase4" class="nav-link phase4"><span class="dot dot-p4"></span>Phase 4 — Premium</a>
+
+  <span class="nav-section">Rules</span>
+  <a href="#golden-rules" class="nav-link"><span class="dot dot-rules"></span>Golden Rules</a>
+  <a href="#token-traps"  class="nav-link"><span class="dot dot-rules"></span>Token Traps</a>
+</nav>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ── COVER ──────────────────────────────────────────────────────────── -->
+<section id="cover">
+<div class="cover">
+  <div class="cover-tag">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+    Claude Pro Plan · Opus 4.6 + Sonnet 4.6
+  </div>
+  <h1>PROJECT <span>NEXUS</span><br>Model Strategy Guide</h1>
+  <p class="cover-desc">
+    Your complete Claude model usage guide for building Nexus — a closed, private, all-in-one collaborative workspace combining notes, code, voice, and chat. This document tells you exactly which model to open, when to paste which prompt, and how to manage your 5-hour windows across every session of the 28-week build.
+  </p>
+  <div class="cover-pills">
+    <span class="pill pill-nexus">28 Weeks · ~196 Days</span>
+    <span class="pill pill-opus">Opus 4.6 · 32% of sessions</span>
+    <span class="pill pill-sonnet">Sonnet 4.6 · 68% of sessions</span>
+    <span class="pill pill-gray">1–2 hrs/day · Solo Developer</span>
+    <span class="pill pill-gray">Next.js · PostgreSQL · Socket.io · LiveKit · Stripe</span>
+  </div>
+</div>
+
+<!-- ── HOW TO USE ─────────────────────────────────────────────────────── -->
+<div class="section-title">How to Use This Guide</div>
+<div class="section-sub">Read this before starting Day 1. Follow it on every single session.</div>
+
+<div class="legend-grid" style="margin-bottom:20px;">
+  <div class="rule-card">
+    <h4>📋 Before Every Session</h4>
+    <p>Look up today's day number in the table. Check the Model column. Open that exact model <strong>before</strong> writing a single word. Never open a chat and decide mid-way.</p>
+  </div>
+  <div class="rule-card">
+    <h4>🔴 OPUS = Fresh Window Only</h4>
+    <p>Every row marked OPUS must be started at the beginning of a fresh 5-hour window — never at the end of a depleted one. Schedule OPUS sessions as the first task of your day.</p>
+  </div>
+  <div class="rule-card">
+    <h4>📎 Paste the Session Starter</h4>
+    <p>From Day 2 onwards, paste the Session Starter Template at the top of every new chat. Claude has no memory. Without it, you waste tokens re-explaining the project.</p>
+  </div>
+  <div class="rule-card">
+    <h4>🏗️ Architecture Prompt = Day 1 Opus</h4>
+    <p>The Architecture Prompt (Section below) is pasted once into a fresh Opus session. This gives Claude the complete blueprint. Everything else builds on top of it.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── BUDGET SUMMARY ─────────────────────────────────────────────────── -->
+<section id="budget">
+<div class="section-title">Overall Budget Summary</div>
+<div class="section-sub">Token and window estimates across all 4 phases of Nexus.</div>
+
+<div class="budget-grid">
+  <div class="budget-card">
+    <div class="num">~2.8M</div>
+    <div class="label">Total tokens estimated across all phases and sessions</div>
+  </div>
+  <div class="budget-card">
+    <div class="num">55–65</div>
+    <div class="label">5-hour windows needed (mixed model)</div>
+  </div>
+  <div class="budget-card">
+    <div class="num">32%</div>
+    <div class="label">Sessions requiring Opus 4.6 (~22 dedicated windows)</div>
+  </div>
+  <div class="budget-card">
+    <div class="num">4</div>
+    <div class="label">Phases · 28 weeks · ~196 working sessions</div>
+  </div>
+</div>
+
+<div class="budget-grid">
+  <div class="budget-card" style="border-color: rgba(245,158,11,0.3); background: var(--opus-dim);">
+    <div class="num" style="color:var(--opus-lt);">~22</div>
+    <div class="label" style="color:var(--opus-lt);">Opus windows<br><span style="color:var(--text3);">Architecture, schema, real-time design, security</span></div>
+  </div>
+  <div class="budget-card" style="border-color: rgba(20,184,166,0.3); background: var(--sonnet-dim);">
+    <div class="num" style="color:var(--sonnet-lt);">~40</div>
+    <div class="label" style="color:var(--sonnet-lt);">Sonnet windows<br><span style="color:var(--text3);">CRUD, UI, tests, deployment, boilerplate</span></div>
+  </div>
+  <div class="budget-card" style="border-color: rgba(239,68,68,0.3); background: var(--warn-dim);">
+    <div class="num" style="color:#fca5a5;">3–4</div>
+    <div class="label" style="color:#fca5a5;">Windows/month<br><span style="color:var(--text3);">Well within Claude Pro plan limits</span></div>
+  </div>
+  <div class="budget-card" style="border-color: rgba(6,182,212,0.3); background: var(--tip-dim);">
+    <div class="num" style="color:#67e8f9;">~10K</div>
+    <div class="label" style="color:#67e8f9;">Tokens/session average<br><span style="color:var(--text3);">Focused single-task sessions stay efficient</span></div>
+  </div>
+</div>
+
+<div class="notice tip">
+  <div class="notice-icon">💡</div>
+  <div><strong>Shared quota warning:</strong> Claude Pro usage is shared between claude.ai chat and Claude Code. On heavy coding days, minimise casual claude.ai chat to preserve your window budget for the session. Nexus is the priority.</div>
+</div>
+</section>
+
+<!-- ── MODEL LEGEND ────────────────────────────────────────────────────── -->
+<section id="models">
+<div class="section-title">Model Colour Legend</div>
+<div class="legend-grid">
+  <div class="legend-card" style="border: 1px solid rgba(245,158,11,0.25); background: var(--opus-dim);">
+    <div class="legend-icon opus">OP</div>
+    <div>
+      <h3 style="color:var(--opus-lt);">Opus 4.6 — Architecture Driver</h3>
+      <p>Reserved for system design decisions, complex feature architecture, database schema design, security audits, real-time infrastructure (Yjs/CRDT, LiveKit, Socket.io), payment flow design, debugging non-obvious failures, and any writing that will be reviewed by a technical stakeholder. Opus is expensive — use it only where reasoning depth genuinely matters.</p>
+    </div>
+  </div>
+  <div class="legend-card" style="border: 1px solid rgba(20,184,166,0.25); background: var(--sonnet-dim);">
+    <div class="legend-icon sonnet">SN</div>
+    <div>
+      <h3 style="color:var(--sonnet-lt);">Sonnet 4.6 — Daily Driver</h3>
+      <p>Handles all CRUD APIs, UI components, boilerplate scaffolding, unit tests, deployment steps, configuration files, data migrations, templated code, and any task where the pattern is already established by an earlier Opus session. Fast, cost-effective, and sufficient for 68% of Nexus development work.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── TOKEN LIMIT STATEMENT ───────────────────────────────────────────── -->
+<section id="token-limit">
+<div class="section-title">Token Limit &amp; Context Statement</div>
+<div class="section-sub">Paste this exact block at the very start of every session — before your task. It sets the rules upfront and prevents Claude from expanding scope or wasting tokens.</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Token Limit &amp; Scope Statement</span>
+      <span class="prompt-tag">PASTE FIRST · EVERY SESSION</span>
+    </div>
+    <button class="copy-btn" id="btn-token" onclick="copyPrompt('token-limit-text','btn-token')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="token-limit-text">⚠️ CONTEXT RULES FOR THIS SESSION:
+
+Project: Nexus — Private Collaborative Workspace (github.com/[your-username]/nexus)
+Stack: Next.js 14 (App Router), Node.js + Express, PostgreSQL + Prisma, Socket.io, LiveKit, AWS S3 / Cloudflare R2, NextAuth.js, Stripe
+Platform rules: 100% closed — no public profiles, no public projects, no public search. Free tier = 5 version snapshots per file (FILO). Premium = extended history.
+
+SESSION RULES:
+1. Focus ONLY on today's stated task. Do not expand into other features unprompted.
+2. Write production-quality code — not tutorial code. Include error handling, input validation, and proper TypeScript types.
+3. If a decision involves architecture that affects future phases, flag it explicitly before implementing.
+4. Do not re-explain what you are about to do — go directly to the implementation.
+5. If you are about to hit a context limit, tell me before stopping so I can continue in a fresh session.
+
+Today's task: [REPLACE WITH TODAY'S TASK FROM THE DAY-BY-DAY TABLE BELOW]</div>
+</div>
+</section>
+
+<!-- ── SESSION STARTER TEMPLATE ───────────────────────────────────────── -->
+<section id="starter">
+<div class="section-title">Daily Session Starter Template</div>
+<div class="section-sub">Use from Day 2 onwards. Paste the Token Limit Statement first, then this 4-line header. Together they give Claude everything it needs without wasting a single token.</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Session Starter (Day 2+)</span>
+      <span class="prompt-tag">USE EVERY SESSION</span>
+    </div>
+    <button class="copy-btn" id="btn-starter" onclick="copyPrompt('starter-text','btn-starter')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="starter-text">Project: Nexus — Private Collaborative Workspace (github.com/[your-username]/nexus)
+Stack: Next.js 14, Node.js + Express, PostgreSQL + Prisma ORM, Socket.io (real-time), LiveKit (voice/video), Cloudflare R2 (file storage), NextAuth.js (auth), Stripe (billing)
+Phase: [PHASE NUMBER AND NAME — e.g. "Phase 1 — Foundation"]
+Today's task: [PASTE THE EXACT TASK TEXT FROM TODAY'S ROW IN THE TABLE BELOW]
+
+Additional context if needed:
+- Closed platform — no public pages, no public profiles, no discovery features ever
+- FILO version history: free = 5 snapshots, premium = configurable (managed via Stripe subscription)
+- Database ORM: Prisma (all schema changes go through prisma migrate dev)
+- Auth: NextAuth with email/password + workspace invite token flow
+- File storage: presigned URLs for direct client uploads to R2/S3
+- Real-time: Socket.io for chat + presence; Yjs (y-websocket) for collaborative editing; LiveKit for voice/video</div>
+</div>
+
+<div class="notice tip">
+  <div class="notice-icon">💡</div>
+  <div><strong>Example — Phase 2, Day 59:</strong> "Today's task: Design and implement the FILO note version history backend. Every save must create a snapshot. Free workspaces cap at 5 snapshots per note (delete oldest when 6th is created). Premium workspaces use a configurable cap from workspace.snapshotLimit. Use Prisma transactions. Store the full note content per snapshot plus a brief auto-generated change summary."</div>
+</div>
+</section>
+
+<!-- ── ARCHITECTURE PROMPT ─────────────────────────────────────────────── -->
+<section id="arch-prompt">
+<div class="section-title">Architecture Prompt</div>
+<div class="section-sub">Paste this once into a <strong>fresh Opus 4.6 session</strong> at the start of Day 1 (after the Sonnet setup session has completed and its 5-hour window has reset). This is your project blueprint. Every subsequent session builds on top of the output this generates. Save the full Opus response — it becomes your living specification document.</div>
+
+<div class="notice opus-note">
+  <div class="notice-icon">⚡</div>
+  <div><strong>FRESH WINDOW REQUIRED:</strong> Do the Day 1 Sonnet setup tasks first (repo, Docker, folder structure). Then wait for the 5-hour window to fully reset. Open a brand new Opus 4.6 session with zero messages. THEN paste this prompt. The clean ~44K token budget is the point — nothing wasted on boilerplate Sonnet already handled.</div>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Full Architecture &amp; Project Prompt</span>
+      <span class="prompt-tag">OPUS 4.6 · FRESH WINDOW · DAY 1</span>
+    </div>
+    <button class="copy-btn" id="btn-arch" onclick="copyPrompt('arch-text','btn-arch')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Full Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="arch-text" style="max-height:300px;">You are acting as a Principal Software Architect and Senior Full-Stack Engineer with 15+ years of experience building collaborative SaaS platforms. I am the sole founder and full-time developer of a new product. I need your complete, unwavering guidance from concept to deployment. Do not simplify your answers. Do not leave gaps. Treat every response as if it is going directly into a technical specification document that a real engineering team will build from.
+
+═══════════════════════════════════════════
+PROJECT NEXUS — Full Platform Specification
+═══════════════════════════════════════════
+
+PROJECT IDENTITY:
+I am building a closed, private, all-in-one collaborative workspace platform — codenamed Nexus. It is designed for any group of people — a solo developer, a duo, a friend group, a small team, or a working group — who want to create, share, document, code, communicate, and collaborate entirely within one unified environment, without any public-facing profiles, public search, or exposure to the outside internet.
+
+Nexus is the spiritual intersection of three products:
+- Notion / Obsidian → Rich note-taking, documentation, folder structures, linked pages
+- GitHub → Code management, project versioning, contributions, change history
+- Discord → Voice calls, group chat channels, personal DMs, persistent audio presence
+
+CORE PHILOSOPHY (non-negotiable):
+1. CLOSED ECOSYSTEM — No public profiles. No search engine indexing. No public project pages. Every user, workspace, and piece of content is private forever. There is no concept of a "public repo" or "public page."
+2. SIMPLICITY FIRST — The tech stack must be maintainable by a single developer. No microservices. No Kubernetes. Scalability via clean architecture, not premature complexity.
+3. SCALABILITY CEILING — Architected to handle growth gracefully. Every decision leaves a door open for horizontal scaling without a full rewrite.
+4. FREEMIUM MODEL — Free tier: last 5 version snapshots per file (FILO — First In, Last Out). Premium tier: extended history. This is the primary monetisation lever.
+5. NO BLOAT — Every feature must justify its existence.
+
+FIXED TECH STACK:
+- Frontend: Next.js 14 (App Router, TypeScript, Tailwind CSS)
+- Backend: Node.js + Express (TypeScript), alongside Next.js API routes for lighter endpoints
+- Database: PostgreSQL
+- ORM: Prisma (type-safe schema, migrations)
+- Real-time: Socket.io (chat + presence + notifications)
+- Collaborative editing: Yjs + y-websocket (CRDT-based, conflict-free)
+- Voice/Video: LiveKit (WebRTC, self-hostable or LiveKit Cloud)
+- File Storage: Cloudflare R2 (or AWS S3) — presigned URL uploads
+- Auth: NextAuth.js (email/password + workspace invite token)
+- Payments: Stripe (per-workspace subscription, monthly/annual)
+- Deployment: Fly.io (backend + LiveKit) + Vercel (frontend) + managed PostgreSQL
+- Search: PostgreSQL full-text search (initially) → Elasticsearch (if needed later)
+
+USER ROLES (per workspace):
+Owner → Admin → Member → Viewer
+
+FEATURES OVERVIEW:
+
+[A] WORKSPACE & TEAM STRUCTURE:
+- One workspace per group/team. Created by Owner. Invite-only via private link or email.
+- Workspaces contain Spaces. Spaces contain channels, notes, projects, files.
+- Users can belong to multiple workspaces.
+- Solo use supported (one user, personal workspace, all features).
+- No public workspace directory. No search. Joining requires explicit invite only.
+
+[B] NOTES & DOCUMENTATION (Notion/Obsidian-style):
+- Block-based rich text editor: headings, bullets, numbered lists, checklists, quotes, dividers, callouts, toggles, code blocks (syntax highlighted), tables, inline images, drag-and-drop media.
+- Markdown shortcuts (## → H2, - → bullet, ``` → code block).
+- Backlinks / internal linking between notes (Obsidian-style, optional graph view future).
+- Nested folder tree (unlimited depth). Drag-and-drop reordering. Emoji icons on notes/folders.
+- Favourites, templates, export (Markdown + PDF).
+- Version History: every save = snapshot. Free = last 5 (FILO). Premium = configurable. Diff viewer shows what changed, when, by whom.
+- Real-time collaborative editing (Yjs/CRDT). Presence cursors with names/colours.
+- Inline comments on any block. Thread-based replies.
+
+[C] CODE & PROJECT MANAGEMENT (GitHub-style, private only):
+- Projects = private codebases. File tree browser, in-browser Monaco Editor (syntax highlighted), upload/edit/delete files.
+- Version History per file: every commit = snapshot. Free = last 5 (FILO). Premium = extended. Activity feed (who changed what, when).
+- Contributions: any invited member can make changes, attributed to contributor.
+- Review/Approval toggle: owner/admin can require approval before changes apply.
+- File comments (line-level). No public projects. No branching in v1 (linear history is sufficient).
+
+[D] CHAT & CHANNELS (Discord-style text):
+- Spaces have multiple text channels (general, topic-specific, private).
+- DMs (1-on-1) and Group DMs.
+- Message features: Markdown, file/image attachments, emoji reactions, thread replies, pinning, @mentions, link previews, editing/deletion (with "edited" label), read receipts (per-workspace setting).
+- Full-text message search within workspace (channels you have access to).
+- Notification system: in-app, real-time via Socket.io.
+
+[E] VOICE & CALLS (Discord-style persistent audio):
+- Spaces have multiple persistent voice channels (join/leave freely, like Discord).
+- Join and stay indefinitely. Others see who is in a channel and can join.
+- Mute/unmute, deafen, push-to-talk option.
+- Screen sharing (v1). Video toggle (v1, optional).
+- MUSIC / AUDIO SHARING: user in a voice channel can share a music stream (system audio OR link to Spotify/YouTube). All members in the channel hear the same audio. Person can stay alone in channel listening to music and working; others join later without disrupting.
+- Direct voice/video calls via DMs.
+- Call history log. No recording by default (premium feature with all-participant consent).
+
+[F] FILE MANAGEMENT:
+- Shared file library per workspace. Any file type. Folder organisation.
+- In-browser preview (images, PDFs, video, audio).
+- Same FILO version history system. Storage quota: free = 2GB, premium = 50GB+.
+- File permissions: restrict by user/role.
+
+[G] PREMIUM TIER (per workspace, Stripe):
+- Extended version history (beyond 5, configurable or unlimited).
+- Expanded file storage.
+- Call recording (all-participant consent required).
+- Advanced permissions (granular role customisation, per-file).
+- Priority support. Workspace activity analytics.
+- Future: custom domain, API access.
+
+═══════════════════════════════════════════
+WHAT I NEED FROM YOU IN THIS SESSION:
+═══════════════════════════════════════════
+
+1. CONFIRM OR IMPROVE THE TECH STACK
+   - Justify every choice. Flag anything that will create pain at scale.
+   - Specifically address: Yjs vs Automerge for collaborative editing. LiveKit Cloud vs self-hosted mediasoup. Socket.io vs plain WebSocket for this scale. Prisma vs Drizzle for a solo developer.
+
+2. COMPLETE PRISMA DATABASE SCHEMA
+   - Every model, every field, every relation, with inline comments explaining design decisions.
+   - Models required: User, Account, Session, Workspace, WorkspaceMember, Space, Channel, Message, Thread, Note, NoteBlock, NoteVersion, NoteComment, Project, ProjectFile, FileVersion, FileComment, VoiceRoom, VoiceSession, DirectMessage, GroupDM, GroupDMMessage, FileLibraryItem, Notification, Subscription, Feature, WorkspaceFeatureGate.
+   - FILO version history: include the cap enforcement pattern (configurable cap, oldest deleted when new is created).
+   - Soft deletes on all content models (deletedAt: DateTime?).
+   - Timestamps on everything (createdAt, updatedAt).
+
+3. MONOREPO FOLDER STRUCTURE
+   - Full directory tree. File naming conventions. Where shared TypeScript types live.
+   - Recommended: apps/web (Next.js), apps/api (Express), packages/db (Prisma), packages/types (shared TS), packages/utils.
+
+4. ARCHITECTURE DECISION ANSWERS (give opinionated recommendations, no "it depends"):
+   a. Monorepo tool: Turborepo vs Nx vs pnpm workspaces only?
+   b. Yjs CRDT: y-websocket standalone server or integrated into Express?
+   c. LiveKit: Cloud (managed) vs self-hosted — which for a solo developer launching with 28 initial users?
+   d. FILO version history: store full content snapshots or diffs? Which is simpler and more reliable?
+   e. JWT strategy: how to handle refresh token rotation and session invalidation across multiple workspaces?
+   f. Notifications: Socket.io or SSE for in-app push notifications?
+   g. Premium gates: database flag checked per request or middleware-level feature flag service?
+
+5. DEVELOPMENT ENVIRONMENT SETUP
+   - docker-compose.yml for local development (PostgreSQL + Redis (if needed) + LiveKit dev server).
+   - Environment variable structure (.env.example with every required variable documented).
+
+After completing the above, confirm you understand the project fully and tell me what the first implementation task should be (Day 1 Sonnet session: monorepo scaffold + Docker setup). Then we proceed feature by feature, phase by phase.
+
+IMPORTANT CONSTRAINTS TO REMEMBER AT ALL TIMES:
+- I am a solo developer. Complexity is my enemy.
+- The platform is 100% closed. No public anything. Ever.
+- Free tier: 5 version snapshots per file (FILO). Premium: more.
+- Stack must be something I can maintain, debug, and extend alone.
+- Every suggestion must be production-quality, not tutorial-quality.
+- Monorepo. TypeScript throughout. Prisma for all database access.</div>
+  <div class="prompt-expand" onclick="toggleExpand('arch-text', this)">▼ Show full prompt</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- PHASE 1                                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="phase1">
+<div class="phase-header p1">
+  <div>
+    <div class="phase-title">Phase 1 — Foundation</div>
+    <div class="phase-sub">Monorepo · Docker · Database Schema · Auth · Workspace · Basic Notes · Chat · File Upload</div>
+  </div>
+  <div class="phase-meta">
+    <div class="weeks">6</div>
+    <div class="weeks-label">Weeks · Days 1–42</div>
+  </div>
+</div>
+
+<div class="notice tip">
+  <div class="notice-icon">🎯</div>
+  <div><strong>Phase 1 Goal:</strong> By Day 42 you have a fully working auth system, workspace management, a basic note editor, a single text chat channel, and file uploads. Nothing is real-time yet. No fancy editor. Just the core plumbing working end-to-end. This is your minimum deployable foundation.</div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Days</th>
+      <th>Tasks for This Session</th>
+      <th>Model</th>
+      <th>Why This Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="days-col">1–2</td>
+      <td class="tasks-col">
+        <strong>Monorepo scaffold + Docker environment</strong>
+        <ul>
+          <li>Create GitHub repo (nexus) with .gitignore for Node/Next.js</li>
+          <li>Set up pnpm workspaces monorepo: apps/web, apps/api, packages/db, packages/types, packages/utils</li>
+          <li>Install Turborepo, configure turbo.json with build/dev/lint pipelines</li>
+          <li>Create docker-compose.yml: PostgreSQL 15 + pgAdmin + (optional) Redis</li>
+          <li>Add .env.example with all required variables (DATABASE_URL, NEXTAUTH_SECRET, etc.)</li>
+          <li>Verify: pnpm dev starts both Next.js and Express without errors</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Pure scaffolding — mechanical setup tasks. Sonnet builds monorepo boilerplate and Docker configs correctly in 1–2 messages. Opus budget saved for schema design.</td>
+    </tr>
+
+    <tr class="paste-row">
+      <td class="days-col" colspan="4" style="text-align:center;">
+        ⬇ &nbsp;<strong>Window 1 Complete.</strong> Wait for full 5-hour reset. Open <strong>fresh Opus 4.6 session</strong>. Paste the Architecture Prompt above. Save the full Opus output as <code>ARCHITECTURE.md</code> in your repo root. ⬇
+      </td>
+    </tr>
+
+    <tr>
+      <td class="days-col">3–4</td>
+      <td class="tasks-col">
+        <strong>Prisma schema — identity + workspace models</strong>
+        <ul>
+          <li>Initialize Prisma in packages/db. Configure DATABASE_URL.</li>
+          <li>Write models: User, Account, Session (NextAuth compatible), Workspace, WorkspaceMember</li>
+          <li>Add Role enum: OWNER, ADMIN, MEMBER, VIEWER</li>
+          <li>Add soft-delete (deletedAt?) and timestamps (createdAt, updatedAt) to all models</li>
+          <li>Run first migration: prisma migrate dev --name init</li>
+          <li>Write seed.ts: create 1 test workspace, 3 test users with different roles</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Schema design is the architectural foundation. Wrong relations here cause cascading pain for 28 weeks. Opus designs the NextAuth-compatible User/Account/Session structure correctly and enforces the right relation cardinalities.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">5–6</td>
+      <td class="tasks-col">
+        <strong>Prisma schema — content models</strong>
+        <ul>
+          <li>Add models: Space, Channel, Note, NoteVersion, Project, ProjectFile, FileVersion</li>
+          <li>NoteVersion / FileVersion: include FILO cap pattern (cap field on workspace, enforce in API)</li>
+          <li>Add: Message, DirectMessage, GroupDM, GroupDMMessage</li>
+          <li>Add: FileLibraryItem, Folder (for file library organisation)</li>
+          <li>Run migration: prisma migrate dev --name content-models</li>
+          <li>Update seed.ts with sample note + project + message data</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">FILO version history cap enforcement pattern, Note-to-NoteVersion relation design, and the polymorphic Folder structure (used for both notes and file library) all require careful architectural thinking. Sonnet would make naive choices here.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">7–8</td>
+      <td class="tasks-col">
+        <strong>Prisma schema — communication + billing models + full seed</strong>
+        <ul>
+          <li>Add models: VoiceRoom, VoiceSession, Notification, Subscription, WorkspaceFeatureGate</li>
+          <li>Subscription model: link to Stripe customerId, subscriptionId, status, currentPeriodEnd</li>
+          <li>WorkspaceFeatureGate: key-value feature flags per workspace (for premium gating)</li>
+          <li>Final schema review — check all foreign keys, cascade rules, indexes</li>
+          <li>Run migration and update seed to cover all models</li>
+          <li>Confirm: prisma studio shows all tables populated cleanly</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">These models follow patterns already established in Days 3–6. Sonnet fills them in correctly. The Subscription model follows a standard Stripe integration pattern that Sonnet knows well.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">9–10</td>
+      <td class="tasks-col">
+        <strong>NextAuth setup — email/password provider</strong>
+        <ul>
+          <li>Install NextAuth v4 in apps/web. Configure [...nextauth].ts</li>
+          <li>Set up CredentialsProvider with email/password + bcrypt hashing</li>
+          <li>Configure PrismaAdapter for session/account storage</li>
+          <li>Add JWT strategy with session callback (attach userId + workspaceIds to token)</li>
+          <li>Create auth API endpoints: /api/auth/register (POST), links to NextAuth sign-in</li>
+          <li>Test: register → login → session → logout cycle works end-to-end</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">NextAuth with PrismaAdapter and CredentialsProvider is well-documented. Sonnet sets this up correctly in 1–2 messages. Keep the session strategy JWT (not database) for stateless scaling.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">11–12</td>
+      <td class="tasks-col">
+        <strong>Invite system backend</strong>
+        <ul>
+          <li>Design invite token flow: generate signed token (crypto.randomBytes) → store in DB → email link → redeem token → join workspace</li>
+          <li>API: POST /workspaces/:id/invites (generate token, optional email field, expires 7 days)</li>
+          <li>API: GET /invites/:token (validate token, return workspace preview)</li>
+          <li>API: POST /invites/:token/accept (authenticated user joins workspace as MEMBER)</li>
+          <li>Set up Resend (or Nodemailer) for invite email delivery</li>
+          <li>Handle: expired tokens, already-used tokens, already-member edge cases</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">The invite system has multiple security-critical edge cases (token expiry, replay attacks, race conditions on acceptance) and must integrate cleanly with the role system. Opus designs the token flow correctly and handles all edge cases.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">13–14</td>
+      <td class="tasks-col">
+        <strong>Role-based auth middleware</strong>
+        <ul>
+          <li>Build requireAuth middleware: validates JWT session, attaches user to request</li>
+          <li>Build requireWorkspaceMember middleware: checks user is member of target workspace</li>
+          <li>Build requireRole middleware: checks user has minimum required role (VIEWER/MEMBER/ADMIN/OWNER)</li>
+          <li>Apply middleware to all workspace API routes</li>
+          <li>Write tests: verify each role level can/cannot access protected endpoints</li>
+          <li>Add rate limiting middleware (express-rate-limit) to auth endpoints</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Permission middleware design has lasting impact — every API route for the next 20+ weeks depends on it. Opus designs a clean, composable middleware chain that handles workspace-scoped role checks without coupling.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">15–16</td>
+      <td class="tasks-col">
+        <strong>Workspace CRUD APIs + creation UI</strong>
+        <ul>
+          <li>API: POST /workspaces (create workspace, auto-assign creator as OWNER)</li>
+          <li>API: GET /workspaces (list user's workspaces)</li>
+          <li>API: GET /workspaces/:id (workspace detail + members)</li>
+          <li>API: PATCH /workspaces/:id (update name, settings — ADMIN+)</li>
+          <li>Build workspace creation page in Next.js (name, optional description)</li>
+          <li>Build workspace switcher in sidebar navigation</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Standard CRUD with middleware already in place. Sonnet implements REST endpoints and Next.js pages efficiently. Middleware pattern is already established — Sonnet applies it correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">17–18</td>
+      <td class="tasks-col">
+        <strong>Space &amp; Channel CRUD + sidebar UI</strong>
+        <ul>
+          <li>API: CRUD for Space (scoped to workspace). CRUD for Channel (scoped to space).</li>
+          <li>Build left sidebar: workspace name → spaces list → channels within space</li>
+          <li>Sidebar collapses/expands spaces. Active channel highlighted.</li>
+          <li>Create space modal, create channel modal (name, type: TEXT/VOICE)</li>
+          <li>Protect all Space/Channel APIs with requireWorkspaceMember middleware</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Pattern is identical to workspace CRUD. Sonnet handles nested resource APIs and Next.js sidebar components efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">19–22</td>
+      <td class="tasks-col">
+        <strong>Basic note editor + auto-save</strong>
+        <ul>
+          <li>Build simple note editor (single-type contenteditable OR Tiptap basic setup — no blocks yet)</li>
+          <li>Goal: users can create notes, type text, and save. Styling and block types come in Phase 2.</li>
+          <li>Implement debounced auto-save: save 2 seconds after last keystroke</li>
+          <li>API: POST /notes (create note in space), PATCH /notes/:id (update content), GET /notes/:id</li>
+          <li>Optimistic UI update: note saves silently, show "Saving…" / "Saved" indicator</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Basic editor is intentionally simple in Phase 1. Sonnet builds a functional Tiptap or contenteditable editor quickly. The full block-based rich editor is a Phase 2 Opus architecture task — do not scope-creep here.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">23–24</td>
+      <td class="tasks-col">
+        <strong>Folder tree UI</strong>
+        <ul>
+          <li>Build nested folder sidebar for notes (left panel): folders + notes in tree view</li>
+          <li>API: CRUD for Folder (parent/child nesting). Notes can be in a folder or at root.</li>
+          <li>Drag-and-drop reorder (react-beautiful-dnd or dnd-kit)</li>
+          <li>Emoji picker for folder/note icons (emoji-mart or similar)</li>
+          <li>Collapse/expand folders. Keyboard navigation (arrow keys).</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Tree UI with drag-and-drop is standard React component work. Sonnet builds this efficiently once the Folder data model is in place from the Opus schema.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">25–26</td>
+      <td class="tasks-col">
+        <strong>Basic text chat (REST, no real-time yet)</strong>
+        <ul>
+          <li>API: POST /channels/:id/messages (send message — text only for now)</li>
+          <li>API: GET /channels/:id/messages (paginated, cursor-based, newest first)</li>
+          <li>Build chat UI: message list, message input, send button</li>
+          <li>Poll for new messages every 3 seconds (temporary — Socket.io comes in Phase 3)</li>
+          <li>Display sender name, avatar initials, timestamp</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Polling chat is intentionally simple. Real-time via Socket.io comes in Phase 3. Sonnet builds REST chat + polling cleanly. Cursor-based pagination pattern is important to get right — tell Sonnet to use cursor (not offset) pagination.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">27–28</td>
+      <td class="tasks-col">
+        <strong>File upload to Cloudflare R2 / S3</strong>
+        <ul>
+          <li>Set up R2 bucket + AWS SDK v3 (R2 is S3-compatible)</li>
+          <li>API: POST /files/upload-url → generate presigned PUT URL (5 min expiry)</li>
+          <li>API: POST /files/confirm → client confirms upload complete, creates FileLibraryItem record</li>
+          <li>API: GET /files/:id → generate presigned GET URL (private, 1 hour expiry)</li>
+          <li>Implement file type validation + size limits server-side</li>
+          <li>Add upload UI: drag-and-drop zone + file picker, progress bar</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Presigned URL pattern for S3/R2 is well-documented. Sonnet implements this correctly. Critical: presigned URLs keep files private — never expose direct bucket URLs to the client.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">29–30</td>
+      <td class="tasks-col">
+        <strong>File library UI + user/workspace settings</strong>
+        <ul>
+          <li>Build file library page: grid/list view of uploaded files, folder navigation</li>
+          <li>File preview modal (images inline, PDF iframe, audio player, video player)</li>
+          <li>Build user settings page: name, email, password change</li>
+          <li>Build workspace settings page: name, invite link management, member list + role change</li>
+          <li>Add member remove functionality (ADMIN+ only)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Standard CRUD UI pages. Sonnet handles settings forms and file grid/list components efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">31–36</td>
+      <td class="tasks-col">
+        <strong>End-to-end testing + Phase 1 bug fixes</strong>
+        <ul>
+          <li>Manual end-to-end flow: register → create workspace → invite user → create space → create channel → write note → upload file → send message</li>
+          <li>Write Jest unit tests for: auth middleware, invite token validation, FILO cap logic (mocked), file upload URL generation</li>
+          <li>Write Playwright (or Cypress) E2E tests for: login flow, workspace creation, note creation</li>
+          <li>Fix all bugs found. Run ESLint + TypeScript check (tsc --noEmit) — zero errors required before Phase 2.</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Test writing and bug fixing is Sonnet territory. The bug descriptions you paste will be specific enough for Sonnet to fix without architectural reasoning.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">37–42</td>
+      <td class="tasks-col">
+        <strong>Responsive UI polish + Phase 1 completion audit</strong>
+        <ul>
+          <li>Audit all pages on mobile (375px) and tablet (768px) — fix layout breaks</li>
+          <li>Add loading states and empty states to all list views</li>
+          <li>Add toast notifications for user actions (file uploaded, note saved, invite sent)</li>
+          <li>Review all API error responses — return consistent {error, code, message} format</li>
+          <li>Add API versioning prefix: /api/v1/</li>
+          <li>Final commit: tag as v0.1.0-phase1-complete</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">UI polish and error handling standardisation is mechanical. Sonnet handles responsive CSS fixes and toast notification integration efficiently.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Phase 1 Context Snippet</span>
+      <span class="prompt-tag">ADD TO SESSIONS THAT NEED EXTRA CONTEXT</span>
+    </div>
+    <button class="copy-btn" id="btn-p1ctx" onclick="copyPrompt('p1ctx-text','btn-p1ctx')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy
+    </button>
+  </div>
+  <div class="prompt-body" id="p1ctx-text">Phase 1 context: We are building the foundation layer of Nexus. No real-time features yet (Socket.io comes in Phase 3). No block-based rich editor yet (comes in Phase 2). The priority is correct data models, clean auth, working invite flow, basic CRUD for all entities, file uploads via presigned URLs, and a deployable development environment. Keep implementations simple and correct — no premature optimisation.</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- PHASE 2                                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="phase2">
+<div class="phase-header p2">
+  <div>
+    <div class="phase-title">Phase 2 — Core Features</div>
+    <div class="phase-sub">Rich Editor · Version History · Monaco Code Editor · Multi-Channel Chat · DMs · Roles</div>
+  </div>
+  <div class="phase-meta">
+    <div class="weeks" style="color:var(--p2);">8</div>
+    <div class="weeks-label">Weeks · Days 43–98</div>
+  </div>
+</div>
+
+<div class="notice tip">
+  <div class="notice-icon">🎯</div>
+  <div><strong>Phase 2 Goal:</strong> By Day 98 Nexus has a full Notion-quality rich editor with FILO version history, a working code editor with file versioning, multi-channel chat with threads and reactions, DMs, and a complete role/permission system. This is the product's core value — take no shortcuts here.</div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Days</th>
+      <th>Tasks for This Session</th>
+      <th>Model</th>
+      <th>Why This Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="days-col">43–46</td>
+      <td class="tasks-col">
+        <strong>Block editor architecture design</strong>
+        <ul>
+          <li>Design the block-based editor component architecture: block types registry, block renderer, block insertion/deletion/reorder engine</li>
+          <li>Decide: build on Tiptap (extension-based) or BlockNote (Notion-like OSS) — get Opus recommendation</li>
+          <li>Define all block types: paragraph, H1/H2/H3, bulletList, numberedList, checklist, quote, divider, callout, codeBlock, table, toggle, image, file embed</li>
+          <li>Design the JSON storage format for block content in the database</li>
+          <li>Scaffold: BlockEditor component shell + block type registry + keyboard shortcut framework</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">Block editor architecture is the most complex UI decision in the project. The storage format, block type system, and extension architecture must be designed correctly — a wrong choice here causes a full rewrite. Opus evaluates Tiptap vs BlockNote correctly for this use case.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">47–52</td>
+      <td class="tasks-col">
+        <strong>Rich block types — text formatting blocks</strong>
+        <ul>
+          <li>Implement: paragraph, H1/H2/H3, bullet list, numbered list, checklist (with check toggle), blockquote, horizontal divider, callout (with icon + colour variants)</li>
+          <li>Keyboard shortcuts: ## + space → H2, - + space → bullet, [] + space → checklist, &gt; + space → quote</li>
+          <li>Slash command menu (/) to insert any block type</li>
+          <li>Drag handles to reorder blocks</li>
+          <li>Toolbar: bold, italic, underline, strikethrough, inline code, link</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Implementation follows the architecture designed in Days 43–46. With the blueprint from Opus, Sonnet implements each block type extension efficiently. Paste the Opus architecture output at the start of this session.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">53–56</td>
+      <td class="tasks-col">
+        <strong>Rich block types — media and structural blocks</strong>
+        <ul>
+          <li>Implement: syntax-highlighted code block (using Prism or Shiki), resizable table, collapsible toggle/accordion, inline image (upload to R2, display inline), file embed block</li>
+          <li>Code block: language selector dropdown (50+ languages), copy button, line numbers toggle</li>
+          <li>Table: add/remove rows and columns, cell formatting</li>
+          <li>All new block types registered in the slash command menu</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Additional block types follow the same extension pattern. Sonnet handles Prism/Shiki integration and table component efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">57–62</td>
+      <td class="tasks-col">
+        <strong>Note version history — FILO backend</strong>
+        <ul>
+          <li>Implement snapshot creation: every auto-save triggers a createNoteVersion() call</li>
+          <li>FILO enforcement: after insert, count versions for this note. If count &gt; workspace.snapshotLimit (default 5), delete the oldest.</li>
+          <li>Use Prisma transaction: insert new version + conditional delete in one atomic operation</li>
+          <li>API: GET /notes/:id/versions → list snapshots (id, createdAt, authorName, contentPreview)</li>
+          <li>API: GET /notes/:id/versions/:vid → full snapshot content</li>
+          <li>API: POST /notes/:id/versions/:vid/restore → replace current note content with snapshot</li>
+          <li>Diff generation: implement or use a diff library (diff, jsdiff) to show what changed between two snapshots</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">FILO version history is the core monetisation differentiator. The atomic Prisma transaction (insert + conditional delete), diff algorithm selection, and the content format for snapshots all require careful architecture. A race condition here corrupts version history silently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">63–64</td>
+      <td class="tasks-col">
+        <strong>Version history UI</strong>
+        <ul>
+          <li>Version history panel: slide-in sidebar showing list of snapshots (date, time, author)</li>
+          <li>Click snapshot: show full preview of that version in a read-only editor pane</li>
+          <li>Diff view: side-by-side or inline diff highlighting additions/deletions</li>
+          <li>Restore button: with confirmation dialog ("This will replace current content")</li>
+          <li>Premium prompt: show "Upgrade to Premium" when user has hit the 5-snapshot limit</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">UI panel and diff viewer components are standard React work. The backend is done — Sonnet wires the frontend to the APIs correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">65–68</td>
+      <td class="tasks-col">
+        <strong>Project module — backend APIs</strong>
+        <ul>
+          <li>API: CRUD for Project (name, description, README content). Auto-render README as Markdown.</li>
+          <li>API: GET /projects/:id/tree → full file + folder tree structure</li>
+          <li>API: POST /projects/:id/files (upload file to project via R2 presigned URL)</li>
+          <li>API: GET /projects/:id/files/:fid/content → file content (text files returned as string, binary as presigned download URL)</li>
+          <li>API: PATCH /projects/:id/files/:fid (update file content — creates new FileVersion, FILO enforced)</li>
+          <li>API: GET /projects/:id/activity → change log (all FileVersion events, sorted newest first)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Project module API design is complex: the file tree API must handle nested folders efficiently, the content API must distinguish text vs binary files correctly, and FILO enforcement must mirror the Note version history pattern exactly. Opus ensures consistency across both systems.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">69–72</td>
+      <td class="tasks-col">
+        <strong>In-browser code editor (Monaco)</strong>
+        <ul>
+          <li>Integrate @monaco-editor/react for in-browser code editing</li>
+          <li>Load file content into Monaco from /projects/:id/files/:fid/content</li>
+          <li>Language auto-detection from file extension (use Monaco's built-in language map)</li>
+          <li>Save button: PATCH file content → triggers FileVersion creation (FILO enforced)</li>
+          <li>Add "Save" keyboard shortcut (Cmd/Ctrl+S)</li>
+          <li>Show unsaved changes indicator in tab title ("● filename.py")</li>
+          <li>Monaco theme: dark theme matching Nexus design (use vs-dark or custom)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Monaco Editor React integration is well-documented. Sonnet wires it to the existing file APIs correctly. Language detection from extension + VS Code dark theme are standard Monaco configs.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">73–76</td>
+      <td class="tasks-col">
+        <strong>Project version history UI + activity feed</strong>
+        <ul>
+          <li>File version history panel (same pattern as note version history UI)</li>
+          <li>For text files: show syntax-highlighted diff between versions</li>
+          <li>Activity feed page: chronological list of all project changes (file created/modified/deleted, by whom, when)</li>
+          <li>Activity feed entry: author avatar, action description, file name, relative timestamp</li>
+          <li>Review/Approval toggle UI: when enabled, changes show as "Pending Review" until approved by ADMIN+</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">UI mirrors the note version history pattern. Sonnet builds it efficiently by following the established component structure.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">77–82</td>
+      <td class="tasks-col">
+        <strong>Multi-channel chat — reactions, threads, pinning</strong>
+        <ul>
+          <li>Upgrade existing chat: add emoji reactions (click + to add, click existing to toggle)</li>
+          <li>API: POST /messages/:id/reactions, DELETE /messages/:id/reactions/:emoji</li>
+          <li>Thread replies: reply to any message opens a thread panel on the right</li>
+          <li>API: GET /messages/:id/thread (get replies), POST /messages/:id/thread (post reply)</li>
+          <li>Message pinning: PIN icon on hover, pinned messages visible in channel header pins panel</li>
+          <li>Message editing (pencil icon on hover) + deletion (with "Message deleted" placeholder)</li>
+          <li>Link preview: on message save, fetch OG tags for URLs and store preview data</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Each of these chat features follows established patterns (emoji reactions, thread panels, pin lists). Sonnet handles them efficiently. Do one feature per session — do not mix reactions + threads + pinning in one chat.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">83–88</td>
+      <td class="tasks-col">
+        <strong>Direct Messages + Group DMs + @mentions</strong>
+        <ul>
+          <li>DM: open DM conversation with any workspace member (create DirectMessage record if first DM)</li>
+          <li>DM list in sidebar: sorted by most recent message, unread count badge</li>
+          <li>Group DM: create a group chat with 2+ selected members (GroupDM + GroupDMMessage)</li>
+          <li>@mention: typing @ in message input opens member dropdown. Inserting mention adds @username markup. Mentioned user gets notification.</li>
+          <li>@everyone: only ADMIN+ can use @everyone in a channel</li>
+          <li>Message search: POST /workspaces/:id/search/messages with full-text query (PostgreSQL tsvector)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">DMs and Group DMs are standard features with clear data models from the Opus schema. @mention parsing with PostgreSQL full-text search are Sonnet-level implementations.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">89–94</td>
+      <td class="tasks-col">
+        <strong>Granular roles &amp; permissions system</strong>
+        <ul>
+          <li>Extend role system: workspace-level roles (OWNER/ADMIN/MEMBER/VIEWER) + space-level role overrides</li>
+          <li>API: PATCH /workspaces/:id/members/:uid/role (change workspace role — OWNER only)</li>
+          <li>API: POST /spaces/:id/permissions (set per-user role override for a specific space)</li>
+          <li>Per-project access: project can be restricted to specific members (not all workspace members)</li>
+          <li>Viewer role enforcement: viewers cannot send messages, edit notes, or modify project files</li>
+          <li>UI: workspace settings → Members tab → role dropdown per member</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Permission system expansion with space-level overrides and per-project access control introduces complexity that must not break existing middleware. Opus designs the permission resolution order (workspace role → space override → project override) correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">95–98</td>
+      <td class="tasks-col">
+        <strong>Phase 2 integration testing + bug fixes</strong>
+        <ul>
+          <li>Full flow test: create project → add files → edit in Monaco → check version history → restore snapshot</li>
+          <li>Full flow test: create note → write blocks → auto-save → check version history → diff view → restore</li>
+          <li>Full flow test: create channels → send messages → react → reply in thread → DM a member → search for message</li>
+          <li>Verify FILO cap: create 7 versions, confirm only 5 remain, confirm oldest was deleted (not newest)</li>
+          <li>Verify role enforcement: VIEWER cannot edit note or send message</li>
+          <li>Tag: v0.2.0-phase2-complete</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Integration testing and targeted bug fixes. Paste specific bug descriptions to Sonnet for efficient fixes.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Phase 2 Context Snippet</span>
+      <span class="prompt-tag">ADD TO SESSIONS AS NEEDED</span>
+    </div>
+    <button class="copy-btn" id="btn-p2ctx" onclick="copyPrompt('p2ctx-text','btn-p2ctx')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy
+    </button>
+  </div>
+  <div class="prompt-body" id="p2ctx-text">Phase 2 context: We are implementing Nexus's core features. The block editor should follow the architecture designed in the Phase 2 Day 43–46 Opus session (saved as ARCHITECTURE.md). FILO version history pattern is the same for both Notes and Projects: insert snapshot, count total, if count > snapshotLimit delete the oldest using a Prisma transaction. The note editor uses JSON block format. Real-time collaborative editing (Yjs) is NOT yet implemented — that is Phase 3. Current saves are single-user sequential.</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- PHASE 3                                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="phase3">
+<div class="phase-header p3">
+  <div>
+    <div class="phase-title">Phase 3 — Real-Time &amp; Communication</div>
+    <div class="phase-sub">Socket.io · Yjs CRDT Collaborative Editing · LiveKit Voice · Screen Share · Music Sharing</div>
+  </div>
+  <div class="phase-meta">
+    <div class="weeks" style="color:var(--p3);">8</div>
+    <div class="weeks-label">Weeks · Days 99–154</div>
+  </div>
+</div>
+
+<div class="notice warning">
+  <div class="notice-icon">⚠️</div>
+  <div><strong>Highest complexity phase.</strong> Phase 3 contains the three hardest technical problems in the entire project: Yjs CRDT integration (Days 107–114), LiveKit server architecture (Days 119–122), and audio sharing (Days 131–134). All three are Opus sessions that must start at the beginning of a fresh 5-hour window. Never attempt these at the end of a depleted session.</div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Days</th>
+      <th>Tasks for This Session</th>
+      <th>Model</th>
+      <th>Why This Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="days-col">99–102</td>
+      <td class="tasks-col">
+        <strong>Socket.io server architecture</strong>
+        <ul>
+          <li>Design Socket.io namespace structure: /chat, /presence, /notifications (separate namespaces for clean isolation)</li>
+          <li>Implement Socket.io server in apps/api with auth middleware (validate JWT on connection)</li>
+          <li>Room management: users join workspace rooms (ws:{workspaceId}) and channel rooms (ch:{channelId}) on connection</li>
+          <li>Connection lifecycle: join rooms on connect, clean up on disconnect, update presence status</li>
+          <li>Design event naming conventions (consistent snake_case: message:new, user:typing, channel:update)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">Socket.io namespace architecture and JWT-authenticated connection middleware design affects every real-time feature for the rest of the project. Getting room management wrong causes messages leaking across workspaces — a critical security issue. Opus designs this correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">103–106</td>
+      <td class="tasks-col">
+        <strong>Real-time chat integration</strong>
+        <ul>
+          <li>Replace polling (3s interval) with Socket.io event listeners on the frontend</li>
+          <li>Emit message:new when message is saved to DB. All channel room members receive it instantly.</li>
+          <li>Implement typing indicators: emit user:typing on keypress, clear after 2s inactivity</li>
+          <li>Show "X is typing…" at bottom of channel when active</li>
+          <li>Presence: show green dot on online members in sidebar (ws:{workspaceId} room member list)</li>
+          <li>Read receipts: emit message:read on scroll-into-view (optional per workspace setting)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Socket.io event integration follows the architecture from Days 99–102. Sonnet wires emit/on events to existing chat UI and APIs. The hard architecture is done — this is connection work.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">107–110</td>
+      <td class="tasks-col">
+        <strong>Yjs CRDT setup — server + provider</strong>
+        <ul>
+          <li>Set up y-websocket standalone server (separate process in apps/collab or integrated into apps/api)</li>
+          <li>Configure Yjs document persistence: store Doc updates to PostgreSQL (y-leveldb or custom persistence provider) so document state survives server restarts</li>
+          <li>Set up Y.Doc, Y.Map (for metadata) and Y.XmlFragment (for editor content) data structures</li>
+          <li>Implement room-based document isolation: each note gets its own Yjs room (note:{noteId})</li>
+          <li>Add auth middleware to y-websocket: validate JWT before allowing connection to a room</li>
+          <li>Test: two browser tabs editing the same note — changes sync in &lt;100ms</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">Yjs CRDT server setup with persistence and auth middleware is the technically deepest session in Phase 3. Y.Doc persistence strategy (what to store, how to snapshot, GC settings) and the auth layer for y-websocket have non-obvious pitfalls. Opus handles these correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">111–114</td>
+      <td class="tasks-col">
+        <strong>Yjs + block editor integration</strong>
+        <ul>
+          <li>Install and configure the Yjs provider for your editor (Tiptap: @tiptap/extension-collaboration + @tiptap/extension-collaboration-cursor OR BlockNote's native Yjs support)</li>
+          <li>Replace auto-save (debounced REST) with Yjs-driven sync: Yjs handles real-time merging, REST save becomes periodic snapshot creation (every 30s or on idle)</li>
+          <li>Implement presence cursors: each user's cursor shows their name + a unique colour using Yjs awareness protocol</li>
+          <li>Test multi-user: 3 simultaneous editors — all cursors visible, all edits merge without conflict</li>
+          <li>Verify: offline edit then reconnect — changes merge correctly without data loss</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Integrating Yjs awareness (cursors) with the block editor and migrating from auto-save to Yjs-driven persistence requires understanding of both Yjs and the block editor internals. Opus handles the integration layer correctly. Do not switch to Sonnet if issues arise — diagnostic context is critical.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">115–118</td>
+      <td class="tasks-col">
+        <strong>Presence indicators + online status</strong>
+        <ul>
+          <li>Track which users are currently viewing each note (Yjs awareness or Socket.io presence room)</li>
+          <li>Show avatar stack at top of note: "3 people viewing this note"</li>
+          <li>Workspace-level presence: show online/away/offline status in sidebar member list</li>
+          <li>Last-seen timestamp for offline members</li>
+          <li>Heartbeat mechanism: client pings server every 30s to maintain "online" status. No ping in 60s = "away".</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Presence indicators build on the Yjs awareness and Socket.io infrastructure already established. Sonnet wires presence events to UI components efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">119–122</td>
+      <td class="tasks-col">
+        <strong>LiveKit server setup + voice channel architecture</strong>
+        <ul>
+          <li>Decision: LiveKit Cloud (managed) vs self-hosted — Opus to confirm best choice for 28–200 users on solo-dev budget</li>
+          <li>Set up LiveKit server (or configure LiveKit Cloud account + API keys)</li>
+          <li>API: POST /voice-rooms/:id/token → generate LiveKit access token (signed with API secret) for joining a specific room</li>
+          <li>LiveKit room naming: voice-{workspaceId}-{channelId} (persistent room, not ephemeral)</li>
+          <li>Implement participant webhook: LiveKit calls back when participant joins/leaves — update VoiceRoom.participants in DB</li>
+          <li>API: GET /channels/:id/voice-status → current participants in voice channel</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">LiveKit architecture (token generation, room naming strategy, webhook handling, persistent vs ephemeral rooms) is complex and must be designed correctly upfront. Wrong room naming = users in wrong channels. Incorrect webhook handling = stale participant data. Opus handles this.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">123–126</td>
+      <td class="tasks-col">
+        <strong>Voice channel UI</strong>
+        <ul>
+          <li>Install @livekit/components-react. Render LiveKit room in voice channel panel.</li>
+          <li>Voice channel entry in sidebar: shows current participant count + avatars when occupied</li>
+          <li>Click channel → join the LiveKit room (request token → connect)</li>
+          <li>In-call UI: participant tiles (audio-only: avatar + name + speaking indicator), mute button, deafen button, leave button</li>
+          <li>Persistent presence: after joining, user stays in channel until explicitly leaving (page navigation does NOT disconnect)</li>
+          <li>Show "You are in a voice channel" persistent footer bar when connected</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">LiveKit React components handle most of the WebRTC complexity. Sonnet integrates @livekit/components-react and builds the channel UI correctly once the token API is in place.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">127–130</td>
+      <td class="tasks-col">
+        <strong>Screen sharing</strong>
+        <ul>
+          <li>Add "Share Screen" button to in-call UI footer</li>
+          <li>Use LiveKit's screen share track: room.localParticipant.setScreenShareEnabled(true)</li>
+          <li>Show screen share tile in channel: screen share displays as large video tile, other participants as smaller tiles</li>
+          <li>Only one active screen share at a time per channel (enforce via LiveKit room config: maxParticipants screen share = 1)</li>
+          <li>Stop sharing: button to end screen share track</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">LiveKit screen share is a built-in track type. Sonnet wires it to the existing room setup correctly. The tile layout adjustment (screen share = large, participants = small) is a standard LiveKit UI pattern.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">131–134</td>
+      <td class="tasks-col">
+        <strong>Audio/music sharing in voice channels</strong>
+        <ul>
+          <li>Design the audio sharing mechanism: user clicks "Share Audio" → browser requests system audio capture (getDisplayMedia with audio:true, video:false)</li>
+          <li>Create a custom LiveKit audio track from the captured system audio stream and publish it to the room</li>
+          <li>All channel participants receive this audio track and hear the music</li>
+          <li>Alternative path: user pastes a YouTube URL → server fetches audio stream → re-broadcasts (evaluate feasibility vs complexity with Opus)</li>
+          <li>Show "🎵 Music playing" indicator in channel when audio is being shared</li>
+          <li>Solo mode: user can join channel alone and share audio — no one else needs to be present</li>
+          <li>Late joiners: when someone joins an active audio-sharing channel, they immediately hear the current audio</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Audio sharing via getDisplayMedia + LiveKit custom track has browser permission model nuances and cross-platform behaviour differences. The YouTube URL alternative requires server-side stream handling evaluation. Opus designs the most reliable approach for a solo developer and handles the late-joiner sync problem.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">135–138</td>
+      <td class="tasks-col">
+        <strong>Direct voice/video calls + call history</strong>
+        <ul>
+          <li>DM call: "Call" button in DM panel → POST /calls/initiate (create ephemeral LiveKit room dm:{userId1}-{userId2}) → send call notification to recipient via Socket.io</li>
+          <li>Incoming call modal: accept/decline. Accept = recipient requests LiveKit token and joins room.</li>
+          <li>In-call: video toggle (camera on/off), mute, end call</li>
+          <li>On end call: both users leave room, LiveKit room is cleaned up</li>
+          <li>API: GET /workspaces/:id/call-history → list past calls (participants, duration, timestamp)</li>
+          <li>Log call events via LiveKit webhook (participant joined/left + timestamps)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Direct call flow follows established LiveKit token pattern. Socket.io notification for incoming call uses the notification infrastructure. Sonnet wires these together correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">139–142</td>
+      <td class="tasks-col">
+        <strong>In-app notification system</strong>
+        <ul>
+          <li>Notification types: message:mention, message:thread_reply, note:comment, invite:received, call:incoming, workspace:member_joined</li>
+          <li>API: GET /notifications (paginated, unread first), PATCH /notifications/:id/read, PATCH /notifications/read-all</li>
+          <li>Socket.io delivery: emit notification:new to user's personal room (user:{userId}) on any notification event</li>
+          <li>Notification bell in top nav: shows unread count badge</li>
+          <li>Notification panel: dropdown list of recent notifications with action links</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Notification system follows a clear event-driven pattern using Socket.io infrastructure already in place. Sonnet implements the API and UI components efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">143–146</td>
+      <td class="tasks-col">
+        <strong>Real-time performance optimisation</strong>
+        <ul>
+          <li>Socket.io throttling: implement throttle on typing indicator events (max 1 emit per 500ms per user)</li>
+          <li>Yjs garbage collection: configure Yjs GC settings to prevent unbounded document growth</li>
+          <li>Yjs persistence: implement periodic snapshot (every 100 updates) to keep document update log manageable</li>
+          <li>Socket.io horizontal scaling: evaluate if Redis adapter is needed (add if deploying multiple API instances)</li>
+          <li>Connection limits: set max Socket.io connections per server instance, plan for LiveKit participant limits</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Yjs GC configuration and Socket.io horizontal scaling decisions (Redis adapter timing) require understanding of production real-time system behaviour. Getting Yjs GC wrong causes memory leaks that only appear under load. Opus makes the correct call on Redis adapter necessity.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">147–154</td>
+      <td class="tasks-col">
+        <strong>Phase 3 load testing + integration testing</strong>
+        <ul>
+          <li>Simulate 28 concurrent Socket.io connections (your initial user group) — verify no dropped events</li>
+          <li>Simulate 3 concurrent Yjs editors on the same document — verify no data loss</li>
+          <li>Simulate 5 people in a LiveKit voice channel + 1 screen share + 1 audio share — verify audio quality</li>
+          <li>Fix any race conditions, memory leaks, or dropped events found</li>
+          <li>Verify: all real-time features work after server restart (persistence check)</li>
+          <li>Tag: v0.3.0-phase3-complete</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Load testing setup and targeted fixes. If a real-time bug is non-obvious, escalate that specific session to Opus with the full error context.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Phase 3 Context Snippet</span>
+      <span class="prompt-tag">HIGH IMPORTANCE — PASTE FOR ALL PHASE 3 SESSIONS</span>
+    </div>
+    <button class="copy-btn" id="btn-p3ctx" onclick="copyPrompt('p3ctx-text','btn-p3ctx')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy
+    </button>
+  </div>
+  <div class="prompt-body" id="p3ctx-text">Phase 3 context: We are implementing all real-time features. Socket.io architecture (namespaces: /chat, /presence, /notifications; room naming: ws:{workspaceId}, ch:{channelId}, user:{userId}) was designed in Days 99–102. Yjs setup uses y-websocket with PostgreSQL persistence, Yjs room naming: note:{noteId}. LiveKit is used for all voice/video (NOT mediasoup, NOT Agora). LiveKit room naming: voice-{workspaceId}-{channelId} for persistent voice channels, dm-{userId1}-{userId2} for direct calls. All real-time connections require JWT authentication. Block editor is using [Tiptap/BlockNote — fill in your actual choice] with Yjs collaboration extensions.</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- PHASE 4                                                                 -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="phase4">
+<div class="phase-header p4">
+  <div>
+    <div class="phase-title">Phase 4 — Premium &amp; Polish</div>
+    <div class="phase-sub">Stripe Billing · Feature Gates · Security Audit · Performance · Deployment · Launch</div>
+  </div>
+  <div class="phase-meta">
+    <div class="weeks" style="color:var(--p4);">6</div>
+    <div class="weeks-label">Weeks · Days 155–196</div>
+  </div>
+</div>
+
+<div class="notice tip">
+  <div class="notice-icon">🎯</div>
+  <div><strong>Phase 4 Goal:</strong> By Day 196 Nexus is live on the internet, secured, paying subscriptions working, premium gates enforced, and polished enough to share with your first 28 users. This phase cannot be rushed — security and billing correctness directly affect trust and revenue.</div>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Days</th>
+      <th>Tasks for This Session</th>
+      <th>Model</th>
+      <th>Why This Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="days-col">155–158</td>
+      <td class="tasks-col">
+        <strong>Stripe subscription architecture</strong>
+        <ul>
+          <li>Design per-workspace billing model: one Stripe Customer per workspace (not per user)</li>
+          <li>Create Stripe products: Nexus Free, Nexus Premium (monthly + annual prices)</li>
+          <li>API: POST /workspaces/:id/billing/checkout → create Stripe Checkout session, redirect to Stripe</li>
+          <li>API: GET /workspaces/:id/billing/portal → create Stripe Customer Portal session (manage/cancel subscription)</li>
+          <li>Store in Workspace: stripeCustomerId, stripeSubscriptionId, plan (FREE/PREMIUM), subscriptionStatus, currentPeriodEnd</li>
+          <li>Implement FILO cap update: when workspace upgrades to Premium, update snapshotLimit field</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">Stripe billing architecture decisions (per-workspace vs per-user, Checkout vs Elements, how subscription status maps to feature access) have long-term revenue implications. Opus designs the correct data model and idempotent checkout flow that handles upgrade/downgrade/cancellation correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">159–162</td>
+      <td class="tasks-col">
+        <strong>Stripe webhooks</strong>
+        <ul>
+          <li>POST /webhooks/stripe endpoint: verify Stripe signature (stripe.webhooks.constructEvent)</li>
+          <li>Handle: checkout.session.completed → activate subscription, update workspace.plan = PREMIUM</li>
+          <li>Handle: customer.subscription.updated → update plan status, currentPeriodEnd</li>
+          <li>Handle: customer.subscription.deleted → downgrade workspace to FREE, reset snapshotLimit to 5</li>
+          <li>Handle: invoice.payment_failed → mark subscriptionStatus = PAST_DUE, show warning banner to workspace owner</li>
+          <li>Make webhook handler idempotent: check if event already processed before applying changes</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Webhook event handling follows standard Stripe patterns. Sonnet implements event handlers correctly. The Stripe signature verification and idempotency key pattern are well-documented for Sonnet.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">163–166</td>
+      <td class="tasks-col">
+        <strong>Premium feature gates</strong>
+        <ul>
+          <li>Design: middleware-based gate using WorkspaceFeatureGate table (key: 'extendedVersionHistory', 'expandedStorage', 'callRecording', etc.)</li>
+          <li>requirePremium(featureKey) middleware: checks workspace.plan === PREMIUM and feature gate is active</li>
+          <li>Apply to: extended history endpoints, file upload when over 2GB, call recording start</li>
+          <li>Frontend gate: useFeatureGate(key) hook — show upgrade prompt when feature is gated</li>
+          <li>Upgrade prompt component: explain what premium unlocks + link to Stripe checkout</li>
+          <li>Graceful downgrade: when subscription lapses, old versions (beyond 5) are hidden but not deleted (30-day grace period)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">Feature gate architecture (middleware vs database flags vs hardcoded plan checks) and the graceful downgrade strategy (hide vs delete) are design decisions that affect user trust and data retention policy. Opus makes the correct call on each.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">167–170</td>
+      <td class="tasks-col">
+        <strong>Extended version history for Premium</strong>
+        <ul>
+          <li>Premium workspace settings page: allow owner to configure snapshotLimit (10, 25, 50, 100, or unlimited)</li>
+          <li>API: PATCH /workspaces/:id/settings → update snapshotLimit (Premium only)</li>
+          <li>When limit is changed: do NOT retroactively delete existing snapshots beyond old cap</li>
+          <li>Storage monitoring: add fileStorageUsed counter to Workspace, increment on upload, decrement on delete</li>
+          <li>Block file uploads when workspace exceeds storage quota (2GB free, 50GB premium)</li>
+          <li>Storage usage display in workspace settings</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Extends existing FILO system with configurable limits. Sonnet implements storage counters and settings UI efficiently following patterns already established.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">171–174</td>
+      <td class="tasks-col">
+        <strong>Advanced permissions (Premium)</strong>
+        <ul>
+          <li>Granular role customisation: workspace owner can create custom roles with specific permission sets</li>
+          <li>Per-file permissions: note/project file can be restricted to specific users, overriding space-level permissions</li>
+          <li>UI: Advanced Permissions panel in workspace settings (Premium users only)</li>
+          <li>API: POST /workspaces/:id/roles (create custom role), PATCH /workspaces/:id/roles/:rid (update permissions)</li>
+          <li>Guest access: invite a user as VIEWER to a specific space without granting workspace membership</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Extends existing role system with custom roles. Sonnet follows the permission model architecture from Phase 2 Days 89–94.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">175–178</td>
+      <td class="tasks-col">
+        <strong>Security audit</strong>
+        <ul>
+          <li>XSS: audit all user-generated content rendering — ensure no dangerouslySetInnerHTML with unsanitised input anywhere. Use DOMPurify for any HTML rendering.</li>
+          <li>CSRF: verify NextAuth CSRF protection is active. Add CSRF tokens to all state-changing API calls.</li>
+          <li>SQL injection: verify all database queries go through Prisma (no raw SQL without parameterisation)</li>
+          <li>Rate limiting: apply express-rate-limit to all APIs. Stricter limits on auth endpoints (5 req/min).</li>
+          <li>File upload security: validate MIME type server-side (not just extension), scan for malicious content, enforce size limits</li>
+          <li>Input validation: add Zod schemas to every API endpoint body</li>
+          <li>Secrets audit: verify no API keys or secrets in git history (use git-secrets or trufflehog)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span> <span class="badge badge-fresh">FRESH WINDOW</span></td>
+      <td class="why-col">Security audit requires systematic, comprehensive reasoning across the entire codebase. Opus produces an actionable security checklist and can reason about attack vectors (stored XSS via rich editor blocks, SSRF via link preview fetcher, insecure presigned URL scope). Sonnet would miss subtle issues.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">179–182</td>
+      <td class="tasks-col">
+        <strong>JWT hardening + session management</strong>
+        <ul>
+          <li>Implement refresh token rotation: issue short-lived access tokens (15min) + long-lived refresh tokens (30 days)</li>
+          <li>Store refresh tokens in DB (hashed). Invalidate on use (rotation). Previous token invalid after rotation.</li>
+          <li>Session revocation: "Log out all devices" endpoint — delete all refresh tokens for user</li>
+          <li>Workspace removal: when user is removed from workspace, invalidate any workspace-scoped session data</li>
+          <li>Suspicious activity: detect concurrent use of same refresh token (replay attack) → force full re-authentication</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-opus">OPUS</span></td>
+      <td class="why-col">JWT refresh rotation implementation has subtle timing and storage requirements. Sonnet implementations commonly miss token binding (tying refresh tokens to the device fingerprint) and replay detection. Opus implements the full rotation pattern correctly.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">183–186</td>
+      <td class="tasks-col">
+        <strong>Performance optimisation</strong>
+        <ul>
+          <li>Database: add missing indexes (check query plans with EXPLAIN ANALYZE on slow queries)</li>
+          <li>Prisma N+1 fix: audit all queries with include/select — use findMany with nested include instead of N separate queries</li>
+          <li>Next.js: implement React.lazy() + Suspense for heavy components (Monaco Editor, LiveKit room)</li>
+          <li>Caching: add Redis cache for workspace membership checks (hot path on every authenticated request)</li>
+          <li>Image optimisation: use Next.js Image component for all user avatars and uploaded images</li>
+          <li>Bundle analysis: run next/bundle-analyzer, identify and fix largest chunks</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Performance fixes are targeted and mechanical once the problem areas are identified. Paste specific slow query examples or bundle analysis screenshots to Sonnet for efficient fixes.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">187–190</td>
+      <td class="tasks-col">
+        <strong>Mobile responsiveness audit + cross-browser testing</strong>
+        <ul>
+          <li>Test all pages on iPhone SE (375px), iPhone 14 (390px), iPad (768px)</li>
+          <li>Fix sidebar navigation: collapse to bottom tab bar on mobile</li>
+          <li>Fix Monaco Editor: disable on mobile (show read-only view instead, editing requires desktop)</li>
+          <li>Fix voice channel UI: mobile-optimised call controls</li>
+          <li>Cross-browser: test on Chrome, Firefox, Safari. Fix any CSS Grid/WebRTC compatibility issues.</li>
+          <li>Test LiveKit voice on iOS Safari (WebRTC permissions flow differs)</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Responsive CSS fixes are mechanical. Sonnet handles Tailwind breakpoint adjustments and mobile-specific component variants efficiently.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">191–192</td>
+      <td class="tasks-col">
+        <strong>Production deployment</strong>
+        <ul>
+          <li>Deploy frontend to Vercel: connect GitHub repo, set environment variables, configure custom domain</li>
+          <li>Deploy backend API to Fly.io: Dockerfile for apps/api, fly.toml config, set secrets</li>
+          <li>Deploy y-websocket (Yjs) server to Fly.io (separate machine or same app, separate process)</li>
+          <li>Deploy LiveKit to Fly.io (or use LiveKit Cloud — confirm with Opus architecture decision from Day 119)</li>
+          <li>Managed PostgreSQL: Supabase, Neon, or Railway PostgreSQL (not self-managed in production)</li>
+          <li>Set up GitHub Actions CI/CD: run tests on PR, deploy to production on main branch push</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Deployment to Vercel + Fly.io is procedural. Sonnet guides through fly.toml config, Dockerfile optimisation, and GitHub Actions CI/CD setup step by step.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">193–194</td>
+      <td class="tasks-col">
+        <strong>Production testing + domain setup</strong>
+        <ul>
+          <li>Full end-to-end test on production URL: register → create workspace → invite 3 test users → run all Phase 1–3 features</li>
+          <li>Test Stripe checkout in production (use live mode — real payment with $0.01 test price)</li>
+          <li>Test LiveKit voice with 5 concurrent participants on production server</li>
+          <li>SSL verification, CORS configuration, security headers (Helmet.js + Next.js headers config)</li>
+          <li>Set up uptime monitoring (Better Uptime or UptimeRobot — free tier)</li>
+          <li>Configure error tracking (Sentry free tier) on both frontend and backend</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Production testing and monitoring setup is procedural. Paste any production errors to Sonnet for diagnosis.</td>
+    </tr>
+
+    <tr>
+      <td class="days-col">195–196</td>
+      <td class="tasks-col">
+        <strong>Documentation + launch</strong>
+        <ul>
+          <li>Write README.md: project overview, tech stack, architecture diagram, setup instructions (docker-compose for local dev), environment variables reference</li>
+          <li>Write CONTRIBUTING.md (for future collaborators): branch naming, PR process, coding standards</li>
+          <li>Record a 3–5 minute demo video: walkthrough of key features (notes, code editor, voice channel, real-time collab)</li>
+          <li>Invite your first 28 users: generate invite links for each workspace member</li>
+          <li>Tag: v1.0.0 — production launch</li>
+        </ul>
+      </td>
+      <td class="model-col"><span class="badge badge-sonnet">SONNET</span></td>
+      <td class="why-col">Documentation writing and release checklist are Sonnet tasks. For the README architecture diagram section, provide your actual stack details and Sonnet generates clean Markdown.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Phase 4 Context Snippet</span>
+      <span class="prompt-tag">BILLING + SECURITY SESSIONS</span>
+    </div>
+    <button class="copy-btn" id="btn-p4ctx" onclick="copyPrompt('p4ctx-text','btn-p4ctx')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy
+    </button>
+  </div>
+  <div class="prompt-body" id="p4ctx-text">Phase 4 context: We are adding Stripe billing, feature gates, and hardening Nexus for production. Billing model: per workspace (not per user). One Stripe Customer per workspace. Free tier snapshotLimit = 5 (FILO). Premium snapshotLimit = configurable by workspace owner. Feature gates are stored in WorkspaceFeatureGate table and checked via requirePremium(featureKey) middleware. Stripe webhooks must be idempotent. Security audit must cover: XSS in block editor rendering, CSRF on API mutations, SSRF in link preview fetcher, file upload MIME bypass, and JWT refresh token replay attacks.</div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- GOLDEN RULES                                                            -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="golden-rules">
+<div class="section-title">The Golden Rules</div>
+<div class="section-sub">Non-negotiable principles for every session of the Nexus build.</div>
+
+<div class="rules-grid">
+  <div class="rule-card highlight">
+    <h4>Choose your model BEFORE opening a chat</h4>
+    <p>Look up today's day in the table. Check the Model column. Open that model before typing a single word. Never open a chat and decide mid-session. The model decision is made here, in this document, not in the moment.</p>
+  </div>
+  <div class="rule-card">
+    <h4>OPUS = Fresh 5-hour window only</h4>
+    <p>The 5-hour window resets from your first message. An Opus session started with 8K tokens remaining will run out mid-debug or mid-architecture. Schedule ALL Opus sessions as the very first task of your day — never at the end of a depleted window.</p>
+  </div>
+  <div class="rule-card">
+    <h4>Never switch models mid-session on a hard task</h4>
+    <p>If you are debugging a Yjs CRDT conflict or a LiveKit connection issue with Opus, do NOT switch to Sonnet to save tokens. The diagnostic context built across messages is what makes Opus valuable. Losing that context mid-debug costs you more time than it saves in tokens.</p>
+  </div>
+  <div class="rule-card">
+    <h4>One task per session</h4>
+    <p>Each session focuses on one numbered task from the roadmap. Do not mix tasks. Claude works best with a focused, bounded scope. A session that tries to implement DMs + @mentions + link previews will produce worse code than three focused sessions.</p>
+  </div>
+  <div class="rule-card">
+    <h4>Always paste your current file</h4>
+    <p>Claude has no memory between sessions. When working on a specific file (schema, middleware, component), paste the current file content at the start of the session. Without it, Claude may generate code that conflicts with your existing implementation.</p>
+  </div>
+  <div class="rule-card">
+    <h4>Save Opus output as reference documents</h4>
+    <p>Every Opus architecture session produces a specification that subsequent Sonnet sessions depend on. Save the full Opus output: ARCHITECTURE.md, SCHEMA.md, REALTIME_DESIGN.md, etc. At the start of related Sonnet sessions, paste the relevant section as context.</p>
+  </div>
+  <div class="rule-card">
+    <h4>Commit to GitHub after every session</h4>
+    <p>Every session ends with a git commit. This builds your commit history, creates daily restore points, and means you never lose more than one session of work. Commit message format: feat(phase1): implement invite system backend</p>
+  </div>
+  <div class="rule-card">
+    <h4>Zero TypeScript errors before moving phases</h4>
+    <p>Run tsc --noEmit before tagging any phase complete. Type errors in Phase 1 compound into 10x harder bugs in Phase 3. The type system is your documentation — keep it clean.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- TOKEN TRAPS                                                              -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<section id="token-traps">
+<div class="section-title">Token Traps — Never Use Opus For These</div>
+<div class="section-sub">These are Sonnet tasks. Using Opus wastes your window budget without any quality gain.</div>
+
+<div class="table-wrap traps-table">
+<table>
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Why it is a Sonnet task</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dockerfiles &amp; docker-compose.yml</strong></td>
+      <td class="why-col">Standard Node/Postgres/Redis Docker config. Sonnet completes in 1 message, ~300 tokens. No architectural decisions involved.</td>
+    </tr>
+    <tr>
+      <td><strong>GitHub Actions CI/CD yaml</strong></td>
+      <td class="why-col">Mechanical config: pnpm install + lint + test + build + deploy. Sonnet under 400 tokens. Copy-paste template.</td>
+    </tr>
+    <tr>
+      <td><strong>Prisma seed files</strong></td>
+      <td class="why-col">Creating test data with prisma.upsert() is templated. Sonnet fills in from your schema correctly.</td>
+    </tr>
+    <tr>
+      <td><strong>Unit test boilerplate</strong></td>
+      <td class="why-col">3–5 test function stubs per file. Sonnet generates from function signatures in one message.</td>
+    </tr>
+    <tr>
+      <td><strong>Tailwind CSS / UI components</strong></td>
+      <td class="why-col">Buttons, cards, modals, form inputs, tables — all templated component work. Sonnet handles entire pages efficiently.</td>
+    </tr>
+    <tr>
+      <td><strong>Standard CRUD API endpoints</strong></td>
+      <td class="why-col">GET/POST/PATCH/DELETE with Prisma, following patterns already established by Opus. Sonnet applies the pattern correctly.</td>
+    </tr>
+    <tr>
+      <td><strong>React hooks (useState, useEffect, useSWR)</strong></td>
+      <td class="why-col">Data fetching hooks, form state, loading states — all standard patterns. Sonnet does not need Opus-level reasoning for these.</td>
+    </tr>
+    <tr>
+      <td><strong>Stripe webhook event handlers</strong></td>
+      <td class="why-col">Once the Stripe architecture is designed by Opus (Days 155–158), the individual webhook handlers are mechanical CRUD with Prisma. Sonnet territory.</td>
+    </tr>
+    <tr>
+      <td><strong>next/bundle-analyzer output fixes</strong></td>
+      <td class="why-col">Bundle size fixes (lazy loading, dynamic imports) are mechanical. Paste the analyzer output to Sonnet for targeted fixes.</td>
+    </tr>
+    <tr>
+      <td><strong>README and documentation</strong></td>
+      <td class="why-col">Setup instructions, environment variable docs, contributing guides — structured Markdown that Sonnet fills from your actual stack details.</td>
+    </tr>
+    <tr>
+      <td><strong>LiveKit React UI components</strong></td>
+      <td class="why-col">@livekit/components-react provides pre-built components. Wiring them to your token API and styling them is Sonnet work once the architecture is in place.</td>
+    </tr>
+    <tr>
+      <td><strong>Socket.io event emission (after architecture)</strong></td>
+      <td class="why-col">After Opus designs the namespace/room architecture, individual emit() and on() calls are mechanical. Sonnet applies the established pattern correctly.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────── -->
+<div class="footer">
+  <span>PROJECT <span>NEXUS</span> · Model Strategy Guide v1.0</span>
+  <span>Opus 4.6 (32%) · Sonnet 4.6 (68%) · 28 Weeks · ~196 Sessions</span>
+  <span>Claude Pro Plan · $20/month</span>
+</div>
+
+</main>
+
+<!-- ══ JAVASCRIPT ════════════════════════════════════════════════════════ -->
+<script>
+function copyPrompt(textId, btnId) {
+  const el = document.getElementById(textId);
+  const btn = document.getElementById(btnId);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,8 6,12 14,4"/></svg> Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg> Copy Prompt';
+      btn.classList.remove('copied');
+    }, 2500);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Prompt'; }, 2500);
+  });
+}
+
+function toggleExpand(bodyId, trigger) {
+  const body = document.getElementById(bodyId);
+  if (body.classList.contains('expanded')) {
+    body.classList.remove('expanded');
+    trigger.textContent = '▼ Show full prompt';
+  } else {
+    body.classList.add('expanded');
+    trigger.textContent = '▲ Collapse';
+  }
+}
+</script>
+</body>
+</html>

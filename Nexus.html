@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus — Your All-In-One Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0D1117;
+      --bg-secondary: #161B22;
+      --bg-tertiary: #21262D;
+      --bg-card: #1C2128;
+      --border: #30363D;
+      --border-light: #3D444D;
+      --text-primary: #E6EDF3;
+      --text-secondary: #8B949E;
+      --text-muted: #6E7681;
+      --nexus: #58A6FF;
+      --nexus-light: #79C0FF;
+      --nexus-dark: #388BFD;
+      --nexus-50: rgba(88, 166, 255, 0.15);
+      --green: #3FB950;
+      --green-50: rgba(63, 185, 80, 0.15);
+      --orange: #DB6D28;
+      --orange-50: rgba(219, 109, 40, 0.15);
+      --purple: #A371F7;
+      --purple-50: rgba(163, 113, 247, 0.15);
+      --cyan: #39D0D0;
+      --cyan-50: rgba(57, 208, 208, 0.15);
+      --red: #F85149;
+      --red-50: rgba(248, 81, 73, 0.15);
+      --yellow: #D29922;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
+      --radius: 8px;
+      --radius-sm: 6px;
+      --radius-xs: 4px;
+      --transition: all 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ======== LOBBY HOMEPAGE ======== */
+    .lobby-home {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workspace-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      width: 100%;
+      transition: var(--transition);
+    }
+
+    .workspace-btn:hover {
+      border-color: var(--border-light);
+      background: var(--bg-card);
+    }
+
+    .workspace-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--nexus), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .workspace-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .workspace-type {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 8px;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 12px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: var(--transition);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--nexus-50);
+      color: var(--nexus-light);
+    }
+
+    .nav-item .icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-item .badge {
+      margin-left: auto;
+      background: var(--red-50);
+      color: var(--red);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .nav-item.active .badge {
+      background: var(--nexus);
+      color: white;
+    }
+
+    /* Voice Channels in Sidebar */
+    .voice-section {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .voice-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      padding: 0 4px;
+    }
+
+    .voice-channel {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 2px;
+    }
+
+    .voice-channel:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .voice-channel.active {
+      background: var(--green-50);
+    }
+
+    .voice-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .voice-channel.active .voice-dot {
+      background: var(--green);
+    }
+
+    .voice-channel-name {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .voice-channel.active .voice-channel-name {
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    .voice-users {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      height: 60px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+
+    .search-container {
+      position: relative;
+      width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--nexus);
+      background: var(--bg-card);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .search-shortcut {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .top-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .top-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      border: 2px solid var(--bg-secondary);
+    }
+
+    .user-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 4px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-btn:hover {
+      border-color: var(--border-light);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--nexus), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .user-btn span {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+    }
+
+    .welcome-banner {
+      margin-bottom: 28px;
+    }
+
+    .welcome-banner h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .welcome-banner h1 span {
+      color: var(--nexus-light);
+    }
+
+    .welcome-banner p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .quick-action {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quick-action:hover {
+      border-color: var(--nexus);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .action-icon.notes { background: var(--nexus-50); }
+    .action-icon.code { background: var(--green-50); }
+    .action-icon.files { background: var(--orange-50); }
+    .action-icon.voice { background: var(--purple-50); }
+
+    .quick-action h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .quick-action p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: none;
+      color: var(--nexus);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-xs);
+      transition: var(--transition);
+    }
+
+    .btn-ghost:hover {
+      background: var(--nexus-50);
+    }
+
+    .panel-body {
+      padding: 12px;
+    }
+
+    /* Note Items */
+    .note-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .note-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .note-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .note-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .note-details h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-details span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .note-menu {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-xs);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .note-item:hover .note-menu { opacity: 1; }
+
+    .note-menu:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    /* Project Items */
+    .project-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .project-item:last-child { border-bottom: none; }
+
+    .project-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .project-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--green-50);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .project-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .project-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .commit-count {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--green-50);
+      color: var(--green);
+    }
+
+    .project-contribs {
+      display: flex;
+      align-items: center;
+    }
+
+    .contrib-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+      margin-left: -8px;
+      background: linear-gradient(135deg, var(--nexus), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .contrib-avatar:first-child { margin-left: 0; }
+
+    /* Members Panel */
+    .members-panel .panel-body {
+      padding: 8px;
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .member-row:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .member-avatar {
+      position: relative;
+    }
+
+    .member-avatar img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .member-status {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+    }
+
+    .member-status.online { background: var(--green); }
+    .member-status.idle { background: var(--yellow); }
+    .member-status.dnd { background: var(--red); }
+
+    .member-info {
+      flex: 1;
+    }
+
+    .member-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .member-status-text {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .member-voice-icon {
+      color: var(--green);
+      font-size: 14px;
+    }
+
+    /* Chat Widget */
+    .chat-widget {
+      margin-top: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chat-header h4 {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-messages {
+      height: 160px;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .chat-msg {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--nexus), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .chat-content .name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1px;
+    }
+
+    .chat-content .text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .chat-content .time {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .chat-input-row input {
+      flex: 1;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .chat-input-row input:focus {
+      outline: none;
+      border-color: var(--nexus);
+    }
+
+    .chat-send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--nexus);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .chat-send-btn:hover {
+      background: var(--nexus-dark);
+    }
+
+    /* Music Player */
+    .music-bar {
+      position: fixed;
+      bottom: 0;
+      left: 260px;
+      right: 0;
+      height: 64px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+      z-index: 100;
+    }
+
+    .music-bar.hidden { display: none; }
+
+    .music-track {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 220px;
+    }
+
+    .music-cover {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--purple), var(--nexus));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .music-track-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .music-track-info span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .music-playback {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .music-playback button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .music-playback button:hover { color: var(--text-primary); }
+
+    .music-playback .play {
+      width: 40px;
+      height: 40px;
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .music-playback .play:hover {
+      transform: scale(1.05);
+    }
+
+    .music-progress {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .music-progress span {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 36px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .progress-track .fill {
+      width: 30%;
+      height: 100%;
+      background: var(--nexus);
+      border-radius: 2px;
+    }
+
+    .music-extras {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-extras button {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-xs);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .music-extras button:hover { color: var(--text-primary); }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .volume-wrap input {
+      width: 70px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .volume-wrap input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--text-primary);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      z-index: 1000;
+    }
+
+    .toast.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .music-bar { left: 0; }
+      .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======== LOBBY HOMEPAGE ======== -->
+  <div class="lobby-home">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <button class="workspace-btn">
+          <div class="workspace-icon">🚀</div>
+          <div>
+            <div class="workspace-name">Dev Team Alpha</div>
+            <div class="workspace-type">Private Workspace</div>
+          </div>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Menu</div>
+        <button class="nav-item active">
+          <span class="icon">🏠</span>
+          Overview
+        </button>
+        <button class="nav-item">
+          <span class="icon">💬</span>
+          Chats
+          <span class="badge">3</span>
+        </button>
+        <button class="nav-item">
+          <span class="icon">🔊</span>
+          Voice
+        </button>
+        <button class="nav-item">
+          <span class="icon">📝</span>
+          Notes
+        </button>
+        <button class="nav-item">
+          <span class="icon">💻</span>
+          Projects
+        </button>
+        <button class="nav-item">
+          <span class="icon">📁</span>
+          Files
+        </button>
+        <button class="nav-item">
+          <span class="icon">📋</span>
+          Tasks
+        </button>
+        <button class="nav-item">
+          <span class="icon">📅</span>
+          Calendar
+        </button>
+
+        <div class="voice-section">
+          <div class="voice-section-title">Voice Channels</div>
+          <div class="voice-channel active">
+            <span class="voice-dot"></span>
+            <span class="voice-channel-name">General</span>
+            <span class="voice-users">3</span>
+          </div>
+          <div class="voice-channel">
+            <span class="voice-dot"></span>
+            <span class="voice-channel-name">Coding Room</span>
+            <span class="voice-users">1</span>
+          </div>
+          <div class="voice-channel">
+            <span class="voice-dot"></span>
+            <span class="voice-channel-name">Music Lounge</span>
+            <span class="voice-users">0</span>
+          </div>
+          <div class="voice-channel">
+            <span class="voice-dot"></span>
+            <span class="voice-channel-name">Quick Sync</span>
+            <span class="voice-users">2</span>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="Search notes, projects, files, messages...">
+          <span class="search-shortcut">⌘K</span>
+        </div>
+
+        <div class="top-actions">
+          <button class="top-btn" title="Notifications">
+            🔔
+            <span class="notif-dot"></span>
+          </button>
+          <button class="top-btn" title="Settings">⚙️</button>
+          <button class="top-btn" title="Help">❓</button>
+          <button class="user-btn">
+            <div class="user-avatar">AK</div>
+            <span>Alex</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content-area">
+        <div class="welcome-banner">
+          <h1>Welcome back, <span>Alex</span></h1>
+          <p>You have 3 unread messages and 2 new commits in your projects today.</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <div class="quick-action" onclick="showToast('Creating new note...')">
+            <div class="action-icon notes">📝</div>
+            <h4>New Note</h4>
+            <p>Create a note</p>
+          </div>
+          <div class="quick-action" onclick="showToast('Creating new project...')">
+            <div class="action-icon code">💻</div>
+            <h4>New Project</h4>
+            <p>Start coding</p>
+          </div>
+          <div class="quick-action" onclick="showToast('Opening file uploader...')">
+            <div class="action-icon files">📁</div>
+            <h4>Upload File</h4>
+            <p>Add to library</p>
+          </div>
+          <div class="quick-action" onclick="joinVoice('General')">
+            <div class="action-icon voice">🔊</div>
+            <h4>Join Voice</h4>
+            <p>Start chatting</p>
+          </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <div class="left-col">
+            <!-- Recent Notes -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">📝 Recent Notes</h3>
+                <button class="btn-ghost">View All →</button>
+              </div>
+              <div class="panel-body">
+                <div class="note-item">
+                  <div class="note-icon">📄</div>
+                  <div class="note-details">
+                    <h4>Project Specifications v2.0</h4>
+                    <span>Edited 2 hours ago</span>
+                  </div>
+                  <button class="note-menu">⋮</button>
+                </div>
+                <div class="note-item">
+                  <div class="note-icon">📋</div>
+                  <div class="note-details">
+                    <h4>Sprint Planning Notes</h4>
+                    <span>Edited yesterday</span>
+                  </div>
+                  <button class="note-menu">⋮</button>
+                </div>
+                <div class="note-item">
+                  <div class="note-icon">📚</div>
+                  <div class="note-details">
+                    <h4>API Documentation</h4>
+                    <span>Edited 3 days ago</span>
+                  </div>
+                  <button class="note-menu">⋮</button>
+                </div>
+                <div class="note-item">
+                  <div class="note-icon">🧠</div>
+                  <div class="note-details">
+                    <h4>Brainstorming Session</h4>
+                    <span>Edited 1 week ago</span>
+                  </div>
+                  <button class="note-menu">⋮</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="panel" style="margin-top: 20px;">
+              <div class="panel-header">
+                <h3 class="panel-title">💻 Active Projects</h3>
+                <button class="btn-ghost">View All →</button>
+              </div>
+              <div class="panel-body" style="padding: 0;">
+                <div class="project-item">
+                  <div class="project-top">
+                    <div class="project-info">
+                      <div class="project-icon">&lt;/&gt;</div>
+                      <div>
+                        <div class="project-name">backend-api</div>
+                        <div class="project-meta">Last commit 5 min ago</div>
+                      </div>
+                    </div>
+                    <span class="commit-count">+5</span>
+                  </div>
+                  <div class="project-contribs">
+                    <div class="contrib-avatar">AK</div>
+                    <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
+                    <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
+                  </div>
+                </div>
+                <div class="project-item">
+                  <div class="project-top">
+                    <div class="project-info">
+                      <div class="project-icon" style="background: var(--purple-50); color: var(--purple);">⚛</div>
+                      <div>
+                        <div class="project-name">frontend-dashboard</div>
+                        <div class="project-meta">Last commit 2 hours ago</div>
+                      </div>
+                    </div>
+                    <span class="commit-count" style="background: var(--purple-50); color: var(--purple);">+3</span>
+                  </div>
+                  <div class="project-contribs">
+                    <div class="contrib-avatar">AK</div>
+                    <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
+                  </div>
+                </div>
+                <div class="project-item">
+                  <div class="project-top">
+                    <div class="project-info">
+                      <div class="project-icon" style="background: var(--cyan-50); color: var(--cyan);">📱</div>
+                      <div>
+                        <div class="project-name">mobile-app</div>
+                        <div class="project-meta">Last commit yesterday</div>
+                      </div>
+                    </div>
+                    <span class="commit-count" style="background: var(--cyan-50); color: var(--cyan);">+1</span>
+                  </div>
+                  <div class="project-contribs">
+                    <div class="contrib-avatar">AK</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Widget -->
+            <div class="chat-widget">
+              <div class="chat-header">
+                <h3>💬 Quick Chat — #general</h3>
+                <button class="btn-ghost">Open Chat</button>
+              </div>
+              <div class="chat-messages">
+                <div class="chat-msg">
+                  <div class="chat-avatar">AK</div>
+                  <div class="chat-content">
+                    <div class="name">Alex</div>
+                    <div class="text">Just pushed the new authentication feature! 🎉</div>
+                    <div class="time">2 min ago</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
+                  <div class="chat-content">
+                    <div class="name">Sarah</div>
+                    <div class="text">Nice work! I'll review it now</div>
+                    <div class="time">1 min ago</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
+                  <div class="chat-content">
+                    <div class="name">Mike</div>
+                    <div class="text">The API docs need updating, I'll handle it</div>
+                    <div class="time">Just now</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-row">
+                <input type="text" placeholder="Type a message...">
+                <button class="chat-send-btn">➤</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="right-col">
+            <!-- Online Members -->
+            <div class="panel members-panel">
+              <div class="panel-header">
+                <h3 class="panel-title">👥 Online Now</h3>
+                <span style="font-size: 12px; color: var(--text-muted);">6 members</span>
+              </div>
+              <div class="panel-body">
+                <div class="member-row">
+                  <div class="member-avatar">
+                    <div class="chat-avatar">AK</div>
+                    <span class="member-status online"></span>
+                  </div>
+                  <div class="member-info">
+                    <div class="member-name">Alex</div>
+                    <div class="member-status-text">Coding...</div>
+                  </div>
+                  <span class="member-voice-icon">🔊</span>
+                </div>
+                <div class="member-row">
+                  <div class="member-avatar">
+                    <div class="chat-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
+                    <span class="member-status online"></span>
+                  </div>
+                  <div class="member-info">
+                    <div class="member-name">Sarah</div>
+                    <div class="member-status-text">Online</div>
+                  </div>
+                </div>
+                <div class="member-row">
+                  <div class="member-avatar">
+                    <div class="chat-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
+                    <span class="member-status idle"></span>
+                  </div>
+                  <div class="member-info">
+                    <div class="member-name">Mike</div>
+                    <div class="member-status-text">Idle</div>
+                  </div>
+                  <span class="member-voice-icon">🔊</span>
+                </div>
+                <div class="member-row">
+                  <div class="member-avatar">
+                    <div class="chat-avatar" style="background: linear-gradient(135deg, var(--cyan), var(--green));">EJ</div>
+                    <span class="member-status online"></span>
+                  </div>
+                  <div class="member-info">
+                    <div class="member-name">Emma</div>
+                    <div class="member-status-text">Online</div>
+                  </div>
+                </div>
+                <div class="member-row">
+                  <div class="member-avatar">
+                    <div class="chat-avatar" style="background: linear-gradient(135deg, var(--nexus), var(--purple));">JD</div>
+                    <span class="member-status dnd"></span>
+                  </div>
+                  <div class="member-info">
+                    <div class="member-name">John</div>
+                    <div class="member-status-text">Do Not Disturb</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Music Player Bar -->
+  <div class="music-bar" id="music-bar">
+    <div class="music-track">
+      <div class="music-cover">🎵</div>
+      <div class="music-track-info">
+        <h4>Blinding Lights</h4>
+        <span>The Weeknd</span>
+      </div>
+    </div>
+    <div class="music-playback">
+      <button>⏮</button>
+      <button class="play" onclick="togglePlay()">⏸</button>
+      <button>⏭</button>
+    </div>
+    <div class="music-progress">
+      <span>1:23</span>
+      <div class="progress-track">
+        <div class="fill"></div>
+      </div>
+      <span>3:20</span>
+    </div>
+    <div class="music-extras">
+      <button title="Queue">☰</button>
+      <button title="Lyrics">📝</button>
+      <div class="volume-wrap">
+        <button>🔊</button>
+        <input type="range" value="70">
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Voice Channel
+    function joinVoice(channel) {
+      document.querySelectorAll('.voice-channel').forEach(c => c.classList.remove('active'));
+      const voiceChannels = document.querySelectorAll('.voice-channel');
+      voiceChannels.forEach(c => {
+        if (c.querySelector('.voice-channel-name').textContent === channel) {
+          c.classList.add('active');
+        }
+      });
+      showToast(`Joined ${channel}`);
+    }
+
+    // Music
+    let isPlaying = true;
+    function togglePlay() {
+      const btn = document.querySelector('.music-playback .play');
+      if (isPlaying) {
+        btn.textContent = '▶';
+        showToast('Music paused');
+      } else {
+        btn.textContent = '⏸';
+        showToast('Now playing');
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('active');
+      setTimeout(() => toast.classList.remove('active'), 2500);
+    }
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.querySelector('.search-input').focus();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus — Claude Model Strategy & Day-by-Day Build Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══ NEXUS DESIGN SYSTEM ═══ */
+:root{
+  --bg:#080B14;--bg2:#0D1220;--bg3:#111726;
+  --card:rgba(13,18,32,0.97);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.13);
+  --text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;--text4:#334155;
+  --cyan:#67E8F9;--purple:#A78BFA;--green:#34D399;--yellow:#FCD34D;--red:#F87171;--orange:#FB923C;
+  --cyan-d:rgba(103,232,249,0.10);--purple-d:rgba(167,139,250,0.10);
+  --green-d:rgba(52,211,153,0.10);--yellow-d:rgba(252,211,77,0.10);
+  --red-d:rgba(248,113,113,0.10);--orange-d:rgba(251,146,60,0.10);
+  --opus:#F59E0B;--opus-d:rgba(245,158,11,0.12);--opus-lt:#FCD34D;
+  --sonnet:#14B8A6;--sonnet-d:rgba(20,184,166,0.12);--sonnet-lt:#34D399;
+  --r:10px;--r-sm:6px;--r-lg:14px;--r-xl:18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.6;display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.18)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 30px rgba(103,232,249,0.15)}50%{box-shadow:0 0 60px rgba(103,232,249,0.35)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:20px 18px;border-bottom:1px solid var(--border)}
+.sb-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--cyan);letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.sb-logo-icon{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sb-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text4);margin-top:4px;letter-spacing:0.8px}
+.sb-inner{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-section{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--text4);letter-spacing:1.5px;text-transform:uppercase;padding:8px 10px 4px}
+.sb-link{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;color:var(--text3);text-decoration:none;font-size:12px;font-weight:500;transition:all 0.14s;border-left:2px solid transparent}
+.sb-link:hover{color:var(--text);background:rgba(255,255,255,0.05);border-left-color:var(--cyan)}
+.sb-link.p1:hover{border-left-color:var(--green);color:var(--green);background:var(--green-d)}
+.sb-link.p2:hover{border-left-color:var(--cyan);color:var(--cyan);background:var(--cyan-d)}
+.sb-link.p3:hover{border-left-color:var(--purple);color:var(--purple);background:var(--purple-d)}
+.sb-link.p4:hover{border-left-color:var(--orange);color:var(--orange);background:var(--orange-d)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* Live clock in sidebar */
+.sb-clock{padding:12px 14px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.clock-time{font-size:18px;font-weight:600;color:var(--cyan);letter-spacing:1px;line-height:1}
+.clock-date{font-size:9.5px;color:var(--text4);margin-top:3px;letter-spacing:0.5px}
+.clock-blink{animation:blink 1s step-end infinite}
+
+/* ── MAIN ── */
+.main{flex:1;padding:36px 44px;max-width:1020px;min-width:0}
+
+/* ── COVER ── */
+.cover{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:44px;margin-bottom:36px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(103,232,249,0.1) 0%,transparent 65%);pointer-events:none}
+.cover::after{content:'';position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(167,139,250,0.08) 0%,transparent 65%);pointer-events:none}
+.cover-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.cover-tag{display:inline-flex;align-items:center;gap:6px;background:var(--cyan-d);border:1px solid rgba(103,232,249,0.25);color:var(--cyan);padding:4px 12px;border-radius:20px;font-size:10.5px;font-family:'JetBrains Mono',monospace;margin-bottom:16px}
+.cover h1{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;letter-spacing:-1.5px;color:#fff;line-height:1.1;margin-bottom:10px}
+.cover h1 span{background:linear-gradient(130deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-desc{font-size:14px;color:var(--text3);max-width:600px;line-height:1.7;margin-bottom:22px}
+.cover-pills{display:flex;flex-wrap:wrap;gap:7px}
+.pill{padding:4px 12px;border-radius:20px;font-size:10.5px;font-weight:500;font-family:'JetBrains Mono',monospace}
+.pill-cyan{background:var(--cyan-d);color:var(--cyan);border:1px solid rgba(103,232,249,0.25)}
+.pill-opus{background:var(--opus-d);color:var(--opus-lt);border:1px solid rgba(245,158,11,0.25)}
+.pill-sonnet{background:var(--sonnet-d);color:var(--sonnet-lt);border:1px solid rgba(20,184,166,0.25)}
+.pill-gray{background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid var(--border)}
+
+/* ── SECTIONS ── */
+.sec-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;margin-bottom:5px;margin-top:40px}
+.sec-sub{color:var(--text3);font-size:13px;margin-bottom:18px;line-height:1.6}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px 14px;text-align:center;transition:border-color 0.2s}
+.stat-card:hover{border-color:rgba(103,232,249,0.2)}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--cyan);line-height:1;margin-bottom:5px}
+.stat-lbl{font-size:11px;color:var(--text3);line-height:1.4}
+
+/* ── MODEL LEGEND ── */
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}
+.legend-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;display:flex;gap:13px;align-items:flex-start}
+.legend-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex-shrink:0}
+.legend-icon.opus{background:var(--opus-d);color:var(--opus);border:1px solid rgba(245,158,11,0.3)}
+.legend-icon.sonnet{background:var(--sonnet-d);color:var(--sonnet);border:1px solid rgba(20,184,166,0.3)}
+.legend-card h3{font-size:13px;font-weight:600;color:#fff;margin-bottom:5px}
+.legend-card p{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* ── PROMPT BLOCK ── */
+.prompt-block{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:22px}
+.prompt-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border)}
+.prompt-header-left{display:flex;align-items:center;gap:10px}
+.prompt-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.prompt-tag{font-size:9.5px;font-family:'JetBrains Mono',monospace;padding:2px 9px;border-radius:12px;background:var(--cyan-d);color:var(--cyan);border:1px solid rgba(103,232,249,0.22)}
+.prompt-body{padding:18px 16px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text3);line-height:1.85;white-space:pre-wrap;background:var(--bg);max-height:340px;overflow-y:auto;border-top:none}
+.prompt-body.expanded{max-height:none}
+.prompt-expand{display:flex;align-items:center;justify-content:center;padding:9px;background:rgba(0,0,0,0.2);border-top:1px solid var(--border);cursor:pointer;font-size:11px;color:var(--text4);gap:5px;transition:color 0.14s;font-family:'JetBrains Mono',monospace}
+.prompt-expand:hover{color:var(--cyan)}
+
+/* ── COPY BTN ── */
+.copy-btn{display:inline-flex;align-items:center;gap:6px;background:var(--cyan);color:var(--bg);border:none;padding:7px 15px;border-radius:var(--r-sm);font-size:11.5px;font-weight:700;cursor:pointer;transition:all 0.18s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.copy-btn:hover{background:var(--purple);transform:translateY(-1px);box-shadow:0 6px 20px rgba(103,232,249,0.25)}
+.copy-btn.done{background:var(--green)}
+.copy-btn svg{width:12px;height:12px}
+
+/* ── PHASE HEADER ── */
+.phase-hdr{border-radius:var(--r-lg);padding:18px 22px;margin:40px 0 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.phase-hdr.ph1{background:var(--green-d);border:1px solid rgba(52,211,153,0.22)}
+.phase-hdr.ph2{background:var(--cyan-d);border:1px solid rgba(103,232,249,0.22)}
+.phase-hdr.ph3{background:var(--purple-d);border:1px solid rgba(167,139,250,0.22)}
+.phase-hdr.ph4{background:var(--orange-d);border:1px solid rgba(251,146,60,0.22)}
+.phase-ttl{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+.ph1 .phase-ttl{color:var(--green)}.ph2 .phase-ttl{color:var(--cyan)}.ph3 .phase-ttl{color:var(--purple)}.ph4 .phase-ttl{color:var(--orange)}
+.phase-sub{font-size:11.5px;color:var(--text3);margin-top:3px}
+.phase-weeks{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1;text-align:right}
+.phase-weeks-lbl{font-size:9.5px;color:var(--text4);font-family:'JetBrains Mono',monospace;text-align:right}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);margin-bottom:22px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:rgba(0,0,0,0.4);color:var(--text3);font-size:9.5px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(255,255,255,0.013)}
+tr:hover td{background:rgba(103,232,249,0.035)}
+td.dc{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--text4);white-space:nowrap;min-width:68px}
+td.tc{color:var(--text);min-width:280px}
+td.tc strong{color:#fff;font-weight:600}
+td.tc ul{list-style:none;margin-top:5px;display:flex;flex-direction:column;gap:2px}
+td.tc ul li{display:flex;gap:6px;font-size:12px;color:var(--text2)}
+td.tc ul li::before{content:'›';color:var(--text4);flex-shrink:0}
+td.mc{white-space:nowrap;min-width:96px}
+td.wc{color:var(--text2);min-width:200px;font-size:12px;line-height:1.5}
+.paste-row{background:rgba(248,113,113,0.06);border-top:2px solid var(--red);border-bottom:2px solid var(--red)}
+.paste-row td{padding:13px 14px;text-align:center;font-size:12.5px;color:#fca5a5}
+.paste-row strong{color:#fff}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.b-opus{background:var(--opus-d);color:var(--opus-lt);border:1px solid rgba(245,158,11,0.3)}
+.b-sonnet{background:var(--sonnet-d);color:var(--sonnet-lt);border:1px solid rgba(20,184,166,0.3)}
+.b-fresh{background:rgba(248,113,113,0.12);color:#fca5a5;border:1px solid rgba(248,113,113,0.3);font-size:9px;margin-left:3px}
+.b-cyan{background:var(--cyan-d);color:var(--cyan);border:1px solid rgba(103,232,249,0.25)}
+.b-green{background:var(--green-d);color:var(--green);border:1px solid rgba(52,211,153,0.25)}
+.b-red{background:var(--red-d);color:var(--red);border:1px solid rgba(248,113,113,0.25)}
+
+/* ── NOTICE ── */
+.notice{border-radius:var(--r);padding:13px 17px;margin:10px 0 18px;font-size:12.5px;line-height:1.65;display:flex;gap:11px;align-items:flex-start}
+.ni{font-size:15px;flex-shrink:0;margin-top:1px}
+.notice.warn{background:var(--red-d);border:1px solid rgba(248,113,113,0.28);color:#fca5a5}
+.notice.tip{background:var(--cyan-d);border:1px solid rgba(103,232,249,0.28);color:var(--cyan)}
+.notice.opus-note{background:var(--opus-d);border:1px solid rgba(245,158,11,0.28);color:var(--opus-lt)}
+.notice.design-note{background:var(--purple-d);border:1px solid rgba(167,139,250,0.28);color:var(--purple)}
+.notice strong{font-weight:700}
+
+/* ── RULE CARDS ── */
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.rule-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:17px;transition:border-color 0.18s}
+.rule-card:hover{border-color:var(--border2)}
+.rule-card h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:5px}
+.rule-card p{font-size:12px;color:var(--text2);line-height:1.6}
+.rule-card.hl{border-color:rgba(103,232,249,0.3);background:var(--cyan-d)}
+.rule-card.hl h4{color:var(--cyan)}
+
+/* ── FOOTER ── */
+.footer{margin-top:56px;border-top:1px solid var(--border);padding-top:20px;font-size:10.5px;color:var(--text4);font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer em{color:var(--cyan)}
+
+/* ── DESIGN BRIEF CARD ── */
+.design-brief{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(103,232,249,0.06));border:1px solid rgba(167,139,250,0.22);border-radius:var(--r-lg);padding:20px;margin-bottom:22px}
+.design-brief h3{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--purple);margin-bottom:10px}
+.design-brief ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.design-brief ul li{font-size:12.5px;color:var(--text2);display:flex;gap:8px;line-height:1.55}
+.design-brief ul li::before{content:'→';color:var(--purple);flex-shrink:0;font-weight:600}
+.design-brief code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:var(--cyan)}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{padding:22px 16px}
+  .stat-grid,.legend-grid,.rule-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-brand">
+      <div class="sb-logo-icon">⚡</div>
+      NEXUS
+    </div>
+    <div class="sb-sub">MODEL STRATEGY · BUILD GUIDE</div>
+  </div>
+  <div class="sb-inner">
+    <div class="sb-section">Overview</div>
+    <a href="#cover"       class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Cover &amp; Intro</a>
+    <a href="#question"    class="sb-link"><span class="dot" style="background:var(--purple)"></span> Your Question Answered</a>
+    <a href="#budget"      class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Budget Summary</a>
+    <a href="#models"      class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Model Legend</a>
+    <a href="#design-brief"class="sb-link"><span class="dot" style="background:var(--purple)"></span> Design Brief (NEW)</a>
+    <a href="#token-limit" class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Token Limit Statement</a>
+    <a href="#starter"     class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Session Starter</a>
+    <a href="#arch-prompt" class="sb-link"><span class="dot" style="background:var(--cyan)"></span> Architecture Prompt</a>
+    <div class="sb-section">Phases</div>
+    <a href="#phase1" class="sb-link p1"><span class="dot" style="background:var(--green)"></span> Phase 1 — Foundation</a>
+    <a href="#phase2" class="sb-link p2"><span class="dot" style="background:var(--cyan)"></span> Phase 2 — Core</a>
+    <a href="#phase3" class="sb-link p3"><span class="dot" style="background:var(--purple)"></span> Phase 3 — Real-Time</a>
+    <a href="#phase4" class="sb-link p4"><span class="dot" style="background:var(--orange)"></span> Phase 4 — Premium</a>
+    <div class="sb-section">Rules</div>
+    <a href="#golden-rules" class="sb-link"><span class="dot" style="background:var(--yellow)"></span> Golden Rules</a>
+    <a href="#token-traps"  class="sb-link"><span class="dot" style="background:var(--red)"></span> Token Traps</a>
+  </div>
+  <div class="sb-clock">
+    <div class="clock-time" id="clock-time">--:--<span class="clock-blink" id="clock-colon">:</span>--</div>
+    <div class="clock-date" id="clock-date">Loading...</div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+<!-- ── COVER ── -->
+<section id="cover">
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-tag">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="currentColor"/></svg>
+    Claude Pro Plan · Opus 4.6 + Sonnet 4.6 · Updated <span id="cover-date" style="color:#fff;margin-left:2px"></span>
+  </div>
+  <h1>PROJECT <span>NEXUS</span><br>Model Strategy Guide</h1>
+  <p class="cover-desc">Your complete Claude model usage guide — which model to open, when to paste which prompt, and how to manage every session of the 28-week build. Redesigned in the Nexus UI language.</p>
+  <div class="cover-pills">
+    <span class="pill pill-cyan">28 Weeks · ~196 Days</span>
+    <span class="pill pill-opus">Opus 4.6 · 32% of sessions</span>
+    <span class="pill pill-sonnet">Sonnet 4.6 · 68% of sessions</span>
+    <span class="pill pill-gray">Next.js · PostgreSQL · Socket.io · LiveKit · Stripe</span>
+  </div>
+</div>
+</section>
+
+<!-- ── YOUR QUESTION ANSWERED ── -->
+<section id="question">
+<div class="sec-title">Your Question — Answered Honestly</div>
+<div class="sec-sub">Will this prompt file give you the same Nexus design and live functions automatically?</div>
+
+<div class="rule-grid">
+  <div class="rule-card" style="border-color:rgba(248,113,113,0.3);background:var(--red-d)">
+    <h4 style="color:var(--red)">❌ What this file does NOT do</h4>
+    <p>This strategy file tells Claude <em>what to build</em> and <em>which model to use</em>. It does not automatically give Claude the Nexus visual design (dark theme, cyan/purple palette, Syne font, grid background, glow cards). If you paste session starters alone, Claude will produce generic-looking UI.</p>
+  </div>
+  <div class="rule-card" style="border-color:rgba(52,211,153,0.3);background:var(--green-d)">
+    <h4 style="color:var(--green)">✅ What you need to add</h4>
+    <p>At the start of every UI session, paste the <strong>Design Brief</strong> (new section below). It gives Claude the exact fonts, colors, and component patterns from the Nexus UI you've already built. With it: same design every time.</p>
+  </div>
+  <div class="rule-card" style="border-color:rgba(103,232,249,0.3);background:var(--cyan-d)">
+    <h4 style="color:var(--cyan)">🕐 Live date &amp; time</h4>
+    <p>Yes — any Claude-built UI can have a live date/time clock. Just tell Claude to add one. It uses JavaScript's <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;color:var(--cyan)">Date</code> object and <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;color:var(--cyan)">setInterval</code> — fully dynamic, no server needed.</p>
+  </div>
+  <div class="rule-card" style="border-color:rgba(167,139,250,0.3);background:var(--purple-d)">
+    <h4 style="color:var(--purple)">💡 The rule</h4>
+    <p><strong>Prompt file</strong> = what to build and which model.<br><strong>Design brief</strong> = how it looks.<br><strong>Reference files</strong> = attach <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;color:var(--cyan)">index.html</code> and <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;color:var(--cyan)">lobby.html</code> for pixel-perfect consistency.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── BUDGET ── -->
+<section id="budget">
+<div class="sec-title">Overall Budget Summary</div>
+<div class="sec-sub">Token and window estimates across all 4 phases.</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="stat-num">~2.8M</div><div class="stat-lbl">Total tokens across all phases</div></div>
+  <div class="stat-card"><div class="stat-num">55–65</div><div class="stat-lbl">5-hour windows needed (mixed)</div></div>
+  <div class="stat-card"><div class="stat-num">32%</div><div class="stat-lbl">Sessions requiring Opus 4.6</div></div>
+  <div class="stat-card"><div class="stat-num">4</div><div class="stat-lbl">Phases · 28 weeks · ~196 sessions</div></div>
+</div>
+<div class="stat-grid">
+  <div class="stat-card" style="border-color:rgba(245,158,11,0.3);background:var(--opus-d)"><div class="stat-num" style="color:var(--opus-lt)">~22</div><div class="stat-lbl" style="color:var(--opus-lt)">Opus windows<br><span style="color:var(--text4)">Architecture, schema, security</span></div></div>
+  <div class="stat-card" style="border-color:rgba(20,184,166,0.3);background:var(--sonnet-d)"><div class="stat-num" style="color:var(--sonnet-lt)">~40</div><div class="stat-lbl" style="color:var(--sonnet-lt)">Sonnet windows<br><span style="color:var(--text4)">CRUD, UI, tests, boilerplate</span></div></div>
+  <div class="stat-card" style="border-color:rgba(248,113,113,0.3);background:var(--red-d)"><div class="stat-num" style="color:var(--red)">3–4</div><div class="stat-lbl" style="color:var(--red)">Windows/month<br><span style="color:var(--text4)">Well within Pro plan</span></div></div>
+  <div class="stat-card" style="border-color:rgba(103,232,249,0.3);background:var(--cyan-d)"><div class="stat-num" style="color:var(--cyan)">~10K</div><div class="stat-lbl" style="color:var(--cyan)">Avg tokens/session<br><span style="color:var(--text4)">Focused single-task sessions</span></div></div>
+</div>
+<div class="notice tip"><div class="ni">💡</div><div><strong>Shared quota warning:</strong> Claude Pro usage is shared between claude.ai chat and Claude Code. On heavy coding days, minimise casual chat to preserve your session budget. Nexus build sessions come first.</div></div>
+</section>
+
+<!-- ── MODEL LEGEND ── -->
+<section id="models">
+<div class="sec-title">Model Legend</div>
+<div class="legend-grid">
+  <div class="legend-card" style="border-color:rgba(245,158,11,0.25);background:var(--opus-d)">
+    <div class="legend-icon opus">OP</div>
+    <div><h3 style="color:var(--opus-lt)">Opus 4.6 — Architecture Driver</h3><p>Reserved for system design, database schema, real-time infrastructure (Yjs/CRDT, LiveKit, Socket.io), security audits, payment flows, debugging non-obvious failures. Expensive — only where reasoning depth genuinely matters.</p></div>
+  </div>
+  <div class="legend-card" style="border-color:rgba(20,184,166,0.25);background:var(--sonnet-d)">
+    <div class="legend-icon sonnet">SN</div>
+    <div><h3 style="color:var(--sonnet-lt)">Sonnet 4.6 — Daily Driver</h3><p>Handles all CRUD APIs, UI components, boilerplate scaffolding, unit tests, deployment steps, configuration files, data migrations, templated code. Fast, cost-effective, sufficient for 68% of all Nexus sessions.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- ── DESIGN BRIEF (NEW) ── -->
+<section id="design-brief">
+<div class="sec-title">Design Brief <span style="background:var(--green-d);color:var(--green);font-size:11px;padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-weight:500;vertical-align:middle;margin-left:8px">NEW</span></div>
+<div class="sec-sub">Paste this at the start of EVERY UI session. Without it Claude will produce generic-looking output. With it — same Nexus design every time.</div>
+
+<div class="notice design-note">
+  <div class="ni">🎨</div>
+  <div><strong>When to paste this:</strong> Any session where you are building or modifying a UI component, page, or front-end feature. This is separate from the Session Starter — paste this AFTER the Token Limit Statement and Session Starter, as a third block.</div>
+</div>
+
+<div class="design-brief">
+  <h3>🎨 Nexus Design System — Reference (paste this into UI sessions)</h3>
+  <ul>
+    <li><strong>Fonts:</strong> <code>Syne 700/800</code> for all headings and brand text · <code>DM Sans 400/500/600</code> for all body text · <code>JetBrains Mono 400/500</code> for all code, labels, timestamps, badges. Load from Google Fonts.</li>
+    <li><strong>Background:</strong> <code>#080B14</code> primary · <code>#0D1220</code> panels/sidebar · <code>#111726</code> cards and hover states. Grid overlay: <code>linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px)</code> at 44px spacing.</li>
+    <li><strong>Accent colors:</strong> Cyan <code>#67E8F9</code> (primary actions, highlights) · Purple <code>#A78BFA</code> (secondary, music) · Green <code>#34D399</code> (success, online) · Yellow <code>#FCD34D</code> (warnings, priority) · Red <code>#F87171</code> (errors, urgent).</li>
+    <li><strong>Ambient glow:</strong> Always add two radial gradient blobs in the background — cyan top-left, purple bottom-right, low opacity (~0.07). Pointer-events: none.</li>
+    <li><strong>Cards:</strong> <code>background: rgba(13,18,32,0.95)</code> · <code>border: 1px solid rgba(255,255,255,0.08)</code> · <code>border-radius: 14px</code> · <code>backdrop-filter: blur(20px)</code>. On hover: border brightens to 0.13 opacity, transform translateY(-2px).</li>
+    <li><strong>Buttons:</strong> Primary = <code>linear-gradient(130deg, #67E8F9, #A78BFA)</code> with dark text, Syne font 700. Secondary = transparent with border. Ghost = no border, hover shows light bg.</li>
+    <li><strong>Badges/Pills:</strong> Semi-transparent background using color at 0.10 opacity, same color border at 0.25 opacity, text in full color. Font: JetBrains Mono 10-11px.</li>
+    <li><strong>Live clock:</strong> Use <code>setInterval</code> every second, <code>new Date()</code>, format as HH:MM AM/PM + full date string. Display in sidebar or header.</li>
+    <li><strong>Animations:</strong> <code>@keyframes fadeUp</code> (opacity 0→1, translateY 14px→0) for page load · <code>@keyframes glow</code> for logo pulse · CSS transitions 0.18s ease on all interactive elements.</li>
+    <li><strong>Scrollbar:</strong> 4-5px width, transparent track, <code>rgba(255,255,255,0.1)</code> thumb, 3px border-radius.</li>
+    <li><strong>Reference files:</strong> See <code>index.html</code> (pre-lobby home) and <code>lobby.html</code> (full workspace) in the Nexus_v1.zip for complete production-ready examples to reference or extend.</li>
+  </ul>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Design Brief Prompt — Copy &amp; Paste</span>
+      <span class="prompt-tag">ADD TO ALL UI SESSIONS</span>
+    </div>
+    <button class="copy-btn" id="btn-design" onclick="copyP('design-text','btn-design')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="design-text">🎨 NEXUS DESIGN SYSTEM — Apply to all UI output in this session:
+
+Fonts: Syne 700/800 (headings) · DM Sans 400/500 (body) · JetBrains Mono (code, labels, timestamps)
+Load from Google Fonts: https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600
+
+Colors:
+  Background:    #080B14 (main)  ·  #0D1220 (panels)  ·  #111726 (cards)
+  Borders:       rgba(255,255,255,0.08) default · rgba(255,255,255,0.13) hover
+  Text:          #F1F5F9 (primary) · #94A3B8 (secondary) · #64748B (muted) · #334155 (disabled)
+  Cyan:          #67E8F9  (primary accent — actions, highlights, links)
+  Purple:        #A78BFA  (secondary accent — music, creative features)
+  Green:         #34D399  (success, online status)
+  Yellow:        #FCD34D  (warnings, deadlines, priority)
+  Red:           #F87171  (errors, urgent, destructive)
+
+Background treatment:
+  Grid overlay: background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px); background-size: 44px 44px;
+  Ambient blobs: radial-gradient(ellipse 55% 45% at 20% 20%, rgba(103,232,249,0.07) 0%, transparent 60%) + radial-gradient(ellipse 45% 35% at 80% 80%, rgba(167,139,250,0.07) 0%, transparent 60%). Position: absolute, pointer-events: none.
+
+Cards: background rgba(13,18,32,0.95) · backdrop-filter blur(20px) · border 1px solid rgba(255,255,255,0.08) · border-radius 14px. Hover: border rgba(255,255,255,0.13) + transform translateY(-2px).
+
+Buttons:
+  Primary: background linear-gradient(130deg, #67E8F9, #A78BFA), color #080B14, font-family Syne, font-weight 700, border-radius 9px.
+  Secondary: transparent, border 1px solid rgba(255,255,255,0.1), color #94A3B8. Hover: border cyan, color cyan.
+
+Badges/Pills: background = color at 10% opacity · border = color at 25% opacity · text = full color. Font: JetBrains Mono 10-11px, padding 3px 10px, border-radius 12px.
+
+Animations:
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(103,232,249,0.15); } 50% { box-shadow: 0 0 60px rgba(103,232,249,0.35); } }
+  All transitions: 0.18s ease on interactive elements.
+
+Scrollbar: ::-webkit-scrollbar { width: 4px; } · thumb: rgba(255,255,255,0.1), border-radius 3px.
+
+Live clock (add if UI has a sidebar or header):
+  setInterval(() => {
+    const now = new Date();
+    const h = now.getHours() % 12 || 12;
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+    clockTimeEl.textContent = `${h}:${m} ${ampm}`;
+    clockDateEl.textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  }, 1000);
+
+Reference: The complete production UI is in Nexus_v1.zip — files index.html and lobby.html. Match that design exactly.</div>
+</div>
+</section>
+
+<!-- ── TOKEN LIMIT ── -->
+<section id="token-limit">
+<div class="sec-title">Token Limit &amp; Scope Statement</div>
+<div class="sec-sub">Paste this <strong style="color:#fff">first</strong>, before anything else, at the top of every single session from Day 1 onwards.</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Token Limit &amp; Scope Statement</span>
+      <span class="prompt-tag">PASTE FIRST · EVERY SESSION</span>
+    </div>
+    <button class="copy-btn" id="btn-token" onclick="copyP('token-text','btn-token')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="token-text">⚠️ CONTEXT RULES FOR THIS SESSION:
+
+Project: Nexus — Private Collaborative Workspace (github.com/[your-username]/nexus)
+Stack: Next.js 14 (App Router), Node.js + Express, PostgreSQL + Prisma, Socket.io, LiveKit, Cloudflare R2, NextAuth.js, Stripe
+Platform rules: 100% closed — no public profiles, no public projects, no public search. Free tier = 5 version snapshots per file (FILO). Premium = extended history.
+
+SESSION RULES:
+1. Focus ONLY on today's stated task. Do not expand into other features unprompted.
+2. Write production-quality code — not tutorial code. Include error handling, input validation, and proper TypeScript types.
+3. If a decision involves architecture that affects future phases, flag it explicitly before implementing.
+4. Do not re-explain what you are about to do — go directly to the implementation.
+5. If you are about to hit a context limit, tell me before stopping so I can continue in a fresh session.
+
+Today's task: [REPLACE WITH TODAY'S TASK FROM THE DAY-BY-DAY TABLE BELOW]</div>
+</div>
+</section>
+
+<!-- ── SESSION STARTER ── -->
+<section id="starter">
+<div class="sec-title">Daily Session Starter</div>
+<div class="sec-sub">Paste this second (after Token Limit Statement) from Day 2 onwards. Together they give Claude full context in under 200 tokens.</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Session Starter Template</span>
+      <span class="prompt-tag">FROM DAY 2 · EVERY SESSION</span>
+    </div>
+    <button class="copy-btn" id="btn-starter" onclick="copyP('starter-text','btn-starter')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="starter-text">Project: Nexus — Private Collaborative Workspace (github.com/[your-username]/nexus)
+Stack: Next.js 14, Node.js + Express, PostgreSQL + Prisma ORM, Socket.io (real-time), LiveKit (voice/video), Cloudflare R2 (files), NextAuth.js (auth), Stripe (billing)
+Phase: [PHASE NUMBER AND NAME — e.g. "Phase 1 — Foundation"]
+Today's task: [PASTE THE EXACT TASK TEXT FROM TODAY'S ROW IN THE TABLE BELOW]
+
+Additional context:
+- Closed platform — no public pages, no public profiles, no discovery features ever
+- FILO version history: free = 5 snapshots, premium = configurable (Stripe-gated)
+- ORM: Prisma (all DB changes via prisma migrate dev)
+- Auth: NextAuth with email/password + workspace invite token flow
+- File storage: presigned URLs for direct client uploads to R2/S3
+- Real-time: Socket.io for chat + presence; Yjs (y-websocket) for collaborative editing; LiveKit for voice/video
+
+[IF THIS IS A UI SESSION — also paste the Design Brief from the Design Brief section above]</div>
+</div>
+
+<div class="notice tip"><div class="ni">💡</div><div><strong>Three-block paste order for UI sessions:</strong> (1) Token Limit Statement → (2) Session Starter → (3) Design Brief. For backend/API sessions, skip the Design Brief. For Opus architecture sessions, only paste the Architecture Prompt.</div></div>
+</section>
+
+<!-- ── ARCHITECTURE PROMPT ── -->
+<section id="arch-prompt">
+<div class="sec-title">Architecture Prompt</div>
+<div class="sec-sub">Paste this <strong style="color:#fff">once only</strong> — into a <strong style="color:var(--opus-lt)">fresh Opus 4.6 session</strong> at the start of Day 1, after the Sonnet setup session has fully completed and the 5-hour window has reset. Save the full Opus response as <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 7px;border-radius:4px;color:var(--cyan)">ARCHITECTURE.md</code> in your repo root.</div>
+
+<div class="notice opus-note"><div class="ni">⚡</div><div><strong>FRESH WINDOW REQUIRED:</strong> Do the Day 1 Sonnet setup tasks first (repo, Docker, folder structure). Then wait for the 5-hour window to fully reset. Open a brand new Opus 4.6 session with zero messages. THEN paste this. The full ~44K token budget is what you're paying for here.</div></div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left">
+      <span class="prompt-label">Full Architecture &amp; Project Prompt</span>
+      <span class="prompt-tag">OPUS 4.6 · FRESH WINDOW · DAY 1 ONLY</span>
+    </div>
+    <button class="copy-btn" id="btn-arch" onclick="copyP('arch-text','btn-arch')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>
+      Copy Full Prompt
+    </button>
+  </div>
+  <div class="prompt-body" id="arch-text" style="max-height:280px">You are acting as a Principal Software Architect and Senior Full-Stack Engineer with 15+ years of experience building collaborative SaaS platforms. I am the sole founder and full-time developer of a new product. I need your complete, unwavering guidance from concept to deployment. Do not simplify your answers. Do not leave gaps. Treat every response as if it is going directly into a technical specification document that a real engineering team will build from.
+
+═══════════════════════════════════════════
+PROJECT NEXUS — Full Platform Specification
+═══════════════════════════════════════════
+
+PROJECT IDENTITY:
+I am building a closed, private, all-in-one collaborative workspace — codenamed Nexus. It is designed for any group — a solo developer, duo, friend group, small team, or large working group — who want to create, share, document, code, communicate, and collaborate entirely within one unified environment, without any public-facing profiles, public search, or internet exposure.
+
+Nexus is the spiritual intersection of three products:
+- Notion / Obsidian → Rich note-taking, docs, folder structures, linked pages
+- GitHub → Code management, project versioning, contributions, change history
+- Discord → Voice calls, group chat channels, personal DMs, persistent audio presence
+
+CORE PHILOSOPHY (non-negotiable):
+1. CLOSED ECOSYSTEM — No public profiles. No search indexing. No public project pages. Everything private forever.
+2. SIMPLICITY FIRST — Maintainable by a single developer. No microservices. No Kubernetes.
+3. SCALABILITY CEILING — Architected to scale gracefully. Every decision leaves a door open for horizontal scaling without a full rewrite.
+4. FREEMIUM MODEL — Free: last 5 version snapshots per file (FILO). Premium: extended. Primary monetisation lever.
+5. NO BLOAT — Every feature must justify its existence.
+
+FIXED TECH STACK:
+- Frontend: Next.js 14 (App Router, TypeScript, Tailwind CSS)
+- Backend: Node.js + Express (TypeScript) + Next.js API routes for lighter endpoints
+- Database: PostgreSQL
+- ORM: Prisma
+- Real-time: Socket.io (chat + presence + notifications)
+- Collaborative editing: Yjs + y-websocket (CRDT-based)
+- Voice/Video: LiveKit (WebRTC)
+- File Storage: Cloudflare R2 (S3-compatible, presigned URLs)
+- Auth: NextAuth.js (email/password + invite tokens)
+- Payments: Stripe (per-workspace subscription, monthly/annual)
+- Deployment: Fly.io (backend + LiveKit) + Vercel (frontend)
+- Search: PostgreSQL full-text search initially
+
+UI DESIGN SYSTEM (all frontend must follow this):
+- Fonts: Syne 700/800 (headings) · DM Sans 400/500 (body) · JetBrains Mono (code, labels)
+- Background: #080B14 · panels #0D1220 · cards rgba(13,18,32,0.95)
+- Accents: Cyan #67E8F9 (primary) · Purple #A78BFA · Green #34D399 · Yellow #FCD34D · Red #F87171
+- Always include: grid overlay background, ambient radial glow blobs, live clock in sidebar
+- Cards: backdrop-filter blur(20px), border rgba(255,255,255,0.08), border-radius 14px
+- Animations: fadeUp on load, glow on logo, 0.18s transitions on all interactive elements
+- Reference: Nexus_v1.zip index.html + lobby.html for complete production examples
+
+USER ROLES (per workspace): Owner → Admin → Member → Viewer
+
+FEATURES:
+[A] Workspace & Team: Invite-only, multi-space, multi-workspace membership, solo use supported
+[B] Notes/Docs: Block editor (Tiptap/BlockNote), FILO snapshots, Yjs real-time collab, inline comments
+[C] Code/Projects: Monaco editor, file tree, FILO version history, attribution, review/approval toggle
+[D] Chat: Multi-channel, DMs, group DMs, reactions, threads, @mentions, full-text search
+[E] Voice/Calls: Persistent LiveKit rooms (like Discord), screen share, video, MUSIC SHARING (Spotify/Apple Music/system audio streamed to all channel members — the unique feature nobody else has)
+[F] Files: R2 storage, previews, FILO versioning, storage quotas
+[G] Premium: Stripe per-workspace, extended history, more storage, call recording, advanced permissions
+
+WHAT I NEED IN THIS SESSION:
+1. Confirm or improve the tech stack — justify every choice, flag any pain points
+2. Complete Prisma schema — every model, field, relation with inline comments
+3. Monorepo folder structure — apps/web, apps/api, packages/db, packages/types, packages/utils
+4. Answer all 7 architecture decisions with opinionated recommendations:
+   a. Turborepo vs pnpm workspaces only
+   b. Yjs: standalone y-websocket vs integrated into Express
+   c. LiveKit: Cloud vs self-hosted for 28–200 initial users
+   d. FILO history: full snapshots vs diffs — which is simpler and more reliable
+   e. JWT: refresh token rotation and session invalidation across multi-workspace
+   f. Notifications: Socket.io vs SSE
+   g. Premium gates: middleware-level vs database feature flags
+5. docker-compose.yml for local dev + .env.example with every variable documented
+6. Confirm you understand the project and tell me what the Day 1 Sonnet session task is
+
+CONSTRAINTS: Solo developer. 100% closed platform. FILO = 5 free, premium = more. Production quality, not tutorial quality. TypeScript throughout. Prisma for all DB access.</div>
+  <div class="prompt-expand" onclick="toggleExpand('arch-text',this)">▼ Show full prompt</div>
+</div>
+</section>
+
+<!-- ══════ PHASE 1 ══════ -->
+<section id="phase1">
+<div class="phase-hdr ph1">
+  <div>
+    <div class="phase-ttl">Phase 1 — Foundation</div>
+    <div class="phase-sub">Monorepo · Docker · Schema · Auth · Workspace · Notes · Chat · File Upload</div>
+  </div>
+  <div><div class="phase-weeks">6</div><div class="phase-weeks-lbl">Weeks · Days 1–42</div></div>
+</div>
+<div class="notice tip"><div class="ni">🎯</div><div><strong>Phase 1 Goal:</strong> By Day 42 you have a working auth system, workspace management, basic note editor, single text chat channel, and file uploads. No real-time yet. Just core plumbing working end-to-end. Tag: v0.1.0-phase1-complete.</div></div>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Days</th><th>Tasks</th><th>Model</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="dc">1–2</td><td class="tc"><strong>Monorepo scaffold + Docker</strong><ul><li>Create GitHub repo (nexus), .gitignore for Node/Next.js</li><li>pnpm workspaces monorepo: apps/web, apps/api, packages/db, packages/types</li><li>Turborepo — turbo.json with build/dev/lint pipelines</li><li>docker-compose.yml: PostgreSQL 15 + pgAdmin</li><li>.env.example with all variables documented</li><li>Verify: pnpm dev starts both Next.js and Express</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Pure scaffolding. Mechanical setup. Sonnet builds monorepo + Docker in 1–2 messages. Save Opus budget for schema.</td></tr>
+    <tr class="paste-row"><td colspan="4">⬇ &nbsp;<strong>Window 1 complete.</strong> Wait for full 5-hour reset. Open <strong>fresh Opus 4.6.</strong> Paste the Architecture Prompt. Save full output as <code style="font-family:'JetBrains Mono',monospace">ARCHITECTURE.md</code> in repo root. ⬇</td></tr>
+    <tr><td class="dc">3–4</td><td class="tc"><strong>Prisma schema — identity + workspace models</strong><ul><li>Initialize Prisma in packages/db. Configure DATABASE_URL.</li><li>Models: User, Account, Session (NextAuth), Workspace, WorkspaceMember</li><li>Role enum: OWNER, ADMIN, MEMBER, VIEWER</li><li>Soft-delete (deletedAt?) + timestamps on all models</li><li>Run first migration: prisma migrate dev --name init</li><li>Seed: 1 test workspace, 3 test users with different roles</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Schema is the architectural foundation. Wrong relations = cascading pain for 28 weeks. Opus designs NextAuth-compatible structure with correct cardinalities.</td></tr>
+    <tr><td class="dc">5–6</td><td class="tc"><strong>Prisma schema — content models</strong><ul><li>Models: Space, Channel, Note, NoteVersion, Project, ProjectFile, FileVersion</li><li>NoteVersion/FileVersion: FILO cap pattern (cap field on workspace, enforce in API)</li><li>Models: Message, DirectMessage, GroupDM, GroupDMMessage</li><li>Models: FileLibraryItem, Folder</li><li>Run migration: prisma migrate dev --name content-models</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">FILO cap enforcement, Note→NoteVersion relation design, polymorphic Folder structure all require careful architecture. Sonnet makes naive choices here.</td></tr>
+    <tr><td class="dc">7–8</td><td class="tc"><strong>Prisma schema — comms + billing + full seed</strong><ul><li>Models: VoiceRoom, VoiceSession, Notification, Subscription, WorkspaceFeatureGate</li><li>Subscription: stripeCustomerId, subscriptionId, status, currentPeriodEnd</li><li>WorkspaceFeatureGate: key-value premium flags per workspace</li><li>Final schema review — foreign keys, cascade rules, indexes</li><li>Full seed covering all models</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">These models follow patterns established in Days 3–6. Sonnet fills them correctly. Stripe Subscription model is a well-known pattern.</td></tr>
+    <tr><td class="dc">9–10</td><td class="tc"><strong>NextAuth — email/password provider</strong><ul><li>Install NextAuth v4 in apps/web. Configure [...nextauth].ts</li><li>CredentialsProvider + bcrypt hashing</li><li>PrismaAdapter for session/account storage</li><li>JWT strategy + session callback (attach userId + workspaceIds)</li><li>API: /api/auth/register (POST)</li><li>Test: register → login → session → logout cycle end-to-end</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">NextAuth + PrismaAdapter + CredentialsProvider is well-documented. Sonnet sets this up in 1–2 messages. Keep strategy JWT (not database).</td></tr>
+    <tr><td class="dc">11–12</td><td class="tc"><strong>Invite system backend</strong><ul><li>Signed token: crypto.randomBytes → store in DB → email link → redeem → join workspace</li><li>POST /workspaces/:id/invites (generate token, optional email, expires 7 days)</li><li>GET /invites/:token (validate, return workspace preview)</li><li>POST /invites/:token/accept (user joins workspace as MEMBER)</li><li>Resend for invite email delivery</li><li>Handle: expired tokens, replay attacks, already-member edge cases</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Invite system has security-critical edge cases (expiry, replay attacks, race conditions). Must integrate cleanly with role system. Opus handles all edge cases correctly.</td></tr>
+    <tr><td class="dc">13–14</td><td class="tc"><strong>Role-based auth middleware</strong><ul><li>requireAuth: validates JWT, attaches user to request</li><li>requireWorkspaceMember: checks user is member of target workspace</li><li>requireRole: checks minimum role level (VIEWER/MEMBER/ADMIN/OWNER)</li><li>Apply middleware to all workspace API routes</li><li>Tests: verify each role level can/cannot access endpoints</li><li>Rate limiting (express-rate-limit) on auth endpoints</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Permission middleware design affects every API route for the next 20+ weeks. Opus designs a clean, composable chain with workspace-scoped role checks.</td></tr>
+    <tr><td class="dc">15–18</td><td class="tc"><strong>Workspace + Space + Channel CRUD + sidebar UI</strong><ul><li>CRUD APIs for Workspace, Space, Channel (all middleware-protected)</li><li>Workspace creation page, workspace switcher</li><li>Left sidebar: workspace → spaces → channels (nested, collapsible)</li><li>Create space modal, create channel modal</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Standard CRUD with middleware already in place. Sonnet implements REST endpoints and Next.js pages efficiently.</td></tr>
+    <tr><td class="dc">19–24</td><td class="tc"><strong>Basic note editor + auto-save + folder tree</strong><ul><li>Simple Tiptap editor (no blocks yet — just text). Auto-save debounced 2s.</li><li>API: POST/PATCH/GET /notes</li><li>Optimistic UI: "Saving…" / "Saved ✓" indicator</li><li>Nested folder sidebar: drag-and-drop (dnd-kit), emoji icons</li><li>CRUD for Folder — notes in folders or at root</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Intentionally simple — full block editor is Phase 2. Sonnet builds basic Tiptap + debounced save quickly.</td></tr>
+    <tr><td class="dc">25–28</td><td class="tc"><strong>Basic REST chat + file uploads</strong><ul><li>API: POST/GET /channels/:id/messages (cursor-based pagination)</li><li>Chat UI: message list, input, send. Poll every 3s (temporary).</li><li>R2/S3 presigned upload: POST /files/upload-url → PUT to R2 → POST /files/confirm</li><li>File preview modal (images, PDFs, audio, video inline)</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Polling chat is intentional — Socket.io comes in Phase 3. Presigned URL pattern is standard S3. Sonnet handles both correctly.</td></tr>
+    <tr><td class="dc">29–42</td><td class="tc"><strong>Settings UI + testing + polish + Phase 1 audit</strong><ul><li>User settings: name, email, password change</li><li>Workspace settings: name, invite management, member list, role change, member remove</li><li>Jest unit tests: auth middleware, invite token, FILO cap (mocked), presigned URLs</li><li>Playwright E2E: login, workspace creation, note creation</li><li>Mobile responsive audit (375px / 768px). Loading + empty states.</li><li>API error format standardisation: {error, code, message}. Add /api/v1/ prefix.</li><li>Zero TypeScript errors (tsc --noEmit). Tag: v0.1.0-phase1-complete.</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Testing, polish, and settings are all Sonnet territory. If a bug is non-obvious, escalate that specific session to Opus with full error context.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left"><span class="prompt-label">Phase 1 Context Snippet</span><span class="prompt-tag">ADD WHEN NEEDED</span></div>
+    <button class="copy-btn" id="btn-p1" onclick="copyP('p1-text','btn-p1')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>Copy</button>
+  </div>
+  <div class="prompt-body" id="p1-text">Phase 1 context: Foundation layer only. No real-time (Socket.io = Phase 3). No block editor (Phase 2). No voice (Phase 3). Priority: correct data models, clean auth, working invite flow, basic CRUD, file uploads via presigned URLs, deployable dev environment. Keep implementations simple and correct — no premature optimisation.</div>
+</div>
+</section>
+
+<!-- ══════ PHASE 2 ══════ -->
+<section id="phase2">
+<div class="phase-hdr ph2">
+  <div>
+    <div class="phase-ttl">Phase 2 — Core Features</div>
+    <div class="phase-sub">Rich Editor · FILO Version History · Monaco Code Editor · Full Chat · DMs · Roles</div>
+  </div>
+  <div><div class="phase-weeks" style="color:var(--cyan)">8</div><div class="phase-weeks-lbl">Weeks · Days 43–98</div></div>
+</div>
+<div class="notice tip"><div class="ni">🎯</div><div><strong>Phase 2 Goal:</strong> Notion-quality block editor with FILO version history, working code editor with file versioning, multi-channel chat with threads/reactions, DMs, complete role system. Take no shortcuts here — this is the product's core value.</div></div>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Days</th><th>Tasks</th><th>Model</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="dc">43–46</td><td class="tc"><strong>Block editor architecture design</strong><ul><li>Design block type registry, block renderer, insertion/deletion/reorder engine</li><li>Decision: Tiptap (extension-based) vs BlockNote (Notion-like OSS) — Opus recommends</li><li>Define all block types: paragraph, H1/H2/H3, bullet, numbered, checklist, quote, divider, callout, codeBlock, table, toggle, image, file embed</li><li>Design JSON storage format for block content in DB</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Block editor architecture is the most complex UI decision in the project. Wrong choice = full rewrite. Opus evaluates Tiptap vs BlockNote correctly for this scale.</td></tr>
+    <tr><td class="dc">47–56</td><td class="tc"><strong>All block types implementation</strong><ul><li>Text: paragraph, H1/H2/H3, bullets, checklist, blockquote, divider, callout</li><li>Shortcuts: ## → H2, - → bullet, [] → checklist, &gt; → quote</li><li>Slash command menu (/) for all block types. Drag handles to reorder.</li><li>Toolbar: bold, italic, underline, strikethrough, inline code, link</li><li>Media: syntax-highlighted code block (Shiki), resizable table, collapsible toggle, inline image (R2), file embed</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Follows the architecture from Days 43–46. Paste Opus architecture output at start of each session. Sonnet implements each block extension efficiently.</td></tr>
+    <tr><td class="dc">57–64</td><td class="tc"><strong>FILO version history — backend + UI</strong><ul><li>Snapshot on every auto-save. Prisma transaction: insert new version + conditional delete oldest if count > snapshotLimit.</li><li>API: GET /notes/:id/versions · GET /notes/:id/versions/:vid · POST /notes/:id/versions/:vid/restore</li><li>Diff generation (jsdiff) to show what changed between snapshots</li><li>UI: slide-in panel, snapshot list (date/time/author), diff view, restore button</li><li>Premium prompt: "Upgrade for more snapshots" when at limit</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">FILO is the core monetisation differentiator. Atomic Prisma transaction + race condition prevention + diff algorithm selection require careful architecture. Critical to get right.</td></tr>
+    <tr><td class="dc">65–76</td><td class="tc"><strong>Project module — backend + Monaco code editor + activity feed</strong><ul><li>CRUD for Project + file tree API (GET /projects/:id/tree)</li><li>File content API: text → string, binary → presigned URL</li><li>PATCH /projects/:id/files/:fid → creates FileVersion (FILO enforced, same pattern as notes)</li><li>GET /projects/:id/activity → change log</li><li>Monaco Editor React integration, language auto-detection, Cmd+S save, unsaved indicator</li><li>File version panel (mirrors note version history UI). Activity feed page.</li><li>Review/Approval toggle UI (approve/reject pending changes)</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Project API design: file tree must handle nested folders, content must distinguish text vs binary, FILO must mirror Note pattern. Opus ensures consistency. Monaco integration is Sonnet after API is done.</td></tr>
+    <tr><td class="dc">77–88</td><td class="tc"><strong>Full chat: reactions, threads, pinning, DMs, @mentions, search</strong><ul><li>Emoji reactions: POST/DELETE /messages/:id/reactions</li><li>Thread replies: GET/POST /messages/:id/thread. Right-side thread panel.</li><li>Message pinning. Message editing + deletion ("edited" label).</li><li>Link previews (fetch OG tags, store preview data)</li><li>DM list (sidebar, unread badge). Group DMs.</li><li>@mention: member dropdown on @, notification on mention. @everyone for ADMIN+.</li><li>Full-text search: POST /workspaces/:id/search/messages (PostgreSQL tsvector)</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Each feature follows established patterns. Do one feature per session. Sonnet builds them efficiently once patterns are in place.</td></tr>
+    <tr><td class="dc">89–98</td><td class="tc"><strong>Granular permissions + Phase 2 integration testing</strong><ul><li>Space-level role overrides (workspace role → space override → project override)</li><li>Per-project access restriction to specific members</li><li>Viewer enforcement: cannot send, edit notes, modify project files</li><li>API: PATCH /workspaces/:id/members/:uid/role · POST /spaces/:id/permissions</li><li>Full flow tests: note create → version → restore · project → Monaco → version · channel → react → thread → DM → search</li><li>Verify FILO: create 7 versions, confirm only 5 remain, oldest deleted</li><li>Tag: v0.2.0-phase2-complete</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Permission resolution order (workspace → space → project override) must not break existing middleware. Opus designs the chain correctly. Integration testing is Sonnet.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left"><span class="prompt-label">Phase 2 Context Snippet</span><span class="prompt-tag">ADD WHEN NEEDED</span></div>
+    <button class="copy-btn" id="btn-p2" onclick="copyP('p2-text','btn-p2')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>Copy</button>
+  </div>
+  <div class="prompt-body" id="p2-text">Phase 2 context: Implementing core features. Block editor follows architecture from Phase 2 Day 43–46 Opus session (saved as ARCHITECTURE.md). FILO pattern: insert snapshot → count total → if count > snapshotLimit → delete oldest using Prisma transaction. Same pattern for Notes and Projects. Note editor uses JSON block format. Real-time collaborative editing (Yjs) is NOT yet implemented — that is Phase 3. All saves are single-user sequential for now.</div>
+</div>
+</section>
+
+<!-- ══════ PHASE 3 ══════ -->
+<section id="phase3">
+<div class="phase-hdr ph3">
+  <div>
+    <div class="phase-ttl">Phase 3 — Real-Time &amp; Communication</div>
+    <div class="phase-sub">Socket.io · Yjs CRDT · LiveKit Voice · Screen Share · 🎵 Music Sharing</div>
+  </div>
+  <div><div class="phase-weeks" style="color:var(--purple)">8</div><div class="phase-weeks-lbl">Weeks · Days 99–154</div></div>
+</div>
+<div class="notice warn"><div class="ni">⚠️</div><div><strong>Highest complexity phase.</strong> Three hardest problems in the entire project: Yjs CRDT integration (Days 107–114), LiveKit server architecture (Days 119–122), and audio/music sharing (Days 131–134). All three are Opus sessions that MUST start at the beginning of a fresh 5-hour window. Never attempt these at the end of a depleted session.</div></div>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Days</th><th>Tasks</th><th>Model</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="dc">99–102</td><td class="tc"><strong>Socket.io server architecture</strong><ul><li>Namespace structure: /chat · /presence · /notifications (separate for clean isolation)</li><li>Auth middleware: validate JWT on connection before allowing any room joins</li><li>Room management: ws:{workspaceId} + ch:{channelId} + user:{userId}</li><li>Connection lifecycle: join rooms on connect, clean up on disconnect</li><li>Event naming conventions: message:new · user:typing · channel:update (consistent snake_case)</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Namespace/room architecture affects every real-time feature for the rest of the project. Messages leaking across workspaces = critical security issue. Opus designs this correctly.</td></tr>
+    <tr><td class="dc">103–106</td><td class="tc"><strong>Real-time chat + typing indicators + presence</strong><ul><li>Replace polling (3s) with Socket.io emit/on events on frontend</li><li>Emit message:new when message saved → all channel room members receive instantly</li><li>Typing indicators: emit user:typing on keypress, clear after 2s inactivity</li><li>Show "X is typing…" at channel bottom when active</li><li>Presence: green dot on online members in sidebar (ws:{workspaceId} room)</li><li>Read receipts: emit message:read on scroll-into-view</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Socket.io event wiring follows architecture from Days 99–102. Sonnet connects emit/on to existing chat UI. Architecture is done — this is connection work.</td></tr>
+    <tr><td class="dc">107–110</td><td class="tc"><strong>Yjs CRDT — server + provider + persistence</strong><ul><li>Set up y-websocket server (apps/collab or integrated into apps/api)</li><li>Yjs document persistence: store Doc updates to PostgreSQL (survive server restarts)</li><li>Y.Doc, Y.Map (metadata), Y.XmlFragment (editor content) data structures</li><li>Room-based document isolation: note:{noteId} per room</li><li>Auth middleware on y-websocket: validate JWT before room join</li><li>Test: 2 browser tabs editing same note → changes sync in &lt;100ms</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Y.Doc persistence strategy (what to store, GC settings, snapshot frequency) and y-websocket auth middleware have non-obvious pitfalls. Opus handles these correctly. Technically deepest session in Phase 3.</td></tr>
+    <tr><td class="dc">111–114</td><td class="tc"><strong>Yjs + block editor integration + presence cursors</strong><ul><li>Configure Yjs provider for editor (@tiptap/extension-collaboration + collaboration-cursor OR BlockNote Yjs support)</li><li>Replace debounced REST save: Yjs handles real-time merging, REST snapshot every 30s on idle</li><li>Presence cursors: each user shows name + unique color (Yjs awareness protocol)</li><li>Test: 3 simultaneous editors — all cursors visible, all edits merge without conflict</li><li>Test offline edit then reconnect — changes merge without data loss</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Integrating Yjs awareness with block editor and migrating from auto-save to Yjs-driven persistence requires understanding of both systems' internals. Do not switch to Sonnet if issues arise — diagnostic context is critical.</td></tr>
+    <tr><td class="dc">115–118</td><td class="tc"><strong>Presence indicators + online status + heartbeat</strong><ul><li>Track who is currently viewing each note (Yjs awareness)</li><li>Show avatar stack at note top: "3 people viewing this note"</li><li>Workspace-level presence: online/away/offline in sidebar member list</li><li>Heartbeat: client pings every 30s → no ping in 60s = "away"</li><li>Last-seen timestamp for offline members</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Builds on Yjs awareness and Socket.io infrastructure already established. Sonnet wires presence events to UI efficiently.</td></tr>
+    <tr><td class="dc">119–122</td><td class="tc"><strong>LiveKit server setup + voice channel architecture</strong><ul><li>Confirm: LiveKit Cloud vs self-hosted (Opus makes final call for 28–200 users on solo-dev budget)</li><li>Set up LiveKit server or configure LiveKit Cloud API keys</li><li>POST /voice-rooms/:id/token → generate LiveKit access token (signed with API secret)</li><li>Room naming: voice-{workspaceId}-{channelId} (persistent rooms, not ephemeral)</li><li>Participant webhook: LiveKit calls back on join/leave → update VoiceRoom.participants in DB</li><li>GET /channels/:id/voice-status → current participants</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Token generation, room naming strategy, persistent vs ephemeral rooms, webhook handling — all must be designed correctly upfront. Wrong room naming = users in wrong channels. Opus handles this.</td></tr>
+    <tr><td class="dc">123–130</td><td class="tc"><strong>Voice channel UI + screen sharing</strong><ul><li>@livekit/components-react: LiveKit room in voice channel panel</li><li>Sidebar entry: participant count + avatars when channel occupied</li><li>In-call UI: audio-only tiles (avatar + name + speaking indicator), mute, deafen, leave</li><li>Persistent presence: user stays in channel until explicitly leaving (page nav does NOT disconnect)</li><li>"You are in a voice channel" persistent footer bar when connected</li><li>Screen share: room.localParticipant.setScreenShareEnabled(true). Large tile for share, small tiles for participants. Max 1 screen share per channel.</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">LiveKit React components handle WebRTC complexity. Sonnet integrates @livekit/components-react correctly once token API is in place.</td></tr>
+    <tr><td class="dc">131–134</td><td class="tc"><strong>🎵 Music / audio sharing — THE UNIQUE FEATURE</strong><ul><li>Design: "Share Audio" button → getDisplayMedia({audio:true, video:false}) → capture system audio → publish as LiveKit custom audio track</li><li>All channel participants receive track and hear the music in real-time</li><li>Alternative: user pastes YouTube URL → evaluate server-side stream feasibility with Opus</li><li>Show "🎵 Music playing" indicator in channel when audio shared</li><li>Solo mode: user can share audio alone in channel (nobody else present)</li><li>Late joiner sync: new participant immediately hears current audio on join</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">getDisplayMedia + LiveKit custom track has browser permission model nuances and cross-platform differences. The late-joiner sync problem requires specific solution. This feature is Nexus's core differentiator — build it right. Opus only.</td></tr>
+    <tr><td class="dc">135–154</td><td class="tc"><strong>Direct calls + notifications + real-time performance + load testing</strong><ul><li>DM call: POST /calls/initiate → ephemeral LiveKit room dm:{userId1}-{userId2} → Socket.io incoming call notification → accept/decline modal</li><li>In-call: video toggle, mute, end call. Call history log via LiveKit webhook.</li><li>Notification types: message:mention · thread_reply · note:comment · call:incoming · invite:received</li><li>Socket.io throttling (max 1 emit per 500ms per user for typing indicators)</li><li>Yjs GC settings to prevent unbounded document growth</li><li>Simulate 28 concurrent Socket.io connections. Simulate 3 concurrent Yjs editors. Simulate 5 in LiveKit call + screen share + music. Fix any issues.</li><li>Tag: v0.3.0-phase3-complete</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">DM call flow follows established LiveKit pattern. Notification system uses Socket.io infrastructure. Performance optimisation is targeted Sonnet fixes. If Yjs GC or Socket.io scaling is non-obvious, escalate that specific session to Opus.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left"><span class="prompt-label">Phase 3 Context Snippet</span><span class="prompt-tag">HIGH IMPORTANCE · ALL PHASE 3 SESSIONS</span></div>
+    <button class="copy-btn" id="btn-p3" onclick="copyP('p3-text','btn-p3')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>Copy</button>
+  </div>
+  <div class="prompt-body" id="p3-text">Phase 3 context: Implementing all real-time features. Socket.io architecture (namespaces: /chat, /presence, /notifications; rooms: ws:{workspaceId}, ch:{channelId}, user:{userId}) designed in Days 99–102. Yjs uses y-websocket with PostgreSQL persistence, room naming: note:{noteId}. LiveKit for all voice/video — NOT mediasoup, NOT Agora. LiveKit room naming: voice-{workspaceId}-{channelId} for persistent voice channels, dm-{userId1}-{userId2} for direct calls. All real-time connections require JWT auth. Block editor uses [Tiptap/BlockNote — update with your actual choice] with Yjs collaboration extensions.</div>
+</div>
+</section>
+
+<!-- ══════ PHASE 4 ══════ -->
+<section id="phase4">
+<div class="phase-hdr ph4">
+  <div>
+    <div class="phase-ttl">Phase 4 — Premium &amp; Polish</div>
+    <div class="phase-sub">Stripe Billing · Feature Gates · Security Audit · JWT Hardening · Deployment · Launch</div>
+  </div>
+  <div><div class="phase-weeks" style="color:var(--orange)">6</div><div class="phase-weeks-lbl">Weeks · Days 155–196</div></div>
+</div>
+<div class="notice tip"><div class="ni">🎯</div><div><strong>Phase 4 Goal:</strong> By Day 196 Nexus is live on the internet, Stripe payments working, premium gates enforced, security hardened, and polished enough to share with your first 28 users. Do not rush this phase — billing correctness and security directly affect trust and revenue.</div></div>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Days</th><th>Tasks</th><th>Model</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="dc">155–158</td><td class="tc"><strong>Stripe subscription architecture</strong><ul><li>Per-workspace billing: one Stripe Customer per workspace (not per user)</li><li>Create Stripe products: Nexus Free, Nexus Premium (monthly + annual prices)</li><li>POST /workspaces/:id/billing/checkout → Stripe Checkout session</li><li>GET /workspaces/:id/billing/portal → Stripe Customer Portal session</li><li>Workspace fields: stripeCustomerId, stripeSubscriptionId, plan (FREE/PREMIUM), subscriptionStatus, currentPeriodEnd</li><li>On upgrade: update workspace.snapshotLimit field</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Billing architecture (per-workspace vs per-user, Checkout vs Elements, subscription→feature mapping) has long-term revenue implications. Opus designs correct data model and idempotent checkout flow for upgrade/downgrade/cancellation.</td></tr>
+    <tr><td class="dc">159–162</td><td class="tc"><strong>Stripe webhooks (idempotent)</strong><ul><li>POST /webhooks/stripe: verify Stripe signature (stripe.webhooks.constructEvent)</li><li>checkout.session.completed → activate Premium, update workspace.plan</li><li>customer.subscription.updated → update status, currentPeriodEnd</li><li>customer.subscription.deleted → downgrade to FREE, reset snapshotLimit to 5</li><li>invoice.payment_failed → mark PAST_DUE, show warning banner to workspace owner</li><li>Idempotency: check if event already processed before applying changes</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Webhook handlers follow standard Stripe patterns. Sonnet implements them correctly. Signature verification and idempotency key pattern are well-documented.</td></tr>
+    <tr><td class="dc">163–170</td><td class="tc"><strong>Premium feature gates + extended history</strong><ul><li>requirePremium(featureKey) middleware: checks workspace.plan === PREMIUM + WorkspaceFeatureGate</li><li>Apply to: extended history endpoints, file upload beyond 2GB, call recording</li><li>useFeatureGate(key) hook on frontend — show upgrade prompt when gated</li><li>Upgrade prompt component → links to Stripe checkout</li><li>Graceful downgrade: when subscription lapses, versions beyond 5 are hidden (not deleted) for 30-day grace period</li><li>Premium settings: owner configures snapshotLimit (10/25/50/100/unlimited)</li><li>Storage counter: fileStorageUsed on Workspace, increment/decrement on upload/delete. Block uploads at quota.</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">Feature gate architecture (middleware vs DB flags vs hardcoded plan checks) and graceful downgrade strategy (hide vs delete) affect user trust and data retention policy. Opus makes the correct call.</td></tr>
+    <tr><td class="dc">171–178</td><td class="tc"><strong>Advanced permissions (Premium) + security audit</strong><ul><li>Custom roles: workspace owner creates roles with specific permission sets</li><li>Per-file permissions: note/project file restricted to specific users</li><li>API: POST/PATCH /workspaces/:id/roles. Guest access (VIEWER to specific space only).</li><li>XSS audit: no dangerouslySetInnerHTML with unsanitised input. DOMPurify for all HTML rendering.</li><li>CSRF: verify NextAuth CSRF protection. CSRF tokens on all state-changing calls.</li><li>Rate limiting: all APIs. Auth endpoints: 5 req/min strict limit.</li><li>File upload security: MIME type validation server-side (not just extension), size limits</li><li>Zod schemas on every API endpoint body. Secrets audit (trufflehog on git history).</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span><span class="badge b-fresh">FRESH</span></td><td class="wc">Security audit needs systematic reasoning across the full codebase. Opus identifies attack vectors: stored XSS via rich editor blocks, SSRF via link preview fetcher, insecure presigned URL scope, MIME bypass on uploads. Sonnet misses subtle issues.</td></tr>
+    <tr><td class="dc">179–182</td><td class="tc"><strong>JWT hardening + session management</strong><ul><li>Refresh token rotation: short-lived access tokens (15min) + long-lived refresh (30 days)</li><li>Store refresh tokens in DB (hashed). Invalidate on use — previous token invalid after rotation.</li><li>Session revocation: "Log out all devices" endpoint — delete all refresh tokens for user</li><li>Workspace removal: invalidate workspace-scoped session data when user removed</li><li>Replay detection: concurrent use of same refresh token → force full re-auth</li></ul></td><td class="mc"><span class="badge b-opus">OPUS</span></td><td class="wc">JWT refresh rotation has subtle timing and storage requirements. Common Sonnet implementations miss token binding and replay detection. Opus implements the full rotation pattern correctly.</td></tr>
+    <tr><td class="dc">183–196</td><td class="tc"><strong>Performance + mobile + deployment + launch</strong><ul><li>Database: EXPLAIN ANALYZE on slow queries, add missing indexes, fix N+1 (Prisma includes)</li><li>Redis cache: workspace membership checks (hot path on every authenticated request)</li><li>Next.js: React.lazy() + Suspense for Monaco, LiveKit room. Bundle analysis.</li><li>Mobile audit: iPhone SE (375px), iPad (768px). Fix sidebar → bottom tab bar on mobile. Monaco read-only on mobile.</li><li>Vercel (frontend) + Fly.io (backend, y-websocket, LiveKit) + managed PostgreSQL (Neon/Supabase)</li><li>GitHub Actions CI/CD: tests on PR, deploy to production on main push</li><li>Sentry (error tracking, free tier) + UptimeRobot (monitoring)</li><li>Production test: register → workspace → invite 3 test users → all Phase 1–3 features</li><li>README.md (tech stack, setup, env vars). Demo video (3–5 min walkthrough).</li><li>Tag: v1.0.0 — production launch 🚀</li></ul></td><td class="mc"><span class="badge b-sonnet">SONNET</span></td><td class="wc">Performance fixes and deployment are mechanical once problem areas are identified. Paste slow query examples or bundle analysis output to Sonnet for targeted fixes. If a non-obvious performance issue arises, escalate to Opus.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <div class="prompt-header-left"><span class="prompt-label">Phase 4 Context Snippet</span><span class="prompt-tag">BILLING + SECURITY SESSIONS</span></div>
+    <button class="copy-btn" id="btn-p4" onclick="copyP('p4-text','btn-p4')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg>Copy</button>
+  </div>
+  <div class="prompt-body" id="p4-text">Phase 4 context: Adding Stripe billing, feature gates, and hardening for production. Billing model: per workspace (not per user). One Stripe Customer per workspace. Free tier snapshotLimit = 5 (FILO). Premium = configurable by workspace owner. Feature gates in WorkspaceFeatureGate table, checked via requirePremium(featureKey) middleware. Stripe webhooks must be idempotent. Security audit must cover: XSS in block editor rendering, CSRF on API mutations, SSRF in link preview fetcher, file upload MIME bypass, JWT refresh token replay attacks.</div>
+</div>
+</section>
+
+<!-- ══════ GOLDEN RULES ══════ -->
+<section id="golden-rules">
+<div class="sec-title">The Golden Rules</div>
+<div class="sec-sub">Non-negotiable. Follow every rule on every session for 28 weeks.</div>
+<div class="rule-grid">
+  <div class="rule-card hl"><h4>Choose your model BEFORE opening a chat</h4><p>Look up today's day in the table. Check the Model column. Open that model before typing a single word. Never open a chat and decide mid-session. The decision is made here, in this document.</p></div>
+  <div class="rule-card"><h4>OPUS = fresh 5-hour window only</h4><p>The window resets from your first message. An Opus session with 8K tokens remaining will run out mid-debug. Schedule all Opus sessions as the very first task of your day — never at the end of a depleted window.</p></div>
+  <div class="rule-card"><h4>Never switch models mid-session on a hard task</h4><p>If debugging a Yjs CRDT conflict or LiveKit connection issue with Opus, do NOT switch to Sonnet to save tokens. The diagnostic context built across messages is what makes Opus valuable. Losing it mid-debug costs more time than it saves.</p></div>
+  <div class="rule-card"><h4>One task per session</h4><p>Each session focuses on one numbered task from the roadmap. Do not mix tasks. A session trying to implement DMs + @mentions + link previews will produce worse code than three focused sessions.</p></div>
+  <div class="rule-card"><h4>Paste design brief for ALL UI sessions</h4><p>Always paste the Design Brief (new section above) at the start of any session building or modifying frontend. Without it Claude generates generic UI. With it: same Nexus design every time. This is the single most important new rule added to this guide.</p></div>
+  <div class="rule-card"><h4>Save Opus output as reference documents</h4><p>Every Opus session produces a specification subsequent Sonnet sessions depend on. Save: ARCHITECTURE.md, SCHEMA.md, REALTIME_DESIGN.md. Paste the relevant section as context at the start of related Sonnet sessions.</p></div>
+  <div class="rule-card"><h4>Commit to GitHub after every session</h4><p>Every session ends with git commit. Format: <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:var(--cyan)">feat(phase1): implement invite system backend</code>. Builds commit history, creates daily restore points, means you never lose more than one session.</p></div>
+  <div class="rule-card"><h4>Zero TypeScript errors before phase transitions</h4><p>Run <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:var(--cyan)">tsc --noEmit</code> before tagging any phase complete. Type errors in Phase 1 compound into 10x harder bugs in Phase 3. The type system is your documentation — keep it clean.</p></div>
+</div>
+</section>
+
+<!-- ══════ TOKEN TRAPS ══════ -->
+<section id="token-traps">
+<div class="sec-title">Token Traps — Never Use Opus For These</div>
+<div class="sec-sub">These are Sonnet tasks. Using Opus wastes your window budget with zero quality gain.</div>
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Task</th><th>Why it is a Sonnet task</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Dockerfiles &amp; docker-compose.yml</strong></td><td class="wc">Standard Node/Postgres/Redis config. Sonnet completes in 1 message, ~300 tokens. Zero architectural decisions.</td></tr>
+    <tr><td><strong>GitHub Actions CI/CD yaml</strong></td><td class="wc">Mechanical: pnpm install + lint + test + build + deploy. Sonnet under 400 tokens.</td></tr>
+    <tr><td><strong>Prisma seed files</strong></td><td class="wc">Creating test data with prisma.upsert() from your schema. Sonnet fills correctly in one message.</td></tr>
+    <tr><td><strong>Unit test stubs</strong></td><td class="wc">3–5 test function skeletons per file. Sonnet generates from function signatures quickly.</td></tr>
+    <tr><td><strong>Tailwind CSS / UI components</strong></td><td class="wc">Buttons, cards, modals, forms, tables. Sonnet builds entire pages efficiently — follow with the Design Brief.</td></tr>
+    <tr><td><strong>Standard CRUD API endpoints</strong></td><td class="wc">GET/POST/PATCH/DELETE with Prisma, following patterns established by Opus. Sonnet applies the pattern correctly.</td></tr>
+    <tr><td><strong>React hooks (useState, useEffect, useSWR)</strong></td><td class="wc">Data fetching, form state, loading states. Standard patterns. No Opus reasoning needed.</td></tr>
+    <tr><td><strong>Stripe webhook event handlers</strong></td><td class="wc">Once billing architecture is designed by Opus (Days 155–158), individual handlers are mechanical CRUD.</td></tr>
+    <tr><td><strong>Bundle analysis fixes</strong></td><td class="wc">Paste analyzer output to Sonnet. It handles lazy loading and dynamic import fixes.</td></tr>
+    <tr><td><strong>README and documentation</strong></td><td class="wc">Setup instructions, env var docs, contributing guides. Sonnet fills from your actual stack details.</td></tr>
+    <tr><td><strong>LiveKit React UI components</strong></td><td class="wc">@livekit/components-react provides pre-built components. Wiring + styling = Sonnet once architecture is done.</td></tr>
+    <tr><td><strong>Socket.io event emission (after architecture)</strong></td><td class="wc">After Opus designs namespace/room architecture, individual emit() and on() calls are mechanical.</td></tr>
+    <tr><td><strong>Design Brief prompt</strong></td><td class="wc">Pasting the design brief is not a prompt engineering task — it is context injection. Use Sonnet for all frontend sessions that follow it.</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <span>PROJECT <em>NEXUS</em> · Model Strategy Guide v2.0</span>
+  <span id="footer-dt"></span>
+  <span>Opus 4.6 (32%) · Sonnet 4.6 (68%) · 28 Weeks · ~196 Sessions</span>
+</div>
+
+</main>
+
+<script>
+/* ── COPY BUTTONS ── */
+function copyP(textId, btnId) {
+  const el = document.getElementById(textId);
+  const btn = document.getElementById(btnId);
+  if (!el || !btn) return;
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,8 6,12 14,4"/></svg> Copied!';
+    btn.classList.add('done');
+    setTimeout(() => {
+      btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="4" y="4" width="9" height="9" rx="1.5"/><path d="M3 3V12H2a1 1 0 01-1-1V2a1 1 0 011-1h9a1 1 0 011 1v1"/></svg> Copy Prompt';
+      btn.classList.remove('done');
+    }, 2500);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Prompt'; }, 2500);
+  });
+}
+
+/* ── EXPAND PROMPT ── */
+function toggleExpand(id, trigger) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.classList.contains('expanded')) {
+    el.classList.remove('expanded');
+    trigger.textContent = '▼ Show full prompt';
+  } else {
+    el.classList.add('expanded');
+    trigger.textContent = '▲ Collapse';
+  }
+}
+
+/* ── LIVE CLOCK ── */
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const mStr = String(m).padStart(2,'0');
+  const sStr = String(s).padStart(2,'0');
+  const colon = s % 2 === 0 ? ':' : '<span style="opacity:0">:</span>';
+
+  const clockTime = document.getElementById('clock-time');
+  if (clockTime) clockTime.innerHTML = `${h}${colon}${mStr} <span style="font-size:11px;color:var(--text4)">${ampm}</span>`;
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr = `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+  const clockDate = document.getElementById('clock-date');
+  if (clockDate) clockDate.textContent = dateStr;
+
+  const coverDate = document.getElementById('cover-date');
+  if (coverDate) coverDate.textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+  const footerDt = document.getElementById('footer-dt');
+  if (footerDt) footerDt.textContent = `${h}:${mStr} ${ampm} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
