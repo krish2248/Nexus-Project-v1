@@ -1,102 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nexus — Your All-In-One Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0D1117;
-      --bg-secondary: #161B22;
-      --bg-tertiary: #21262D;
-      --bg-card: #1C2128;
-      --border: #30363D;
-      --border-light: #3D444D;
-      --text-primary: #E6EDF3;
-      --text-secondary: #8B949E;
-      --text-muted: #6E7681;
-      --nexus: #58A6FF;
-      --nexus-light: #79C0FF;
-      --nexus-dark: #388BFD;
-      --nexus-50: rgba(88, 166, 255, 0.15);
-      --green: #3FB950;
-      --green-50: rgba(63, 185, 80, 0.15);
-      --orange: #DB6D28;
-      --orange-50: rgba(219, 109, 40, 0.15);
-      --purple: #A371F7;
-      --purple-50: rgba(163, 113, 247, 0.15);
-      --cyan: #39D0D0;
-      --cyan-50: rgba(57, 208, 208, 0.15);
-      --red: #F85149;
-      --red-50: rgba(248, 81, 73, 0.15);
-      --yellow: #D29922;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-      --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
-      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
-      --radius: 8px;
-      --radius-sm: 6px;
-      --radius-xs: 4px;
-      --transition: all 0.2s ease;
+      --bg-primary: #0D1117; --bg-secondary: #161B22; --bg-tertiary: #21262D;
+      --bg-card: #1C2128; --border: #30363D; --border-light: #3D444D;
+      --text-primary: #E6EDF3; --text-secondary: #8B949E; --text-muted: #6E7681;
+      --nexus: #58A6FF; --nexus-light: #79C0FF; --nexus-dark: #388BFD; --nexus-50: rgba(88,166,255,0.15);
+      --green: #3FB950; --green-50: rgba(63,185,80,0.15); --orange: #DB6D28; --orange-50: rgba(219,109,40,0.15);
+      --purple: #A371F7; --purple-50: rgba(163,113,247,0.15); --cyan: #39D0D0; --cyan-50: rgba(57,208,208,0.15);
+      --red: #F85149; --red-50: rgba(248,81,73,0.15); --yellow: #D29922; --yellow-50: rgba(210,153,34,0.15);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3); --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4);
+      --radius: 8px; --radius-sm: 6px; --radius-xs: 4px; --transition: all 0.2s ease;
     }
-
+    [data-theme="light"] {
+      --bg-primary: #ffffff; --bg-secondary: #f6f8fa; --bg-tertiary: #eaeef2;
+      --bg-card: #ffffff; --border: #d0d7de; --border-light: #b8c0c8;
+      --text-primary: #1f2328; --text-secondary: #656d76; --text-muted: #8c959f;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.08); --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
-
     body {
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
+      background: var(--bg-primary); color: var(--text-primary); min-height: 100vh;
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
     }
-
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-secondary); }
     ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-    .lobby-home { display: flex; min-height: 100vh; }
+    /* Onboarding Overlay */
+    .onboarding-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .onboarding-overlay.hidden { display: none; }
+    .onboarding-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 48px; max-width: 520px; width: 90%; text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .onboarding-card .logo { font-size: 48px; margin-bottom: 16px; }
+    .onboarding-card h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .onboarding-card h1 span { color: var(--nexus-light); }
+    .onboarding-card p { color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+    .onboarding-card input {
+      width: 100%; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 15px; margin-bottom: 12px;
+    }
+    .onboarding-card input:focus { outline: none; border-color: var(--nexus); }
+    .onboarding-steps { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+    .onboarding-step { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+    .onboarding-step.active { background: var(--nexus); }
+    .onboarding-actions { display: flex; gap: 12px; justify-content: center; }
 
+    /* Layout */
+    .app-layout { display: flex; min-height: 100vh; }
     .sidebar {
       width: 260px; background: var(--bg-secondary); border-right: 1px solid var(--border);
       display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; position: sticky; top: 0;
     }
-
     .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
-
     .workspace-btn {
       display: flex; align-items: center; gap: 12px; padding: 10px 12px;
       background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm);
       cursor: pointer; width: 100%; transition: var(--transition);
     }
     .workspace-btn:hover { border-color: var(--border-light); background: var(--bg-card); }
-
     .workspace-icon {
       width: 36px; height: 36px; border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--nexus), var(--purple));
       display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
-
-    .workspace-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .workspace-name { font-size: 14px; font-weight: 600; }
     .workspace-type { font-size: 11px; color: var(--text-muted); }
 
     .sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
-
     .nav-section-label {
       font-size: 11px; font-weight: 600; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.5px; padding: 16px 12px 8px;
     }
-
     .nav-item {
       display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-      border-radius: var(--radius-sm); color: var(--text-secondary); text-decoration: none;
-      font-size: 14px; font-weight: 500; transition: var(--transition); cursor: pointer;
+      border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 14px;
+      font-weight: 500; transition: var(--transition); cursor: pointer;
       border: none; background: none; width: 100%; text-align: left;
     }
     .nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
@@ -111,16 +108,14 @@
     .voice-section { padding: 12px; border-top: 1px solid var(--border); }
     .voice-section-title {
       font-size: 11px; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding: 0 4px;
+      text-transform: uppercase; margin-bottom: 8px; padding: 0 4px;
     }
-
     .voice-channel {
       display: flex; align-items: center; gap: 10px; padding: 8px 10px;
       border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); margin-bottom: 2px;
     }
     .voice-channel:hover { background: var(--bg-tertiary); }
     .voice-channel.active { background: var(--green-50); }
-
     .voice-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
     .voice-channel.active .voice-dot { background: var(--green); }
     .voice-channel-name { font-size: 13px; color: var(--text-secondary); }
@@ -128,34 +123,44 @@
     .voice-users { margin-left: auto; font-size: 12px; color: var(--text-muted); }
 
     .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
     .top-bar {
       height: 60px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0;
     }
-
+    .mobile-menu-btn {
+      display: none; width: 36px; height: 36px; border-radius: var(--radius-sm); background: transparent;
+      border: none; color: var(--text-secondary); cursor: pointer; font-size: 20px;
+      align-items: center; justify-content: center; margin-right: 12px;
+    }
     .search-container { position: relative; width: 400px; }
-
     .search-input {
       width: 100%; padding: 10px 14px 10px 40px; background: var(--bg-tertiary);
       border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary);
       font-family: inherit; font-size: 14px; transition: var(--transition);
     }
     .search-input:focus { outline: none; border-color: var(--nexus); background: var(--bg-card); }
-
-    .search-icon {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      color: var(--text-muted); font-size: 14px;
-    }
-
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
     .search-shortcut {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
       font-size: 11px; color: var(--text-muted); background: var(--bg-card);
       padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border);
     }
+    .search-results {
+      position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius); margin-top: 4px;
+      box-shadow: var(--shadow-lg); display: none; z-index: 200; max-height: 400px; overflow-y: auto;
+    }
+    .search-results.show { display: block; }
+    .search-result-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .search-result-item:hover { background: var(--bg-tertiary); }
+    .search-result-item .icon { font-size: 16px; width: 24px; text-align: center; }
+    .search-result-item .title { font-size: 13px; font-weight: 600; }
+    .search-result-item .type { font-size: 11px; color: var(--text-muted); margin-left: auto; }
 
     .top-actions { display: flex; align-items: center; gap: 8px; }
-
     .top-btn {
       width: 36px; height: 36px; border-radius: var(--radius-sm); background: transparent;
       border: none; color: var(--text-secondary); cursor: pointer;
@@ -163,45 +168,42 @@
       transition: var(--transition); position: relative;
     }
     .top-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-
     .notif-dot {
       position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
       background: var(--red); border-radius: 50%; border: 2px solid var(--bg-secondary);
     }
-
     .user-btn {
       display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px;
       background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 20px;
       cursor: pointer; transition: var(--transition);
     }
     .user-btn:hover { border-color: var(--border-light); }
-
     .user-avatar {
       width: 28px; height: 28px; border-radius: 50%;
       background: linear-gradient(135deg, var(--nexus), var(--purple));
       display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 600; color: white;
     }
-    .user-btn span { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .user-btn span { font-size: 13px; font-weight: 500; }
 
-    .content-area { flex: 1; padding: 28px; overflow-y: auto; }
-
+    /* Content */
+    .content-area { flex: 1; padding: 28px; overflow-y: auto; padding-bottom: 92px; }
     .page-view { display: none; }
     .page-view.active { display: block; }
 
+    /* Welcome */
     .welcome-banner { margin-bottom: 28px; }
-    .welcome-banner h1 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .welcome-banner h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
     .welcome-banner h1 span { color: var(--nexus-light); }
     .welcome-banner p { color: var(--text-secondary); font-size: 14px; }
 
+    /* Quick Actions */
     .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-
     .quick-action {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
       padding: 20px; cursor: pointer; transition: var(--transition);
     }
     .quick-action:hover { border-color: var(--nexus); box-shadow: var(--shadow-md); transform: translateY(-2px); }
-
     .action-icon {
       width: 44px; height: 44px; border-radius: var(--radius-sm);
       display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px;
@@ -210,50 +212,37 @@
     .action-icon.code { background: var(--green-50); }
     .action-icon.files { background: var(--orange-50); }
     .action-icon.voice { background: var(--purple-50); }
-
-    .quick-action h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .quick-action h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
     .quick-action p { font-size: 12px; color: var(--text-muted); }
 
+    /* Dashboard Grid */
     .dashboard-grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
-
     .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-
     .panel-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 20px; border-bottom: 1px solid var(--border);
     }
-
-    .panel-title {
-      font-size: 14px; font-weight: 600; color: var(--text-primary);
-      display: flex; align-items: center; gap: 8px;
-    }
-
+    .panel-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .btn-ghost {
       background: transparent; border: none; color: var(--nexus); font-size: 12px;
       cursor: pointer; padding: 4px 8px; border-radius: var(--radius-xs); transition: var(--transition);
     }
     .btn-ghost:hover { background: var(--nexus-50); }
-
     .panel-body { padding: 12px; }
 
+    /* Notes */
     .note-item {
       display: flex; align-items: center; gap: 12px; padding: 12px;
       border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
     }
     .note-item:hover { background: var(--bg-tertiary); }
-
     .note-icon {
       width: 36px; height: 36px; border-radius: var(--radius-sm);
       background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
-
     .note-details { flex: 1; min-width: 0; }
-    .note-details h4 {
-      font-size: 13px; font-weight: 600; color: var(--text-primary);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    .note-details h4 { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .note-details span { font-size: 12px; color: var(--text-muted); }
-
     .note-menu {
       width: 28px; height: 28px; border-radius: var(--radius-xs); background: transparent;
       border: none; color: var(--text-muted); cursor: pointer;
@@ -262,161 +251,488 @@
     }
     .note-item:hover .note-menu { opacity: 1; }
     .note-menu:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .note-fav { color: var(--yellow); margin-left: 4px; }
 
+    /* Projects */
     .project-item { padding: 16px; border-bottom: 1px solid var(--border); }
     .project-item:last-child { border-bottom: none; }
-
     .project-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-
     .project-info { display: flex; align-items: center; gap: 12px; }
-
     .project-icon {
       width: 32px; height: 32px; border-radius: var(--radius-sm);
       background: var(--green-50); color: var(--green);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;
     }
-
-    .project-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .project-name { font-size: 13px; font-weight: 600; }
     .project-meta { font-size: 12px; color: var(--text-muted); }
-
-    .commit-count {
-      font-size: 12px; font-weight: 600; padding: 4px 10px;
-      border-radius: 12px; background: var(--green-50); color: var(--green);
-    }
-
+    .commit-count { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px; background: var(--green-50); color: var(--green); }
     .project-contribs { display: flex; align-items: center; }
-
     .contrib-avatar {
       width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--bg-card);
       margin-left: -8px; background: linear-gradient(135deg, var(--nexus), var(--purple));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 600; color: white;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white;
     }
     .contrib-avatar:first-child { margin-left: 0; }
 
+    /* Members */
     .members-panel .panel-body { padding: 8px; }
-
-    .member-row {
-      display: flex; align-items: center; gap: 12px; padding: 10px;
-      border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
-    }
+    .member-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
     .member-row:hover { background: var(--bg-tertiary); }
-
     .member-avatar { position: relative; }
-    .member-status {
-      position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
-      border-radius: 50%; border: 2px solid var(--bg-card);
-    }
+    .member-status { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg-card); }
     .member-status.online { background: var(--green); }
     .member-status.idle { background: var(--yellow); }
     .member-status.dnd { background: var(--red); }
-
     .member-info { flex: 1; }
-    .member-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .member-name { font-size: 13px; font-weight: 600; }
     .member-status-text { font-size: 11px; color: var(--text-muted); }
     .member-voice-icon { color: var(--green); font-size: 14px; }
 
+    /* Chat Widget */
     .chat-widget { margin-top: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-
-    .chat-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; border-bottom: 1px solid var(--border);
-    }
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
     .chat-header h4 { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-
     .chat-messages { height: 160px; padding: 12px; overflow-y: auto; }
-
     .chat-msg { display: flex; gap: 10px; margin-bottom: 12px; }
-
     .chat-avatar {
       width: 28px; height: 28px; border-radius: 50%;
       background: linear-gradient(135deg, var(--nexus), var(--purple));
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; font-weight: 600; color: white; flex-shrink: 0;
     }
-
-    .chat-content .name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 1px; }
+    .chat-content .name { font-size: 12px; font-weight: 600; margin-bottom: 1px; }
     .chat-content .text { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
     .chat-content .time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-
     .chat-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); }
-
     .chat-input-row input {
-      flex: 1; padding: 10px 12px; background: var(--bg-tertiary);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--text-primary); font-family: inherit; font-size: 13px;
+      flex: 1; padding: 10px 12px; background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; font-size: 13px;
     }
     .chat-input-row input:focus { outline: none; border-color: var(--nexus); }
-
     .chat-send-btn {
-      width: 36px; height: 36px; border-radius: var(--radius-sm);
-      background: var(--nexus); border: none; color: white; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: var(--transition);
+      width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--nexus);
+      border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);
     }
     .chat-send-btn:hover { background: var(--nexus-dark); }
 
+    /* Music Player */
     .music-bar {
       position: fixed; bottom: 0; left: 260px; right: 0; height: 64px;
       background: var(--bg-card); border-top: 1px solid var(--border);
       display: flex; align-items: center; padding: 0 20px; gap: 20px; z-index: 100;
     }
     .music-bar.hidden { display: none; }
-
     .music-track { display: flex; align-items: center; gap: 12px; width: 220px; }
-
     .music-cover {
       width: 44px; height: 44px; border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--purple), var(--nexus));
       display: flex; align-items: center; justify-content: center; font-size: 18px;
     }
-
-    .music-track-info h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .music-track-info h4 { font-size: 13px; font-weight: 600; }
     .music-track-info span { font-size: 12px; color: var(--text-muted); }
-
     .music-playback { display: flex; align-items: center; gap: 16px; }
-
     .music-playback button {
-      width: 32px; height: 32px; border-radius: 50%; background: transparent;
-      border: none; color: var(--text-secondary); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; transition: var(--transition);
+      width: 32px; height: 32px; border-radius: 50%; background: transparent; border: none;
+      color: var(--text-secondary); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 14px; transition: var(--transition);
     }
     .music-playback button:hover { color: var(--text-primary); }
     .music-playback .play { width: 40px; height: 40px; background: var(--text-primary); color: var(--bg-primary); }
     .music-playback .play:hover { transform: scale(1.05); }
-
     .music-progress { flex: 1; display: flex; align-items: center; gap: 10px; }
     .music-progress span { font-size: 11px; color: var(--text-muted); min-width: 36px; }
-
-    .progress-track {
-      flex: 1; height: 4px; background: var(--border); border-radius: 2px; cursor: pointer;
-      position: relative;
-    }
-    .progress-track .fill {
-      width: 30%; height: 100%; background: var(--nexus); border-radius: 2px; transition: width 0.1s;
-    }
-
+    .progress-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; cursor: pointer; position: relative; }
+    .progress-track .fill { width: 30%; height: 100%; background: var(--nexus); border-radius: 2px; transition: width 0.1s; }
     .music-extras { display: flex; align-items: center; gap: 8px; }
-
     .music-extras button {
       width: 28px; height: 28px; border-radius: var(--radius-xs); background: transparent;
-      border: none; color: var(--text-muted); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: var(--transition);
+      border: none; color: var(--text-muted); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: var(--transition);
     }
     .music-extras button:hover { color: var(--text-primary); }
-
     .volume-wrap { display: flex; align-items: center; gap: 6px; }
+    .volume-wrap input { width: 70px; height: 4px; -webkit-appearance: none; background: var(--border); border-radius: 2px; }
+    .volume-wrap input::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--text-primary); border-radius: 50%; cursor: pointer; }
 
-    .volume-wrap input {
-      width: 70px; height: 4px; -webkit-appearance: none;
-      background: var(--border); border-radius: 2px;
+    /* Notifications Dropdown */
+    .notif-dropdown {
+      position: absolute; top: 48px; right: 0; width: 360px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg);
+      z-index: 200; display: none; overflow: hidden;
     }
-    .volume-wrap input::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 12px; height: 12px;
-      background: var(--text-primary); border-radius: 50%; cursor: pointer;
+    .notif-dropdown.show { display: block; }
+    .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .notif-dropdown-header h3 { font-size: 14px; font-weight: 600; }
+    .notif-list { max-height: 320px; overflow-y: auto; }
+    .notif-item { display: flex; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); }
+    .notif-item:hover { background: var(--bg-tertiary); }
+    .notif-item.unread { background: var(--nexus-50); }
+    .notif-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .notif-icon.msg { background: var(--nexus-50); }
+    .notif-icon.commit { background: var(--green-50); }
+    .notif-icon.mention { background: var(--purple-50); }
+    .notif-body { flex: 1; }
+    .notif-body p { font-size: 13px; line-height: 1.4; }
+    .notif-body span { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
+
+    /* Modals */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; width: 480px; max-width: 90vw; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+    .modal.wide { width: 720px; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .modal-header h2 { font-size: 16px; font-weight: 600; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: var(--radius-sm); background: transparent; border: none;
+      color: var(--text-secondary); cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; transition: var(--transition);
+    }
+    .modal-close:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .modal-body { padding: 24px; }
+
+    /* Command Palette */
+    .cmd-palette {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 600;
+      display: none; align-items: flex-start; justify-content: center; padding-top: 20vh;
+    }
+    .cmd-palette.show { display: flex; }
+    .cmd-palette-box {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      width: 560px; max-width: 90vw; box-shadow: var(--shadow-lg); overflow: hidden;
+    }
+    .cmd-palette-input {
+      width: 100%; padding: 16px 20px; background: transparent; border: none;
+      border-bottom: 1px solid var(--border); color: var(--text-primary);
+      font-family: inherit; font-size: 16px;
+    }
+    .cmd-palette-input:focus { outline: none; }
+    .cmd-palette-results { max-height: 300px; overflow-y: auto; }
+    .cmd-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .cmd-item:hover, .cmd-item.selected { background: var(--bg-tertiary); }
+    .cmd-item .icon { font-size: 16px; width: 24px; text-align: center; }
+    .cmd-item .label { font-size: 14px; }
+    .cmd-item .shortcut { font-size: 11px; color: var(--text-muted); margin-left: auto; font-family: 'JetBrains Mono', monospace; }
+    .cmd-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* Settings */
+    .setting-group { margin-bottom: 24px; }
+    .setting-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .setting-group p { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .setting-input {
+      width: 100%; padding: 10px 12px; background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; font-size: 13px;
+    }
+    .setting-input:focus { outline: none; border-color: var(--nexus); }
+    .setting-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .setting-toggle:last-child { border-bottom: none; }
+    .setting-toggle .label { font-size: 13px; }
+    .setting-toggle .desc { font-size: 11px; color: var(--text-muted); }
+    .toggle-switch { width: 44px; height: 24px; background: var(--bg-tertiary); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; position: relative; transition: var(--transition); }
+    .toggle-switch.on { background: var(--nexus); border-color: var(--nexus); }
+    .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: var(--transition); }
+    .toggle-switch.on::after { left: 22px; }
+
+    .btn-primary { padding: 10px 20px; background: var(--nexus); border: none; border-radius: var(--radius-sm); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: var(--transition); }
+    .btn-primary:hover { background: var(--nexus-dark); }
+    .btn-danger { padding: 10px 20px; background: var(--red); border: none; border-radius: var(--radius-sm); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: var(--transition); }
+    .btn-danger:hover { background: #da3633; }
+    .btn-secondary { padding: 10px 20px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-weight: 500; font-size: 13px; cursor: pointer; transition: var(--transition); }
+    .btn-secondary:hover { border-color: var(--border-light); background: var(--bg-tertiary); }
+
+    /* Notes Page */
+    .notes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .notes-header h2 { font-size: 20px; font-weight: 700; }
+    .notes-toolbar { display: flex; gap: 8px; align-items: center; }
+    .notes-toolbar select { padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; font-size: 13px; }
+
+    .note-editor { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; }
+    .note-editor.show { display: block; }
+    .note-editor input {
+      width: 100%; padding: 8px 0; background: transparent; border: none;
+      font-size: 20px; font-weight: 700; color: var(--text-primary); font-family: inherit; margin-bottom: 12px;
+    }
+    .note-editor input:focus { outline: none; }
+
+    .editor-toolbar { display: flex; gap: 4px; padding: 8px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .toolbar-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-xs); background: transparent;
+      border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; transition: var(--transition);
+      font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    }
+    .toolbar-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .toolbar-btn.active { background: var(--nexus-50); color: var(--nexus); }
+    .toolbar-sep { width: 1px; background: var(--border); margin: 4px 4px; }
+
+    .note-editor textarea {
+      width: 100%; min-height: 150px; padding: 8px 0; background: transparent;
+      border: none; font-size: 14px; color: var(--text-secondary); font-family: inherit;
+      resize: vertical; line-height: 1.7;
+    }
+    .note-editor textarea:focus { outline: none; }
+    .note-editor-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 12px; align-items: center; }
+
+    .note-detail { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; display: none; }
+    .note-detail.show { display: block; }
+    .note-detail h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .note-detail .meta { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; gap: 16px; }
+    .note-detail .content { font-size: 14px; color: var(--text-secondary); line-height: 1.8; white-space: pre-wrap; }
+    .note-detail-actions { display: flex; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    /* Version History */
+    .version-list { margin-top: 12px; }
+    .version-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
+    }
+    .version-item:hover { background: var(--bg-tertiary); }
+    .version-item .ver { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--nexus); background: var(--nexus-50); padding: 2px 8px; border-radius: 4px; }
+    .version-item .time { font-size: 12px; color: var(--text-muted); }
+
+    /* Tasks Page */
+    .tasks-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .tasks-header h2 { font-size: 20px; font-weight: 700; }
+    .task-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .task-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+    .task-stat .num { font-size: 28px; font-weight: 700; color: var(--nexus-light); }
+    .task-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .task-add { display: flex; gap: 12px; margin-bottom: 24px; }
+    .task-add input { flex: 1; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 14px; }
+    .task-add input:focus { outline: none; border-color: var(--nexus); }
+    .task-add select { padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 14px; }
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+    .task-item {
+      display: flex; align-items: center; gap: 12px; padding: 16px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; transition: var(--transition);
+    }
+    .task-item:hover { border-color: var(--border-light); }
+    .task-check {
+      width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition); flex-shrink: 0; background: transparent; color: transparent; font-size: 12px;
+    }
+    .task-check:hover { border-color: var(--nexus); }
+    .task-check.done { background: var(--green); border-color: var(--green); color: white; }
+    .task-body { flex: 1; }
+    .task-body h4 { font-size: 14px; font-weight: 600; }
+    .task-item.completed .task-body h4 { text-decoration: line-through; color: var(--text-muted); }
+    .task-body .task-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .task-priority { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px; }
+    .task-priority.high { background: var(--red-50); color: var(--red); }
+    .task-priority.medium { background: var(--orange-50); color: var(--orange); }
+    .task-priority.low { background: var(--green-50); color: var(--green); }
+    .task-delete {
+      width: 28px; height: 28px; border-radius: var(--radius-xs); background: transparent; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 14px; display: flex;
+      align-items: center; justify-content: center; transition: var(--transition); opacity: 0;
+    }
+    .task-item:hover .task-delete { opacity: 1; }
+    .task-delete:hover { background: var(--red-50); color: var(--red); }
+
+    /* Chats Page */
+    .chat-page { display: flex; height: calc(100vh - 60px); margin: -28px; border-radius: 0; }
+    .chat-sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; }
+    .chat-sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .chat-sidebar-header h3 { font-size: 14px; font-weight: 600; }
+    .channel-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; transition: var(--transition); }
+    .channel-item:hover { background: var(--bg-tertiary); }
+    .channel-item.active { background: var(--nexus-50); }
+    .channel-item .icon { font-size: 14px; color: var(--text-muted); }
+    .channel-item .name { font-size: 14px; color: var(--text-secondary); }
+    .channel-item.active .name { color: var(--nexus-light); font-weight: 500; }
+    .chat-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .chat-main-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .chat-main-header h3 { font-size: 16px; font-weight: 600; }
+    .chat-main-messages { flex: 1; padding: 20px; overflow-y: auto; }
+    .chat-main-input { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 12px; align-items: center; }
+    .chat-main-input input {
+      flex: 1; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 14px;
+    }
+    .chat-main-input input:focus { outline: none; border-color: var(--nexus); }
+    .chat-full-msg { display: flex; gap: 12px; margin-bottom: 20px; position: relative; }
+    .chat-full-msg .chat-avatar { width: 36px; height: 36px; font-size: 12px; }
+    .chat-full-msg .name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .chat-full-msg .text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+    .chat-full-msg .time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .chat-full-msg .msg-actions {
+      position: absolute; top: 4px; right: 0; display: none; gap: 4px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 4px; box-shadow: var(--shadow);
+    }
+    .chat-full-msg:hover .msg-actions { display: flex; }
+    .msg-action-btn {
+      width: 28px; height: 28px; border-radius: var(--radius-xs); background: transparent; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 12px; display: flex;
+      align-items: center; justify-content: center; transition: var(--transition);
+    }
+    .msg-action-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .msg-reactions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+    .msg-reaction {
+      display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px;
+      background: var(--bg-tertiary); border: 1px solid var(--border); cursor: pointer; font-size: 13px;
+      transition: var(--transition);
+    }
+    .msg-reaction:hover { border-color: var(--nexus); }
+    .msg-reaction.active { border-color: var(--nexus); background: var(--nexus-50); }
+    .msg-reaction .count { font-size: 11px; color: var(--text-muted); }
+
+    /* Emoji Picker */
+    .emoji-picker {
+      position: absolute; bottom: 100%; right: 0; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      padding: 12px; display: none; z-index: 100; width: 280px;
+    }
+    .emoji-picker.show { display: block; }
+    .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+    .emoji-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-xs); background: transparent; border: none;
+      cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .emoji-btn:hover { background: var(--bg-tertiary); }
+
+    /* Typing Indicator */
+    .typing-indicator { padding: 4px 20px; font-size: 12px; color: var(--text-muted); font-style: italic; min-height: 20px; }
+    .typing-dots { display: inline-flex; gap: 2px; margin-left: 4px; }
+    .typing-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); animation: typingBounce 1.4s infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+    /* Files Page */
+    .files-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .files-header h2 { font-size: 20px; font-weight: 700; }
+    .file-drop-zone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 48px;
+      text-align: center; margin-bottom: 24px; transition: var(--transition); cursor: pointer;
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover { border-color: var(--nexus); background: var(--nexus-50); }
+    .file-drop-zone .icon { font-size: 48px; margin-bottom: 12px; }
+    .file-drop-zone h3 { font-size: 16px; margin-bottom: 4px; }
+    .file-drop-zone p { font-size: 13px; color: var(--text-muted); }
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .file-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px; cursor: pointer; transition: var(--transition); text-align: center; position: relative;
+    }
+    .file-card:hover { border-color: var(--nexus); transform: translateY(-2px); }
+    .file-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .file-card .name { font-size: 13px; font-weight: 600; margin-bottom: 4px; word-break: break-all; }
+    .file-card .meta { font-size: 11px; color: var(--text-muted); }
+    .file-card .file-actions {
+      position: absolute; top: 8px; right: 8px; display: none; gap: 4px;
+    }
+    .file-card:hover .file-actions { display: flex; }
+
+    /* Code Editor Page */
+    .code-page { display: flex; height: calc(100vh - 60px); margin: -28px; }
+    .code-sidebar { width: 240px; background: var(--bg-secondary); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; }
+    .code-sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .code-sidebar-header h3 { font-size: 14px; font-weight: 600; }
+    .file-tree-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 16px;
+      cursor: pointer; transition: var(--transition); font-size: 13px; color: var(--text-secondary);
+    }
+    .file-tree-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .file-tree-item.active { background: var(--nexus-50); color: var(--nexus-light); }
+    .file-tree-item .indent { width: 16px; flex-shrink: 0; }
+    .code-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .code-header {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; background: var(--bg-secondary);
+    }
+    .code-header .filename { font-size: 14px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    .code-editor-area {
+      flex: 1; padding: 16px; overflow: auto; font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; line-height: 1.6; background: var(--bg-primary);
+    }
+    .code-editor-area textarea {
+      width: 100%; height: 100%; min-height: 400px; background: transparent; border: none;
+      color: var(--text-primary); font-family: inherit; font-size: inherit; line-height: inherit;
+      resize: none; tab-size: 2;
+    }
+    .code-editor-area textarea:focus { outline: none; }
+    .code-status-bar {
+      padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg-secondary);
+      display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted);
     }
 
+    /* Calendar Page */
+    .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .calendar-header h2 { font-size: 20px; font-weight: 700; }
+    .calendar-nav { display: flex; gap: 8px; }
+    .calendar-nav button {
+      width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--bg-tertiary);
+      border: 1px solid var(--border); color: var(--text-primary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: var(--transition);
+    }
+    .calendar-nav button:hover { border-color: var(--border-light); }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .cal-day-header { text-align: center; font-size: 12px; font-weight: 600; color: var(--text-muted); padding: 8px; }
+    .cal-day { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; min-height: 80px; transition: var(--transition); }
+    .cal-day:hover { border-color: var(--border-light); }
+    .cal-day.today { border-color: var(--nexus); }
+    .cal-day.other-month { opacity: 0.3; }
+    .cal-day .num { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .cal-day.today .num { color: var(--nexus); }
+    .cal-event { font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-event.blue { background: var(--nexus-50); color: var(--nexus-light); }
+    .cal-event.green { background: var(--green-50); color: var(--green); }
+    .cal-event.purple { background: var(--purple-50); color: var(--purple); }
+
+    /* Voice Page */
+    .voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .voice-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; cursor: pointer; transition: var(--transition);
+    }
+    .voice-card:hover { border-color: var(--green); }
+    .voice-card.active { border-color: var(--green); background: var(--green-50); }
+    .voice-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .voice-card .users { font-size: 13px; color: var(--text-muted); }
+    .voice-card .join-btn { margin-top: 12px; }
+
+    /* Activity Feed */
+    .activity-feed { margin-top: 24px; }
+    .activity-item {
+      display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 32px; height: 32px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+    }
+    .activity-body p { font-size: 13px; line-height: 1.4; }
+    .activity-body .time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Workspace Members Page */
+    .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .member-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px; display: flex; align-items: center; gap: 16px;
+    }
+    .member-card .avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--nexus), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 600; color: white; position: relative;
+    }
+    .member-card .info { flex: 1; }
+    .member-card .name { font-size: 15px; font-weight: 600; }
+    .member-card .role { font-size: 12px; color: var(--text-muted); }
+    .member-card select { padding: 4px 8px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-xs); color: var(--text-primary); font-size: 12px; }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    /* Toast */
     .toast {
       position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
       background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);
@@ -426,1540 +742,1229 @@
     }
     .toast.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-    /* Notification Dropdown */
-    .notif-dropdown {
-      position: absolute; top: 48px; right: 0; width: 360px; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg);
-      z-index: 200; display: none; overflow: hidden;
-    }
-    .notif-dropdown.show { display: block; }
-
-    .notif-dropdown-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .notif-dropdown-header h3 { font-size: 14px; font-weight: 600; }
-
-    .notif-list { max-height: 320px; overflow-y: auto; }
-
-    .notif-item {
-      display: flex; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: var(--transition);
-    }
-    .notif-item:hover { background: var(--bg-tertiary); }
-    .notif-item.unread { background: var(--nexus-50); }
-
-    .notif-icon {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
-    }
-    .notif-icon.msg { background: var(--nexus-50); }
-    .notif-icon.commit { background: var(--green-50); }
-    .notif-icon.mention { background: var(--purple-50); }
-
-    .notif-body { flex: 1; }
-    .notif-body p { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
-    .notif-body span { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
-
-    /* Settings Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500;
-      display: none; align-items: center; justify-content: center;
-    }
-    .modal-overlay.show { display: flex; }
-
-    .modal {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      width: 480px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 24px; border-bottom: 1px solid var(--border);
-    }
-    .modal-header h2 { font-size: 16px; font-weight: 600; }
-    .modal-close {
-      width: 32px; height: 32px; border-radius: var(--radius-sm); background: transparent;
-      border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px;
-      display: flex; align-items: center; justify-content: center; transition: var(--transition);
-    }
-    .modal-close:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-
-    .modal-body { padding: 24px; }
-
-    .setting-group { margin-bottom: 24px; }
-    .setting-group:last-child { margin-bottom: 0; }
-    .setting-group label {
-      display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;
-    }
-    .setting-group p { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-
-    .setting-input {
-      width: 100%; padding: 10px 12px; background: var(--bg-tertiary);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--text-primary); font-family: inherit; font-size: 13px;
-    }
-    .setting-input:focus { outline: none; border-color: var(--nexus); }
-
-    .setting-toggle {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-    }
-    .setting-toggle:last-child { border-bottom: none; }
-    .setting-toggle .label { font-size: 13px; color: var(--text-primary); }
-    .setting-toggle .desc { font-size: 11px; color: var(--text-muted); }
-
-    .toggle-switch {
-      width: 44px; height: 24px; background: var(--bg-tertiary); border-radius: 12px;
-      border: 1px solid var(--border); cursor: pointer; position: relative; transition: var(--transition);
-    }
-    .toggle-switch.on { background: var(--nexus); border-color: var(--nexus); }
-    .toggle-switch::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 18px; height: 18px; background: white; border-radius: 50%;
-      transition: var(--transition);
-    }
-    .toggle-switch.on::after { left: 22px; }
-
-    .btn-primary {
-      padding: 10px 20px; background: var(--nexus); border: none; border-radius: var(--radius-sm);
-      color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: var(--transition);
-    }
-    .btn-primary:hover { background: var(--nexus-dark); }
-
-    .btn-danger {
-      padding: 10px 20px; background: var(--red); border: none; border-radius: var(--radius-sm);
-      color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: var(--transition);
-    }
-    .btn-danger:hover { background: #da3633; }
-
-    /* Notes Page */
-    .notes-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .notes-header h2 { font-size: 20px; font-weight: 700; }
-
-    .note-editor {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 20px; margin-bottom: 20px; display: none;
-    }
-    .note-editor.show { display: block; }
-
-    .note-editor input {
-      width: 100%; padding: 8px 0; background: transparent; border: none;
-      font-size: 18px; font-weight: 600; color: var(--text-primary);
-      font-family: inherit; margin-bottom: 12px;
-    }
-    .note-editor input:focus { outline: none; }
-
-    .note-editor textarea {
-      width: 100%; min-height: 120px; padding: 8px 0; background: transparent;
-      border: none; font-size: 14px; color: var(--text-secondary);
-      font-family: inherit; resize: vertical; line-height: 1.6;
-    }
-    .note-editor textarea:focus { outline: none; }
-
-    .note-editor-actions {
-      display: flex; gap: 8px; justify-content: flex-end; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 12px;
-    }
-
-    /* Tasks Page */
-    .tasks-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .tasks-header h2 { font-size: 20px; font-weight: 700; }
-
-    .task-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;
-    }
-
-    .task-stat {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 20px; text-align: center;
-    }
-    .task-stat .num { font-size: 28px; font-weight: 700; color: var(--nexus-light); }
-    .task-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-    .task-add {
-      display: flex; gap: 12px; margin-bottom: 24px;
-    }
-    .task-add input {
-      flex: 1; padding: 12px 16px; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: var(--radius);
-      color: var(--text-primary); font-family: inherit; font-size: 14px;
-    }
-    .task-add input:focus { outline: none; border-color: var(--nexus); }
-
-    .task-add select {
-      padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text-primary); font-family: inherit; font-size: 14px;
-    }
-
-    .task-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .task-item {
-      display: flex; align-items: center; gap: 12px; padding: 16px;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      transition: var(--transition);
-    }
-    .task-item:hover { border-color: var(--border-light); }
-
-    .task-check {
-      width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: var(--transition); flex-shrink: 0; background: transparent; color: transparent;
-    }
-    .task-check:hover { border-color: var(--nexus); }
-    .task-check.done {
-      background: var(--green); border-color: var(--green); color: white;
-    }
-
-    .task-body { flex: 1; }
-    .task-body h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-    .task-item.completed .task-body h4 {
-      text-decoration: line-through; color: var(--text-muted);
-    }
-    .task-body .task-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-
-    .task-priority {
-      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px;
-    }
-    .task-priority.high { background: var(--red-50); color: var(--red); }
-    .task-priority.medium { background: var(--orange-50); color: var(--orange); }
-    .task-priority.low { background: var(--green-50); color: var(--green); }
-
-    .task-delete {
-      width: 28px; height: 28px; border-radius: var(--radius-xs); background: transparent;
-      border: none; color: var(--text-muted); cursor: pointer; font-size: 14px;
-      display: flex; align-items: center; justify-content: center; transition: var(--transition);
-      opacity: 0;
-    }
-    .task-item:hover .task-delete { opacity: 1; }
-    .task-delete:hover { background: var(--red-50); color: var(--red); }
-
-    .empty-state {
-      text-align: center; padding: 48px 20px; color: var(--text-muted);
-    }
-    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
-    .empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; }
-
-    /* Search Results */
-    .search-results {
-      position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: var(--radius); margin-top: 4px;
-      box-shadow: var(--shadow-lg); display: none; z-index: 200; max-height: 400px; overflow-y: auto;
-    }
-    .search-results.show { display: block; }
-
-    .search-result-item {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      cursor: pointer; transition: var(--transition);
-    }
-    .search-result-item:hover { background: var(--bg-tertiary); }
-    .search-result-item .icon { font-size: 16px; width: 24px; text-align: center; }
-    .search-result-item .title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .search-result-item .type { font-size: 11px; color: var(--text-muted); margin-left: auto; }
-
-    /* Chats Page */
-    .chat-page { display: flex; height: calc(100vh - 60px); }
-    .chat-sidebar {
-      width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border);
-      overflow-y: auto;
-    }
-    .chat-sidebar-header {
-      padding: 16px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .chat-sidebar-header h3 { font-size: 14px; font-weight: 600; }
-
-    .channel-item {
-      display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-      cursor: pointer; transition: var(--transition);
-    }
-    .channel-item:hover { background: var(--bg-tertiary); }
-    .channel-item.active { background: var(--nexus-50); }
-    .channel-item .icon { font-size: 14px; color: var(--text-muted); }
-    .channel-item .name { font-size: 14px; color: var(--text-secondary); }
-    .channel-item.active .name { color: var(--nexus-light); font-weight: 500; }
-
-    .chat-main { flex: 1; display: flex; flex-direction: column; }
-
-    .chat-main-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px;
-    }
-    .chat-main-header h3 { font-size: 16px; font-weight: 600; }
-
-    .chat-main-messages {
-      flex: 1; padding: 20px; overflow-y: auto;
-    }
-
-    .chat-main-input {
-      padding: 16px; border-top: 1px solid var(--border);
-      display: flex; gap: 12px;
-    }
-    .chat-main-input input {
-      flex: 1; padding: 12px 16px; background: var(--bg-tertiary);
-      border: 1px solid var(--border); border-radius: var(--radius);
-      color: var(--text-primary); font-family: inherit; font-size: 14px;
-    }
-    .chat-main-input input:focus { outline: none; border-color: var(--nexus); }
-
-    .chat-full-msg { display: flex; gap: 12px; margin-bottom: 20px; }
-    .chat-full-msg .chat-avatar { width: 36px; height: 36px; font-size: 12px; }
-    .chat-full-msg .name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-    .chat-full-msg .text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
-    .chat-full-msg .time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-
-    /* Files Page */
-    .files-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .files-header h2 { font-size: 20px; font-weight: 700; }
-
-    .file-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
-    }
-
-    .file-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 20px; cursor: pointer; transition: var(--transition); text-align: center;
-    }
-    .file-card:hover { border-color: var(--nexus); transform: translateY(-2px); }
-
-    .file-card .icon { font-size: 32px; margin-bottom: 12px; }
-    .file-card .name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-    .file-card .meta { font-size: 11px; color: var(--text-muted); }
-
-    /* Calendar Page */
-    .calendar-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .calendar-header h2 { font-size: 20px; font-weight: 700; }
-
-    .calendar-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
-    }
-
-    .cal-day-header {
-      text-align: center; font-size: 12px; font-weight: 600; color: var(--text-muted);
-      padding: 8px;
-    }
-
-    .cal-day {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 12px; min-height: 80px; transition: var(--transition);
-    }
-    .cal-day:hover { border-color: var(--border-light); }
-    .cal-day.today { border-color: var(--nexus); }
-    .cal-day.other-month { opacity: 0.3; }
-
-    .cal-day .num {
-      font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;
-    }
-    .cal-day.today .num { color: var(--nexus); }
-
-    .cal-event {
-      font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .cal-event.blue { background: var(--nexus-50); color: var(--nexus-light); }
-    .cal-event.green { background: var(--green-50); color: var(--green); }
-    .cal-event.purple { background: var(--purple-50); color: var(--purple); }
-
+    /* Responsive */
     @media (max-width: 1100px) {
       .dashboard-grid { grid-template-columns: 1fr; }
       .chat-sidebar { display: none; }
+      .code-sidebar { display: none; }
     }
-
     @media (max-width: 768px) {
-      .sidebar { display: none; }
+      .mobile-menu-btn { display: flex; }
+      .sidebar { position: fixed; left: -260px; z-index: 300; transition: left 0.3s ease; }
+      .sidebar.open { left: 0; }
+      .sidebar-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 299; display: none; }
+      .sidebar-backdrop.show { display: block; }
       .music-bar { left: 0; }
       .quick-actions { grid-template-columns: repeat(2, 1fr); }
       .search-container { width: 200px; }
+      .search-shortcut { display: none; }
       .task-stats { grid-template-columns: 1fr; }
+      .task-add { flex-direction: column; }
+      .content-area { padding: 16px; padding-bottom: 92px; }
+      .chat-page { margin: 0; height: calc(100vh - 60px); }
+      .code-page { margin: 0; height: calc(100vh - 60px); }
     }
   </style>
 </head>
 <body>
 
-  <div class="lobby-home">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <button class="workspace-btn">
-          <div class="workspace-icon">&#x1F680;</div>
-          <div>
-            <div class="workspace-name">Dev Team Alpha</div>
-            <div class="workspace-type">Private Workspace</div>
-          </div>
-        </button>
-      </div>
+<!-- Onboarding -->
+<div class="onboarding-overlay" id="onboarding">
+  <div class="onboarding-card">
+    <div class="onboarding-steps">
+      <div class="onboarding-step active" data-step="0"></div>
+      <div class="onboarding-step" data-step="1"></div>
+      <div class="onboarding-step" data-step="2"></div>
+    </div>
+    <div id="onboarding-content">
+      <div class="logo">&#x1F680;</div>
+      <h1>Welcome to <span>Nexus</span></h1>
+      <p>Your all-in-one workspace for notes, code, chat, and collaboration. Let's set up your workspace.</p>
+      <input type="text" id="onboard-name" placeholder="Your name" value="Alex">
+    </div>
+    <div class="onboarding-actions">
+      <button class="btn-primary" id="onboard-next" onclick="nextOnboardingStep()">Get Started</button>
+    </div>
+  </div>
+</div>
 
-      <nav class="sidebar-nav">
-        <div class="nav-section-label">Menu</div>
-        <button class="nav-item active" data-page="overview">
-          <span class="icon">&#x1F3E0;</span> Overview
-        </button>
-        <button class="nav-item" data-page="chats">
-          <span class="icon">&#x1F4AC;</span> Chats
-          <span class="badge" id="chat-badge">3</span>
-        </button>
-        <button class="nav-item" data-page="voice">
-          <span class="icon">&#x1F50A;</span> Voice
-        </button>
-        <button class="nav-item" data-page="notes">
-          <span class="icon">&#x1F4DD;</span> Notes
-        </button>
-        <button class="nav-item" data-page="projects">
-          <span class="icon">&#x1F4BB;</span> Projects
-        </button>
-        <button class="nav-item" data-page="files">
-          <span class="icon">&#x1F4C1;</span> Files
-        </button>
-        <button class="nav-item" data-page="tasks">
-          <span class="icon">&#x1F4CB;</span> Tasks
-        </button>
-        <button class="nav-item" data-page="calendar">
-          <span class="icon">&#x1F4C5;</span> Calendar
-        </button>
+<!-- Sidebar Backdrop (mobile) -->
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
-        <div class="voice-section">
-          <div class="voice-section-title">Voice Channels</div>
-          <div class="voice-channel active" onclick="joinVoice('General')">
-            <span class="voice-dot"></span>
-            <span class="voice-channel-name">General</span>
-            <span class="voice-users">3</span>
-          </div>
-          <div class="voice-channel" onclick="joinVoice('Coding Room')">
-            <span class="voice-dot"></span>
-            <span class="voice-channel-name">Coding Room</span>
-            <span class="voice-users">1</span>
-          </div>
-          <div class="voice-channel" onclick="joinVoice('Music Lounge')">
-            <span class="voice-dot"></span>
-            <span class="voice-channel-name">Music Lounge</span>
-            <span class="voice-users">0</span>
-          </div>
-          <div class="voice-channel" onclick="joinVoice('Quick Sync')">
-            <span class="voice-dot"></span>
-            <span class="voice-channel-name">Quick Sync</span>
-            <span class="voice-users">2</span>
-          </div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="workspace-btn">
+        <div class="workspace-icon">&#x1F680;</div>
+        <div>
+          <div class="workspace-name">Dev Team Alpha</div>
+          <div class="workspace-type">Private Workspace</div>
         </div>
-      </nav>
-    </aside>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu</div>
+      <button class="nav-item active" data-page="overview"><span class="icon">&#x1F3E0;</span> Overview</button>
+      <button class="nav-item" data-page="chats"><span class="icon">&#x1F4AC;</span> Chats <span class="badge" id="chat-badge">3</span></button>
+      <button class="nav-item" data-page="notes"><span class="icon">&#x1F4DD;</span> Notes</button>
+      <button class="nav-item" data-page="tasks"><span class="icon">&#x1F4CB;</span> Tasks</button>
+      <button class="nav-item" data-page="code"><span class="icon">&#x1F4BB;</span> Code</button>
+      <button class="nav-item" data-page="files"><span class="icon">&#x1F4C1;</span> Files</button>
+      <button class="nav-item" data-page="voice"><span class="icon">&#x1F50A;</span> Voice</button>
+      <button class="nav-item" data-page="calendar"><span class="icon">&#x1F4C5;</span> Calendar</button>
+      <button class="nav-item" data-page="members"><span class="icon">&#x1F465;</span> Members</button>
 
-    <main class="main-content">
-      <header class="top-bar">
+      <div class="voice-section">
+        <div class="voice-section-title">Voice Channels</div>
+        <div class="voice-channel active" onclick="joinVoice('General')"><span class="voice-dot"></span><span class="voice-channel-name">General</span><span class="voice-users">3</span></div>
+        <div class="voice-channel" onclick="joinVoice('Coding Room')"><span class="voice-dot"></span><span class="voice-channel-name">Coding Room</span><span class="voice-users">1</span></div>
+        <div class="voice-channel" onclick="joinVoice('Music Lounge')"><span class="voice-dot"></span><span class="voice-channel-name">Music Lounge</span><span class="voice-users">0</span></div>
+        <div class="voice-channel" onclick="joinVoice('Quick Sync')"><span class="voice-dot"></span><span class="voice-channel-name">Quick Sync</span><span class="voice-users">2</span></div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div style="display: flex; align-items: center;">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">&#x2630;</button>
         <div class="search-container">
           <span class="search-icon">&#x1F50D;</span>
-          <input type="text" class="search-input" id="search-input" placeholder="Search notes, tasks, projects, files...">
+          <input type="text" class="search-input" id="search-input" placeholder="Search everything...">
           <span class="search-shortcut">&#x2318;K</span>
           <div class="search-results" id="search-results"></div>
         </div>
+      </div>
+      <div class="top-actions">
+        <button class="top-btn" id="notif-btn" title="Notifications">&#x1F514;<span class="notif-dot" id="notif-dot"></span>
+          <div class="notif-dropdown" id="notif-dropdown">
+            <div class="notif-dropdown-header"><h3>Notifications</h3><button class="btn-ghost" onclick="clearNotifications()">Mark all read</button></div>
+            <div class="notif-list" id="notif-list"></div>
+          </div>
+        </button>
+        <button class="top-btn" id="theme-btn" title="Toggle Theme">&#x1F319;</button>
+        <button class="top-btn" id="shortcuts-btn" title="Keyboard Shortcuts">&#x2328;&#xFE0F;</button>
+        <button class="top-btn" id="settings-btn" title="Settings">&#x2699;&#xFE0F;</button>
+        <button class="user-btn"><div class="user-avatar">AK</div><span id="user-name-display">Alex</span></button>
+      </div>
+    </header>
 
-        <div class="top-actions">
-          <button class="top-btn" id="notif-btn" title="Notifications">
-            &#x1F514;
-            <span class="notif-dot" id="notif-dot"></span>
-            <div class="notif-dropdown" id="notif-dropdown">
-              <div class="notif-dropdown-header">
-                <h3>Notifications</h3>
-                <button class="btn-ghost" onclick="clearNotifications()">Mark all read</button>
-              </div>
-              <div class="notif-list" id="notif-list"></div>
-            </div>
-          </button>
-          <button class="top-btn" id="settings-btn" title="Settings">&#x2699;&#xFE0F;</button>
-          <button class="top-btn" title="Help">&#x2753;</button>
-          <button class="user-btn">
-            <div class="user-avatar">AK</div>
-            <span>Alex</span>
-          </button>
+    <div class="content-area">
+      <!-- OVERVIEW -->
+      <div class="page-view active" id="page-overview">
+        <div class="welcome-banner"><h1>Welcome back, <span id="user-greeting">Alex</span></h1><p id="welcome-sub">Loading...</p></div>
+        <div class="quick-actions">
+          <div class="quick-action" onclick="navigateTo('notes'); setTimeout(openNoteEditor, 100)"><div class="action-icon notes">&#x1F4DD;</div><h4>New Note</h4><p>Create a note</p></div>
+          <div class="quick-action" onclick="navigateTo('code')"><div class="action-icon code">&#x1F4BB;</div><h4>Code Editor</h4><p>Start coding</p></div>
+          <div class="quick-action" onclick="navigateTo('files')"><div class="action-icon files">&#x1F4C1;</div><h4>Upload File</h4><p>Add to library</p></div>
+          <div class="quick-action" onclick="joinVoice('General')"><div class="action-icon voice">&#x1F50A;</div><h4>Join Voice</h4><p>Start chatting</p></div>
         </div>
-      </header>
-
-      <div class="content-area">
-        <!-- OVERVIEW PAGE -->
-        <div class="page-view active" id="page-overview">
-          <div class="welcome-banner">
-            <h1>Welcome back, <span id="user-greeting">Alex</span></h1>
-            <p id="welcome-sub">Loading your workspace...</p>
+        <div class="dashboard-grid">
+          <div class="left-col">
+            <div class="panel"><div class="panel-header"><h3 class="panel-title">&#x1F4DD; Recent Notes</h3><button class="btn-ghost" onclick="navigateTo('notes')">View All &#x2192;</button></div><div class="panel-body" id="recent-notes"></div></div>
+            <div class="panel" style="margin-top: 20px;"><div class="panel-header"><h3 class="panel-title">&#x1F4BB; Active Projects</h3><button class="btn-ghost" onclick="navigateTo('code')">View All &#x2192;</button></div>
+              <div class="panel-body" style="padding: 0;">
+                <div class="project-item"><div class="project-top"><div class="project-info"><div class="project-icon">&lt;/&gt;</div><div><div class="project-name">backend-api</div><div class="project-meta">Last commit 5 min ago</div></div></div><span class="commit-count">+5</span></div><div class="project-contribs"><div class="contrib-avatar">AK</div><div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div><div class="contrib-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div></div></div>
+                <div class="project-item"><div class="project-top"><div class="project-info"><div class="project-icon" style="background: var(--purple-50); color: var(--purple);">&#x269B;</div><div><div class="project-name">frontend-dashboard</div><div class="project-meta">Last commit 2 hours ago</div></div></div><span class="commit-count" style="background: var(--purple-50); color: var(--purple);">+3</span></div><div class="project-contribs"><div class="contrib-avatar">AK</div><div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div></div></div>
+                <div class="project-item"><div class="project-top"><div class="project-info"><div class="project-icon" style="background: var(--cyan-50); color: var(--cyan);">&#x1F4F1;</div><div><div class="project-name">mobile-app</div><div class="project-meta">Last commit yesterday</div></div></div><span class="commit-count" style="background: var(--cyan-50); color: var(--cyan);">+1</span></div><div class="project-contribs"><div class="contrib-avatar">AK</div></div></div>
+              </div>
+            </div>
+            <div class="chat-widget"><div class="chat-header"><h3>&#x1F4AC; Quick Chat &#x2014; #general</h3><button class="btn-ghost" onclick="navigateTo('chats')">Open Chat</button></div><div class="chat-messages" id="overview-chat"></div><div class="chat-input-row"><input type="text" id="quick-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendQuickChat()"><button class="chat-send-btn" onclick="sendQuickChat()">&#x27A4;</button></div></div>
+            <!-- Activity Feed -->
+            <div class="panel" style="margin-top: 20px;"><div class="panel-header"><h3 class="panel-title">&#x1F4CA; Activity Feed</h3></div><div class="panel-body" id="activity-feed"></div></div>
           </div>
-
-          <div class="quick-actions">
-            <div class="quick-action" onclick="openNoteEditor()">
-              <div class="action-icon notes">&#x1F4DD;</div>
-              <h4>New Note</h4>
-              <p>Create a note</p>
-            </div>
-            <div class="quick-action" onclick="navigateTo('projects')">
-              <div class="action-icon code">&#x1F4BB;</div>
-              <h4>Projects</h4>
-              <p>View projects</p>
-            </div>
-            <div class="quick-action" onclick="navigateTo('files')">
-              <div class="action-icon files">&#x1F4C1;</div>
-              <h4>Files</h4>
-              <p>Browse library</p>
-            </div>
-            <div class="quick-action" onclick="joinVoice('General')">
-              <div class="action-icon voice">&#x1F50A;</div>
-              <h4>Join Voice</h4>
-              <p>Start chatting</p>
-            </div>
-          </div>
-
-          <div class="dashboard-grid">
-            <div class="left-col">
-              <div class="panel">
-                <div class="panel-header">
-                  <h3 class="panel-title">&#x1F4DD; Recent Notes</h3>
-                  <button class="btn-ghost" onclick="navigateTo('notes')">View All &#x2192;</button>
-                </div>
-                <div class="panel-body" id="recent-notes"></div>
-              </div>
-
-              <div class="panel" style="margin-top: 20px;">
-                <div class="panel-header">
-                  <h3 class="panel-title">&#x1F4BB; Active Projects</h3>
-                  <button class="btn-ghost" onclick="navigateTo('projects')">View All &#x2192;</button>
-                </div>
-                <div class="panel-body" style="padding: 0;">
-                  <div class="project-item">
-                    <div class="project-top">
-                      <div class="project-info">
-                        <div class="project-icon">&lt;/&gt;</div>
-                        <div>
-                          <div class="project-name">backend-api</div>
-                          <div class="project-meta">Last commit 5 min ago</div>
-                        </div>
-                      </div>
-                      <span class="commit-count">+5</span>
-                    </div>
-                    <div class="project-contribs">
-                      <div class="contrib-avatar">AK</div>
-                      <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
-                      <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
-                    </div>
-                  </div>
-                  <div class="project-item">
-                    <div class="project-top">
-                      <div class="project-info">
-                        <div class="project-icon" style="background: var(--purple-50); color: var(--purple);">&#x269B;</div>
-                        <div>
-                          <div class="project-name">frontend-dashboard</div>
-                          <div class="project-meta">Last commit 2 hours ago</div>
-                        </div>
-                      </div>
-                      <span class="commit-count" style="background: var(--purple-50); color: var(--purple);">+3</span>
-                    </div>
-                    <div class="project-contribs">
-                      <div class="contrib-avatar">AK</div>
-                      <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
-                    </div>
-                  </div>
-                  <div class="project-item">
-                    <div class="project-top">
-                      <div class="project-info">
-                        <div class="project-icon" style="background: var(--cyan-50); color: var(--cyan);">&#x1F4F1;</div>
-                        <div>
-                          <div class="project-name">mobile-app</div>
-                          <div class="project-meta">Last commit yesterday</div>
-                        </div>
-                      </div>
-                      <span class="commit-count" style="background: var(--cyan-50); color: var(--cyan);">+1</span>
-                    </div>
-                    <div class="project-contribs">
-                      <div class="contrib-avatar">AK</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="chat-widget">
-                <div class="chat-header">
-                  <h3>&#x1F4AC; Quick Chat &#x2014; #general</h3>
-                  <button class="btn-ghost" onclick="navigateTo('chats')">Open Chat</button>
-                </div>
-                <div class="chat-messages" id="overview-chat"></div>
-                <div class="chat-input-row">
-                  <input type="text" id="quick-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendQuickChat()">
-                  <button class="chat-send-btn" onclick="sendQuickChat()">&#x27A4;</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="right-col">
-              <div class="panel members-panel">
-                <div class="panel-header">
-                  <h3 class="panel-title">&#x1F465; Online Now</h3>
-                  <span style="font-size: 12px; color: var(--text-muted);">6 members</span>
-                </div>
-                <div class="panel-body">
-                  <div class="member-row">
-                    <div class="member-avatar">
-                      <div class="chat-avatar">AK</div>
-                      <span class="member-status online"></span>
-                    </div>
-                    <div class="member-info">
-                      <div class="member-name">Alex</div>
-                      <div class="member-status-text">Coding...</div>
-                    </div>
-                    <span class="member-voice-icon">&#x1F50A;</span>
-                  </div>
-                  <div class="member-row">
-                    <div class="member-avatar">
-                      <div class="chat-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
-                      <span class="member-status online"></span>
-                    </div>
-                    <div class="member-info">
-                      <div class="member-name">Sarah</div>
-                      <div class="member-status-text">Online</div>
-                    </div>
-                  </div>
-                  <div class="member-row">
-                    <div class="member-avatar">
-                      <div class="chat-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
-                      <span class="member-status idle"></span>
-                    </div>
-                    <div class="member-info">
-                      <div class="member-name">Mike</div>
-                      <div class="member-status-text">Idle</div>
-                    </div>
-                    <span class="member-voice-icon">&#x1F50A;</span>
-                  </div>
-                  <div class="member-row">
-                    <div class="member-avatar">
-                      <div class="chat-avatar" style="background: linear-gradient(135deg, var(--cyan), var(--green));">EJ</div>
-                      <span class="member-status online"></span>
-                    </div>
-                    <div class="member-info">
-                      <div class="member-name">Emma</div>
-                      <div class="member-status-text">Online</div>
-                    </div>
-                  </div>
-                  <div class="member-row">
-                    <div class="member-avatar">
-                      <div class="chat-avatar" style="background: linear-gradient(135deg, var(--nexus), var(--purple));">JD</div>
-                      <span class="member-status dnd"></span>
-                    </div>
-                    <div class="member-info">
-                      <div class="member-name">John</div>
-                      <div class="member-status-text">Do Not Disturb</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="right-col">
+            <div class="panel members-panel"><div class="panel-header"><h3 class="panel-title">&#x1F465; Online Now</h3><span style="font-size: 12px; color: var(--text-muted);">6 members</span></div><div class="panel-body">
+              <div class="member-row"><div class="member-avatar"><div class="chat-avatar">AK</div><span class="member-status online"></span></div><div class="member-info"><div class="member-name">Alex</div><div class="member-status-text">Coding...</div></div><span class="member-voice-icon">&#x1F50A;</span></div>
+              <div class="member-row"><div class="member-avatar"><div class="chat-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div><span class="member-status online"></span></div><div class="member-info"><div class="member-name">Sarah</div><div class="member-status-text">Online</div></div></div>
+              <div class="member-row"><div class="member-avatar"><div class="chat-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div><span class="member-status idle"></span></div><div class="member-info"><div class="member-name">Mike</div><div class="member-status-text">Idle</div></div><span class="member-voice-icon">&#x1F50A;</span></div>
+              <div class="member-row"><div class="member-avatar"><div class="chat-avatar" style="background: linear-gradient(135deg, var(--cyan), var(--green));">EJ</div><span class="member-status online"></span></div><div class="member-info"><div class="member-name">Emma</div><div class="member-status-text">Online</div></div></div>
+              <div class="member-row"><div class="member-avatar"><div class="chat-avatar" style="background: linear-gradient(135deg, var(--nexus), var(--purple));">JD</div><span class="member-status dnd"></span></div><div class="member-info"><div class="member-name">John</div><div class="member-status-text">Do Not Disturb</div></div></div>
+            </div></div>
           </div>
         </div>
+      </div>
 
-        <!-- CHATS PAGE -->
-        <div class="page-view" id="page-chats">
-          <div class="chat-page">
-            <div class="chat-sidebar">
-              <div class="chat-sidebar-header">
-                <h3>Channels</h3>
-              </div>
-              <div class="channel-item active" data-channel="general">
-                <span class="icon">#</span>
-                <span class="name">general</span>
-              </div>
-              <div class="channel-item" data-channel="dev">
-                <span class="icon">#</span>
-                <span class="name">dev</span>
-              </div>
-              <div class="channel-item" data-channel="design">
-                <span class="icon">#</span>
-                <span class="name">design</span>
-              </div>
-              <div class="channel-item" data-channel="random">
-                <span class="icon">#</span>
-                <span class="name">random</span>
-              </div>
-            </div>
-            <div class="chat-main">
-              <div class="chat-main-header">
-                <span style="color: var(--text-muted);">#</span>
-                <h3 id="chat-channel-name">general</h3>
-              </div>
-              <div class="chat-main-messages" id="chat-full-messages"></div>
-              <div class="chat-main-input">
-                <input type="text" id="full-chat-input" placeholder="Message #general..." onkeydown="if(event.key==='Enter')sendFullChat()">
-                <button class="btn-primary" onclick="sendFullChat()">Send</button>
-              </div>
-            </div>
+      <!-- CHATS -->
+      <div class="page-view" id="page-chats">
+        <div class="chat-page">
+          <div class="chat-sidebar">
+            <div class="chat-sidebar-header"><h3>Channels</h3></div>
+            <div class="channel-item active" data-channel="general"><span class="icon">#</span><span class="name">general</span></div>
+            <div class="channel-item" data-channel="dev"><span class="icon">#</span><span class="name">dev</span></div>
+            <div class="channel-item" data-channel="design"><span class="icon">#</span><span class="name">design</span></div>
+            <div class="channel-item" data-channel="random"><span class="icon">#</span><span class="name">random</span></div>
           </div>
-        </div>
-
-        <!-- NOTES PAGE -->
-        <div class="page-view" id="page-notes">
-          <div class="notes-header">
-            <h2>&#x1F4DD; Notes</h2>
-            <button class="btn-primary" onclick="openNoteEditor()">&#x2795; New Note</button>
-          </div>
-
-          <div class="note-editor" id="note-editor">
-            <input type="text" id="note-title" placeholder="Note title...">
-            <textarea id="note-content" placeholder="Start writing..."></textarea>
-            <div class="note-editor-actions">
-              <button class="btn-ghost" onclick="closeNoteEditor()">Cancel</button>
-              <button class="btn-primary" onclick="saveNote()">Save Note</button>
-            </div>
-          </div>
-
-          <div id="notes-list"></div>
-        </div>
-
-        <!-- TASKS PAGE -->
-        <div class="page-view" id="page-tasks">
-          <div class="tasks-header">
-            <h2>&#x1F4CB; Tasks</h2>
-          </div>
-
-          <div class="task-stats">
-            <div class="task-stat">
-              <div class="num" id="stat-total">0</div>
-              <div class="lbl">Total Tasks</div>
-            </div>
-            <div class="task-stat">
-              <div class="num" id="stat-active" style="color: var(--orange);">0</div>
-              <div class="lbl">In Progress</div>
-            </div>
-            <div class="task-stat">
-              <div class="num" id="stat-done" style="color: var(--green);">0</div>
-              <div class="lbl">Completed</div>
-            </div>
-          </div>
-
-          <div class="task-add">
-            <input type="text" id="task-input" placeholder="Add a new task..." onkeydown="if(event.key==='Enter')addTask()">
-            <select id="task-priority">
-              <option value="low">Low</option>
-              <option value="medium" selected>Medium</option>
-              <option value="high">High</option>
-            </select>
-            <button class="btn-primary" onclick="addTask()">Add Task</button>
-          </div>
-
-          <div class="task-list" id="task-list"></div>
-        </div>
-
-        <!-- FILES PAGE -->
-        <div class="page-view" id="page-files">
-          <div class="files-header">
-            <h2>&#x1F4C1; Files</h2>
-            <button class="btn-primary" onclick="showToast('File upload coming soon!')">&#x2795; Upload File</button>
-          </div>
-          <div class="file-grid">
-            <div class="file-card"><div class="icon">&#x1F4C4;</div><div class="name">project-specs.pdf</div><div class="meta">2.4 MB &#x2022; 2 hours ago</div></div>
-            <div class="file-card"><div class="icon">&#x1F5BC;&#xFE0F;</div><div class="name">mockup-v2.png</div><div class="meta">1.1 MB &#x2022; Yesterday</div></div>
-            <div class="file-card"><div class="icon">&#x1F4C7;</div><div class="name">api-docs.json</div><div class="meta">15 KB &#x2022; 3 days ago</div></div>
-            <div class="file-card"><div class="icon">&#x1F4CA;</div><div class="name">analytics.xlsx</div><div class="meta">890 KB &#x2022; 1 week ago</div></div>
-            <div class="file-card"><div class="icon">&#x1F3AC;</div><div class="name">demo-recording.mp4</div><div class="meta">45 MB &#x2022; 2 weeks ago</div></div>
-            <div class="file-card"><div class="icon">&#x1F3B5;</div><div class="name">jingle.mp3</div><div class="meta">3.2 MB &#x2022; 1 month ago</div></div>
-          </div>
-        </div>
-
-        <!-- PROJECTS PAGE -->
-        <div class="page-view" id="page-projects">
-          <div class="notes-header">
-            <h2>&#x1F4BB; Projects</h2>
-            <button class="btn-primary" onclick="showToast('Project creation coming soon!')">&#x2795; New Project</button>
-          </div>
-          <div class="panel">
-            <div class="panel-body" style="padding: 0;">
-              <div class="project-item">
-                <div class="project-top">
-                  <div class="project-info">
-                    <div class="project-icon">&lt;/&gt;</div>
-                    <div>
-                      <div class="project-name">backend-api</div>
-                      <div class="project-meta">Last commit 5 min ago</div>
-                    </div>
-                  </div>
-                  <span class="commit-count">+5</span>
-                </div>
-                <div class="project-contribs">
-                  <div class="contrib-avatar">AK</div>
-                  <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
-                  <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--orange), var(--purple));">MK</div>
-                </div>
-              </div>
-              <div class="project-item">
-                <div class="project-top">
-                  <div class="project-info">
-                    <div class="project-icon" style="background: var(--purple-50); color: var(--purple);">&#x269B;</div>
-                    <div>
-                      <div class="project-name">frontend-dashboard</div>
-                      <div class="project-meta">Last commit 2 hours ago</div>
-                    </div>
-                  </div>
-                  <span class="commit-count" style="background: var(--purple-50); color: var(--purple);">+3</span>
-                </div>
-                <div class="project-contribs">
-                  <div class="contrib-avatar">AK</div>
-                  <div class="contrib-avatar" style="background: linear-gradient(135deg, var(--green), var(--cyan));">SM</div>
-                </div>
-              </div>
-              <div class="project-item">
-                <div class="project-top">
-                  <div class="project-info">
-                    <div class="project-icon" style="background: var(--cyan-50); color: var(--cyan);">&#x1F4F1;</div>
-                    <div>
-                      <div class="project-name">mobile-app</div>
-                      <div class="project-meta">Last commit yesterday</div>
-                    </div>
-                  </div>
-                  <span class="commit-count" style="background: var(--cyan-50); color: var(--cyan);">+1</span>
-                </div>
-                <div class="project-contribs">
-                  <div class="contrib-avatar">AK</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CALENDAR PAGE -->
-        <div class="page-view" id="page-calendar">
-          <div class="calendar-header">
-            <h2 id="calendar-title">Calendar</h2>
-          </div>
-          <div class="calendar-grid" id="calendar-grid"></div>
-        </div>
-
-        <!-- VOICE PAGE -->
-        <div class="page-view" id="page-voice">
-          <div class="notes-header">
-            <h2>&#x1F50A; Voice Channels</h2>
-          </div>
-          <div class="panel">
-            <div class="panel-header">
-              <h3 class="panel-title">Active Channels</h3>
-            </div>
-            <div class="panel-body">
-              <div class="voice-channel active" style="padding: 16px; margin-bottom: 8px;" onclick="joinVoice('General')">
-                <span class="voice-dot"></span>
-                <span class="voice-channel-name" style="font-size: 15px;">General</span>
-                <span class="voice-users" style="font-size: 13px;">3 users</span>
-              </div>
-              <div class="voice-channel" style="padding: 16px; margin-bottom: 8px;" onclick="joinVoice('Coding Room')">
-                <span class="voice-dot"></span>
-                <span class="voice-channel-name" style="font-size: 15px;">Coding Room</span>
-                <span class="voice-users" style="font-size: 13px;">1 user</span>
-              </div>
-              <div class="voice-channel" style="padding: 16px; margin-bottom: 8px;" onclick="joinVoice('Music Lounge')">
-                <span class="voice-dot"></span>
-                <span class="voice-channel-name" style="font-size: 15px;">Music Lounge</span>
-                <span class="voice-users" style="font-size: 13px;">0 users</span>
-              </div>
-              <div class="voice-channel" style="padding: 16px;" onclick="joinVoice('Quick Sync')">
-                <span class="voice-dot"></span>
-                <span class="voice-channel-name" style="font-size: 15px;">Quick Sync</span>
-                <span class="voice-users" style="font-size: 13px;">2 users</span>
-              </div>
+          <div class="chat-main">
+            <div class="chat-main-header"><span style="color: var(--text-muted);">#</span><h3 id="chat-channel-name">general</h3></div>
+            <div class="chat-main-messages" id="chat-full-messages"></div>
+            <div class="typing-indicator" id="typing-indicator"></div>
+            <div class="chat-main-input" style="position: relative;">
+              <button class="top-btn" id="emoji-btn" onclick="toggleEmojiPicker()" style="flex-shrink: 0;">&#x1F60A;</button>
+              <input type="text" id="full-chat-input" placeholder="Message #general..." onkeydown="handleChatInput(event)">
+              <button class="btn-primary" onclick="sendFullChat()">Send</button>
+              <div class="emoji-picker" id="emoji-picker"></div>
             </div>
           </div>
         </div>
       </div>
-    </main>
-  </div>
 
-  <div class="music-bar" id="music-bar">
-    <div class="music-track">
-      <div class="music-cover">&#x1F3B5;</div>
-      <div class="music-track-info">
-        <h4 id="track-name">Blinding Lights</h4>
-        <span id="track-artist">The Weeknd</span>
+      <!-- NOTES -->
+      <div class="page-view" id="page-notes">
+        <div class="notes-header"><h2>&#x1F4DD; Notes</h2><div class="notes-toolbar">
+          <select id="notes-filter" onchange="filterNotes()"><option value="all">All Notes</option><option value="favorites">Favorites</option></select>
+          <button class="btn-primary" onclick="openNoteEditor()">&#x2795; New Note</button>
+        </div></div>
+        <div class="note-editor" id="note-editor">
+          <input type="text" id="note-title" placeholder="Note title...">
+          <div class="editor-toolbar">
+            <button class="toolbar-btn" onclick="formatNote('bold')" title="Bold"><b>B</b></button>
+            <button class="toolbar-btn" onclick="formatNote('italic')" title="Italic"><i>I</i></button>
+            <button class="toolbar-btn" onclick="formatNote('code')" title="Code">&lt;/&gt;</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onclick="formatNote('h1')" title="Heading 1">H1</button>
+            <button class="toolbar-btn" onclick="formatNote('h2')" title="Heading 2">H2</button>
+            <button class="toolbar-btn" onclick="formatNote('h3')" title="Heading 3">H3</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onclick="formatNote('ul')" title="Bullet List">&#x2022;</button>
+            <button class="toolbar-btn" onclick="formatNote('ol')" title="Numbered List">1.</button>
+            <button class="toolbar-btn" onclick="formatNote('check')" title="Checkbox">&#x2610;</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onclick="formatNote('quote')" title="Quote">&#x201C;</button>
+            <button class="toolbar-btn" onclick="formatNote('divider')" title="Divider">&#x2014;</button>
+          </div>
+          <textarea id="note-content" placeholder="Start writing... Use markdown shortcuts: ## for H2, - for bullets, ``` for code"></textarea>
+          <div class="note-editor-actions">
+            <span id="save-status" style="font-size: 12px; color: var(--text-muted);"></span>
+            <button class="btn-ghost" onclick="closeNoteEditor()">Cancel</button>
+            <button class="btn-secondary" onclick="exportNote()">Export</button>
+            <button class="btn-primary" onclick="saveNote()">Save Note</button>
+          </div>
+        </div>
+        <div class="note-detail" id="note-detail"></div>
+        <div id="notes-list"></div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="page-view" id="page-tasks">
+        <div class="tasks-header"><h2>&#x1F4CB; Tasks</h2></div>
+        <div class="task-stats"><div class="task-stat"><div class="num" id="stat-total">0</div><div class="lbl">Total</div></div><div class="task-stat"><div class="num" id="stat-active" style="color: var(--orange);">0</div><div class="lbl">In Progress</div></div><div class="task-stat"><div class="num" id="stat-done" style="color: var(--green);">0</div><div class="lbl">Completed</div></div></div>
+        <div class="task-add">
+          <input type="text" id="task-input" placeholder="Add a new task..." onkeydown="if(event.key==='Enter')addTask()">
+          <select id="task-priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select>
+          <button class="btn-primary" onclick="addTask()">Add</button>
+        </div>
+        <div class="task-list" id="task-list"></div>
+      </div>
+
+      <!-- CODE EDITOR -->
+      <div class="page-view" id="page-code">
+        <div class="code-page">
+          <div class="code-sidebar">
+            <div class="code-sidebar-header"><h3>Files</h3><button class="btn-ghost" onclick="addCodeFile()">&#x2795;</button></div>
+            <div id="code-file-tree"></div>
+          </div>
+          <div class="code-main">
+            <div class="code-header"><span class="filename" id="code-filename">Select a file</span><div style="display: flex; gap: 8px;"><button class="btn-secondary" onclick="saveCodeFile()">Save</button></div></div>
+            <div class="code-editor-area"><textarea id="code-editor" placeholder="// Select a file from the tree to start editing..." spellcheck="false"></textarea></div>
+            <div class="code-status-bar"><span id="code-status">Ready</span><span id="code-lang">JavaScript</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILES -->
+      <div class="page-view" id="page-files">
+        <div class="files-header"><h2>&#x1F4C1; Files</h2></div>
+        <div class="file-drop-zone" id="file-drop-zone" onclick="simulateFileUpload()">
+          <div class="icon">&#x1F4E4;</div>
+          <h3>Drop files here or click to upload</h3>
+          <p>Supports any file type. Free tier: 2GB storage.</p>
+        </div>
+        <div class="file-grid" id="file-grid"></div>
+      </div>
+
+      <!-- VOICE -->
+      <div class="page-view" id="page-voice">
+        <div class="notes-header"><h2>&#x1F50A; Voice Channels</h2></div>
+        <div class="voice-grid" id="voice-grid"></div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div class="page-view" id="page-calendar">
+        <div class="calendar-header"><h2 id="calendar-title">Calendar</h2><div class="calendar-nav"><button onclick="changeMonth(-1)">&#x25C0;</button><button onclick="changeMonth(1)">&#x25B6;</button></div></div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="page-view" id="page-members">
+        <div class="notes-header"><h2>&#x1F465; Workspace Members</h2><button class="btn-primary" onclick="showToast('Invite link copied!')">&#x2795; Invite Member</button></div>
+        <div class="members-grid" id="members-grid"></div>
       </div>
     </div>
-    <div class="music-playback">
-      <button onclick="prevTrack()">&#x23EE;</button>
-      <button class="play" id="play-btn" onclick="togglePlay()">&#x23F8;</button>
-      <button onclick="nextTrack()">&#x23ED;</button>
-    </div>
-    <div class="music-progress">
-      <span id="music-current">1:23</span>
-      <div class="progress-track" id="progress-track" onclick="seekMusic(event)">
-        <div class="fill" id="progress-fill"></div>
+  </main>
+</div>
+
+<!-- Music Player -->
+<div class="music-bar" id="music-bar">
+  <div class="music-track"><div class="music-cover">&#x1F3B5;</div><div class="music-track-info"><h4 id="track-name">Blinding Lights</h4><span id="track-artist">The Weeknd</span></div></div>
+  <div class="music-playback"><button onclick="prevTrack()">&#x23EE;</button><button class="play" id="play-btn" onclick="togglePlay()">&#x23F8;</button><button onclick="nextTrack()">&#x23ED;</button></div>
+  <div class="music-progress"><span id="music-current">1:23</span><div class="progress-track" id="progress-track" onclick="seekMusic(event)"><div class="fill" id="progress-fill"></div></div><span id="music-total">3:20</span></div>
+  <div class="music-extras"><button title="Queue">&#x2630;</button><button title="Lyrics">&#x1F4DD;</button><div class="volume-wrap"><button>&#x1F50A;</button><input type="range" value="70" min="0" max="100"></div></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-header"><h2>&#x2699;&#xFE0F; Settings</h2><button class="modal-close" onclick="closeSettings()">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="setting-group"><label>Display Name</label><input type="text" class="setting-input" id="setting-name" value="Alex"></div>
+      <div class="setting-group"><label>Email</label><input type="email" class="setting-input" id="setting-email" value="alex@devteam.com"></div>
+      <div class="setting-group"><label>Workspace</label><input type="text" class="setting-input" id="setting-workspace" value="Dev Team Alpha"></div>
+      <div class="setting-group"><label>Preferences</label>
+        <div class="setting-toggle"><div><div class="label">Desktop Notifications</div><div class="desc">Show notifications on desktop</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="setting-toggle"><div><div class="label">Sound Effects</div><div class="desc">Play sounds for notifications</div></div><div class="toggle-switch" onclick="this.classList.toggle('on')"></div></div>
+        <div class="setting-toggle"><div><div class="label">Auto-save Notes</div><div class="desc">Automatically save notes every 30 seconds</div></div><div class="toggle-switch on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="setting-toggle"><div><div class="label">Compact Mode</div><div class="desc">Reduce spacing for more content</div></div><div class="toggle-switch" onclick="this.classList.toggle('on')"></div></div>
       </div>
-      <span id="music-total">3:20</span>
-    </div>
-    <div class="music-extras">
-      <button title="Queue">&#x2630;</button>
-      <button title="Lyrics">&#x1F4DD;</button>
-      <div class="volume-wrap">
-        <button>&#x1F50A;</button>
-        <input type="range" value="70" min="0" max="100">
-      </div>
+      <div class="setting-group"><label>Data Management</label><p>All data is stored locally in your browser.</p><button class="btn-danger" onclick="if(confirm('Clear ALL local data? This cannot be undone.')){localStorage.clear();location.reload();}">Clear All Data</button></div>
+      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;"><button class="btn-ghost" onclick="closeSettings()">Cancel</button><button class="btn-primary" onclick="saveSettings()">Save Changes</button></div>
     </div>
   </div>
+</div>
 
-  <div class="toast" id="toast"></div>
-
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>&#x2699;&#xFE0F; Settings</h2>
-        <button class="modal-close" onclick="closeSettings()">&#x2715;</button>
-      </div>
-      <div class="modal-body">
-        <div class="setting-group">
-          <label>Display Name</label>
-          <input type="text" class="setting-input" id="setting-name" value="Alex">
-        </div>
-        <div class="setting-group">
-          <label>Email</label>
-          <input type="email" class="setting-input" id="setting-email" value="alex@devteam.com">
-        </div>
-        <div class="setting-group">
-          <label>Preferences</label>
-          <div class="setting-toggle">
-            <div>
-              <div class="label">Desktop Notifications</div>
-              <div class="desc">Show notifications on desktop</div>
-            </div>
-            <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
-          </div>
-          <div class="setting-toggle">
-            <div>
-              <div class="label">Sound Effects</div>
-              <div class="desc">Play sounds for notifications</div>
-            </div>
-            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
-          </div>
-          <div class="setting-toggle">
-            <div>
-              <div class="label">Auto-save Notes</div>
-              <div class="desc">Automatically save notes every 30 seconds</div>
-            </div>
-            <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
-          </div>
-          <div class="setting-toggle">
-            <div>
-              <div class="label">Compact Mode</div>
-              <div class="desc">Reduce spacing for more content</div>
-            </div>
-            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
-          </div>
-        </div>
-        <div class="setting-group">
-          <label>Data Management</label>
-          <p>All data is stored locally in your browser.</p>
-          <button class="btn-danger" onclick="if(confirm('Clear all local data?')){localStorage.clear();location.reload();}">Clear All Data</button>
-        </div>
-        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-          <button class="btn-ghost" onclick="closeSettings()">Cancel</button>
-          <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
-        </div>
-      </div>
+<!-- Shortcuts Modal -->
+<div class="modal-overlay" id="shortcuts-modal">
+  <div class="modal">
+    <div class="modal-header"><h2>&#x2328;&#xFE0F; Keyboard Shortcuts</h2><button class="modal-close" onclick="closeShortcuts()">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="setting-toggle"><div class="label">Open Command Palette</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + K</div></div>
+      <div class="setting-toggle"><div class="label">Search</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + K</div></div>
+      <div class="setting-toggle"><div class="label">Close Modal</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Esc</div></div>
+      <div class="setting-toggle"><div class="label">New Note</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + N</div></div>
+      <div class="setting-toggle"><div class="label">Save Note</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + S</div></div>
+      <div class="setting-toggle"><div class="label">Send Message</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Enter</div></div>
+      <div class="setting-toggle"><div class="label">Toggle Theme</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + D</div></div>
+      <div class="setting-toggle"><div class="label">Toggle Sidebar</div><div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px;">Ctrl + B</div></div>
     </div>
   </div>
+</div>
 
-  <script>
-    // ==================== STATE ====================
-    const state = {
-      notes: JSON.parse(localStorage.getItem('nexus_notes') || '[]'),
-      tasks: JSON.parse(localStorage.getItem('nexus_tasks') || '[]'),
-      chatMessages: JSON.parse(localStorage.getItem('nexus_chat') || 'null') || [
-        { user: 'Alex', initials: 'AK', text: 'Just pushed the new authentication feature!', time: Date.now() - 120000, gradient: 'linear-gradient(135deg, var(--nexus), var(--purple))' },
-        { user: 'Sarah', initials: 'SM', text: 'Nice work! I\'ll review it now', time: Date.now() - 60000, gradient: 'linear-gradient(135deg, var(--green), var(--cyan))' },
-        { user: 'Mike', initials: 'MK', text: 'The API docs need updating, I\'ll handle it', time: Date.now(), gradient: 'linear-gradient(135deg, var(--orange), var(--purple))' }
-      ],
-      notifications: [
-        { icon: 'msg', text: 'Sarah replied to your comment on backend-api', time: '2 min ago', unread: true },
-        { icon: 'commit', text: '5 new commits pushed to frontend-dashboard', time: '1 hour ago', unread: true },
-        { icon: 'mention', text: 'Mike mentioned you in #general', time: '3 hours ago', unread: true },
-        { icon: 'msg', text: 'Emma shared a file: analytics.xlsx', time: '1 day ago', unread: false },
-        { icon: 'commit', text: 'mobile-app build succeeded', time: '2 days ago', unread: false }
-      ],
-      channels: {
-        general: [...(JSON.parse(localStorage.getItem('nexus_chat') || '[]') || [
-          { user: 'Alex', initials: 'AK', text: 'Just pushed the new authentication feature!', time: Date.now() - 120000 },
-          { user: 'Sarah', initials: 'SM', text: 'Nice work! I\'ll review it now', time: Date.now() - 60000 },
-          { user: 'Mike', initials: 'MK', text: 'The API docs need updating, I\'ll handle it', time: Date.now() }
-        ])],
-        dev: [
-          { user: 'Alex', initials: 'AK', text: 'Started working on the PRisma schema', time: Date.now() - 3600000 },
-          { user: 'Sarah', initials: 'SM', text: 'I\'ll handle the migration scripts', time: Date.now() - 1800000 }
-        ],
-        design: [
-          { user: 'Emma', initials: 'EJ', text: 'Updated the mockups, check Figma', time: Date.now() - 7200000 }
-        ],
-        random: [
-          { user: 'Mike', initials: 'MK', text: 'Anyone up for lunch?', time: Date.now() - 86400000 }
-        ]
-      },
-      activeChannel: 'general',
-      currentPage: 'overview',
-      music: {
-        isPlaying: true,
-        progress: 30,
-        currentTrack: 0,
-        tracks: [
-          { name: 'Blinding Lights', artist: 'The Weeknd', duration: 200 },
-          { name: 'Starboy', artist: 'The Weeknd', duration: 230 },
-          { name: 'Shape of You', artist: 'Ed Sheeran', duration: 233 },
-          { name: 'Levitating', artist: 'Dua Lipa', duration: 203 }
-        ]
-      },
-      editingNoteId: null
-    };
+<!-- Version History Modal -->
+<div class="modal-overlay" id="version-modal">
+  <div class="modal">
+    <div class="modal-header"><h2>&#x1F4C8; Version History</h2><button class="modal-close" onclick="closeVersionHistory()">&#x2715;</button></div>
+    <div class="modal-body"><div id="version-history-content"></div></div>
+  </div>
+</div>
 
-    // ==================== INIT ====================
-    function init() {
-      renderNotes();
-      renderTasks();
-      renderOverviewChat();
+<!-- Command Palette -->
+<div class="cmd-palette" id="cmd-palette">
+  <div class="cmd-palette-box">
+    <input type="text" class="cmd-palette-input" id="cmd-input" placeholder="Type a command or search..." oninput="filterCommands()">
+    <div class="cmd-palette-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+const state = {
+  notes: JSON.parse(localStorage.getItem('nexus_notes') || '[]'),
+  tasks: JSON.parse(localStorage.getItem('nexus_tasks') || '[]'),
+  channels: JSON.parse(localStorage.getItem('nexus_channels') || 'null') || getDefaultChannels(),
+  files: JSON.parse(localStorage.getItem('nexus_files') || '[]'),
+  codeFiles: JSON.parse(localStorage.getItem('nexus_code_files') || 'null') || getDefaultCodeFiles(),
+  notifications: getDefaultNotifications(),
+  activeChannel: 'general',
+  currentPage: 'overview',
+  editingNoteId: null,
+  viewingNoteId: null,
+  activeCodeFile: null,
+  music: { isPlaying: true, progress: 30, currentTrack: 0, tracks: [
+    { name: 'Blinding Lights', artist: 'The Weeknd', duration: 200 },
+    { name: 'Starboy', artist: 'The Weeknd', duration: 230 },
+    { name: 'Shape of You', artist: 'Ed Sheeran', duration: 233 },
+    { name: 'Levitating', artist: 'Dua Lipa', duration: 203 },
+    { name: 'Watermelon Sugar', artist: 'Harry Styles', duration: 174 }
+  ]},
+  theme: localStorage.getItem('nexus_theme') || 'dark',
+  calendarDate: new Date(),
+  user: JSON.parse(localStorage.getItem('nexus_user') || 'null') || { name: 'Alex', email: 'alex@devteam.com' },
+  onboarded: localStorage.getItem('nexus_onboarded') === 'true'
+};
+
+function getDefaultChannels() {
+  return {
+    general: [
+      { user: 'Alex', initials: 'AK', text: 'Just pushed the new authentication feature!', time: Date.now() - 120000, reactions: [{ emoji: '&#x1F389;', count: 2, active: true }] },
+      { user: 'Sarah', initials: 'SM', text: 'Nice work! I\'ll review it now', time: Date.now() - 60000, reactions: [] },
+      { user: 'Mike', initials: 'MK', text: 'The API docs need updating, I\'ll handle it', time: Date.now(), reactions: [] }
+    ],
+    dev: [
+      { user: 'Alex', initials: 'AK', text: 'Started working on the Prisma schema', time: Date.now() - 3600000, reactions: [] },
+      { user: 'Sarah', initials: 'SM', text: 'I\'ll handle the migration scripts', time: Date.now() - 1800000, reactions: [] }
+    ],
+    design: [{ user: 'Emma', initials: 'EJ', text: 'Updated the mockups, check Figma', time: Date.now() - 7200000, reactions: [{ emoji: '&#x1F44D;', count: 3, active: false }] }],
+    random: [{ user: 'Mike', initials: 'MK', text: 'Anyone up for lunch?', time: Date.now() - 86400000, reactions: [] }]
+  };
+}
+
+function getDefaultCodeFiles() {
+  return [
+    { name: 'index.js', path: 'backend-api/src/', content: '// Backend API Entry Point\nconst express = require(\'express\');\nconst app = express();\nconst PORT = process.env.PORT || 3001;\n\napp.use(express.json());\n\napp.get(\'/api/health\', (req, res) => {\n  res.json({ status: \'ok\', timestamp: new Date() });\n});\n\napp.listen(PORT, () => {\n  console.log(`Server running on port ${PORT}`);\n});' },
+    { name: 'schema.prisma', path: 'packages/db/', content: '// Nexus Database Schema\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel User {\n  id            String    @id @default(cuid())\n  email         String    @unique\n  name          String?\n  createdAt     DateTime  @default(now())\n  updatedAt     DateTime  @updatedAt\n  workspaces    WorkspaceMember[]\n}' },
+    { name: 'auth.ts', path: 'apps/web/api/', content: '// NextAuth Configuration\nimport NextAuth from \'next-auth\';\nimport CredentialsProvider from \'next-auth/providers/credentials\';\n\nexport default NextAuth({\n  providers: [\n    CredentialsProvider({\n      name: \'Credentials\',\n      credentials: {\n        email: { label: "Email", type: "email" },\n        password: { label: "Password", type: "password" }\n      },\n      async authorize(credentials) {\n        // Add auth logic here\n        return null;\n      }\n    })\n  ],\n  pages: { signIn: \'/login\' },\n  session: { strategy: \'jwt\' }\n});' },
+    { name: 'workspace.ts', path: 'apps/api/routes/', content: '// Workspace Routes\nimport { Router } from \'express\';\nimport { requireAuth, requireWorkspaceMember } from \'../middleware/auth\';\n\nconst router = Router();\n\nrouter.get(\'/\', requireAuth, async (req, res) => {\n  const workspaces = await prisma.workspace.findMany({\n    where: { members: { some: { userId: req.user.id } } }\n  });\n  res.json(workspaces);\n});\n\nrouter.post(\'/\', requireAuth, async (req, res) => {\n  const { name } = req.body;\n  const workspace = await prisma.workspace.create({\n    data: { name, ownerId: req.user.id }\n  });\n  res.status(201).json(workspace);\n});\n\nexport default router;' }
+  ];
+}
+
+function getDefaultNotifications() {
+  return [
+    { icon: 'msg', text: 'Sarah replied to your comment on backend-api', time: '2 min ago', unread: true },
+    { icon: 'commit', text: '5 new commits pushed to frontend-dashboard', time: '1 hour ago', unread: true },
+    { icon: 'mention', text: 'Mike mentioned you in #general', time: '3 hours ago', unread: true },
+    { icon: 'msg', text: 'Emma shared a file: analytics.xlsx', time: '1 day ago', unread: false },
+    { icon: 'commit', text: 'mobile-app build succeeded', time: '2 days ago', unread: false }
+  ];
+}
+
+// ==================== INIT ====================
+function init() {
+  applyTheme();
+  if (!state.onboarded) { showOnboarding(); } else { document.getElementById('onboarding').classList.add('hidden'); }
+  setupUser();
+  renderAll();
+  setupNavigation();
+  setupSearch();
+  setupModals();
+  setupChannelSwitching();
+  setupFileDrop();
+  startMusicProgress();
+  updateWelcome();
+  setupKeyboardShortcuts();
+  buildEmojiPicker();
+}
+
+function renderAll() {
+  renderNotes(); renderTasks(); renderRecentNotes(); renderOverviewChat();
+  renderFullChat(); renderNotifications(); renderCalendar();
+  renderFiles(); renderVoiceChannels(); renderMembers();
+  renderCodeFileTree(); renderActivityFeed();
+}
+
+// ==================== ONBOARDING ====================
+function showOnboarding() { state.onboardStep = 0; updateOnboardingStep(); }
+function nextOnboardingStep() {
+  state.onboardStep++;
+  if (state.onboardStep >= 3) {
+    const name = document.getElementById('onboard-name').value.trim() || 'Alex';
+    state.user = { name, email: `${name.toLowerCase().replace(/\s/g,'.')}@nexus.dev` };
+    localStorage.setItem('nexus_user', JSON.stringify(state.user));
+    localStorage.setItem('nexus_onboarded', 'true');
+    state.onboarded = true;
+    document.getElementById('onboarding').classList.add('hidden');
+    setupUser(); updateWelcome(); showToast('Welcome to Nexus, ' + name + '!');
+    return;
+  }
+  updateOnboardingStep();
+}
+function updateOnboardingStep() {
+  document.querySelectorAll('.onboarding-step').forEach((s, i) => s.classList.toggle('active', i === state.onboardStep));
+  const content = document.getElementById('onboarding-content');
+  const btn = document.getElementById('onboard-next');
+  if (state.onboardStep === 0) {
+    content.innerHTML = '<div class="logo">&#x1F680;</div><h1>Welcome to <span>Nexus</span></h1><p>Your all-in-one workspace for notes, code, chat, and collaboration.</p><input type="text" id="onboard-name" placeholder="Your name" value="' + state.user.name + '">';
+    btn.textContent = 'Next';
+  } else if (state.onboardStep === 1) {
+    content.innerHTML = '<div class="logo">&#x1F4DD;</div><h1>Organize Everything</h1><p>Create notes with rich formatting, manage tasks with priorities, organize files, and write code &#x2014; all in one place.</p>';
+    btn.textContent = 'Next';
+  } else {
+    content.innerHTML = '<div class="logo">&#x1F4AC;</div><h1>Collaborate in Real-Time</h1><p>Chat in channels, join voice rooms, share screens, and collaborate on documents with your team.</p>';
+    btn.textContent = 'Launch Nexus &#x1F680;';
+  }
+}
+
+// ==================== USER ====================
+function setupUser() {
+  document.getElementById('user-greeting').textContent = state.user.name;
+  document.getElementById('user-name-display').textContent = state.user.name;
+  const initials = state.user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  document.querySelector('.user-avatar').textContent = initials;
+}
+
+// ==================== NAVIGATION ====================
+function setupNavigation() {
+  document.querySelectorAll('.nav-item[data-page]').forEach(btn => btn.addEventListener('click', () => { navigateTo(btn.dataset.page); closeSidebar(); }));
+}
+function navigateTo(page) {
+  state.currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`)?.classList.add('active');
+}
+
+// ==================== MOBILE SIDEBAR ====================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('show');
+}
+
+// ==================== THEME ====================
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  document.getElementById('theme-btn').textContent = state.theme === 'dark' ? '&#x1F319;' : '&#x2600;&#xFE0F;';
+}
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('nexus_theme', state.theme);
+  applyTheme();
+  showToast(state.theme === 'dark' ? 'Dark mode' : 'Light mode');
+}
+
+// ==================== NOTES ====================
+function saveNotes() { localStorage.setItem('nexus_notes', JSON.stringify(state.notes)); }
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  const filter = document.getElementById('notes-filter')?.value || 'all';
+  let notes = state.notes;
+  if (filter === 'favorites') notes = notes.filter(n => n.favorite);
+
+  if (!notes.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">&#x1F4DD;</div><h3>${filter === 'favorites' ? 'No favorite notes' : 'No notes yet'}</h3><p>${filter === 'favorites' ? 'Star notes to add them here' : 'Create your first note to get started.'}</p></div>`;
+    return;
+  }
+  list.innerHTML = notes.map(note => `
+    <div class="note-item" onclick="viewNote('${note.id}')">
+      <div class="note-icon">&#x1F4C4;</div>
+      <div class="note-details"><h4>${escHtml(note.title)} ${note.favorite ? '<span class="note-fav">&#x2B50;</span>' : ''}</h4><span>${timeAgo(note.updatedAt)}</span></div>
+      <button class="note-menu" onclick="event.stopPropagation(); toggleNoteFav('${note.id}')" title="Favorite">${note.favorite ? '&#x2B50;' : '&#x2606;'}</button>
+      <button class="note-menu" onclick="event.stopPropagation(); showVersionHistory('${note.id}')" title="History">&#x1F4C8;</button>
+      <button class="note-menu" onclick="event.stopPropagation(); deleteNote('${note.id}')" title="Delete">&#x2715;</button>
+    </div>
+  `).join('');
+}
+
+function renderRecentNotes() {
+  const el = document.getElementById('recent-notes');
+  const recent = [...state.notes].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 4);
+  if (!recent.length) { el.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 13px;">No notes yet</div>'; return; }
+  el.innerHTML = recent.map(note => `
+    <div class="note-item" onclick="navigateTo('notes'); viewNote('${note.id}')">
+      <div class="note-icon">&#x1F4C4;</div>
+      <div class="note-details"><h4>${escHtml(note.title)}</h4><span>${timeAgo(note.updatedAt)}</span></div>
+    </div>
+  `).join('');
+}
+
+function openNoteEditor(noteId) {
+  const editor = document.getElementById('note-editor');
+  const detail = document.getElementById('note-detail');
+  editor.classList.add('show'); detail.classList.remove('show');
+  if (noteId) {
+    const note = state.notes.find(n => n.id === noteId);
+    state.editingNoteId = noteId;
+    document.getElementById('note-title').value = note.title;
+    document.getElementById('note-content').value = note.content;
+  } else { state.editingNoteId = null; document.getElementById('note-title').value = ''; document.getElementById('note-content').value = ''; }
+  document.getElementById('note-title').focus();
+}
+
+function closeNoteEditor() { document.getElementById('note-editor').classList.remove('show'); document.getElementById('note-detail').classList.remove('show'); state.editingNoteId = null; }
+
+function viewNote(id) {
+  const note = state.notes.find(n => n.id === id);
+  if (!note) return;
+  state.viewingNoteId = id;
+  const detail = document.getElementById('note-detail');
+  const editor = document.getElementById('note-editor');
+  editor.classList.remove('show');
+  detail.classList.add('show');
+  detail.innerHTML = `
+    <h2>${escHtml(note.title)} ${note.favorite ? '&#x2B50;' : ''}</h2>
+    <div class="meta"><span>Created ${timeAgo(note.createdAt)}</span><span>Updated ${timeAgo(note.updatedAt)}</span><span>${note.versions?.length || 0} versions</span></div>
+    <div class="content">${formatNoteContent(note.content)}</div>
+    <div class="note-detail-actions">
+      <button class="btn-secondary" onclick="openNoteEditor('${id}')">&#x270F;&#xFE0F; Edit</button>
+      <button class="btn-secondary" onclick="showVersionHistory('${id}')">&#x1F4C8; History</button>
+      <button class="btn-secondary" onclick="exportNote('${id}')">&#x1F4E5; Export</button>
+      <button class="btn-danger" onclick="deleteNote('${id}')" style="margin-left: auto;">Delete</button>
+    </div>
+  `;
+}
+
+function formatNoteContent(content) {
+  return escHtml(content)
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: JetBrains Mono, monospace; font-size: 12px;">$1</code>')
+    .replace(/^- \[x\] (.+)$/gm, '<div style="display: flex; gap: 8px; align-items: center;"><span style="color: var(--green);">&#x2705;</span><span style="text-decoration: line-through; color: var(--text-muted);">$1</span></div>')
+    .replace(/^- \[ \] (.+)$/gm, '<div style="display: flex; gap: 8px; align-items: center;"><span>&#x2610;</span> $1</div>')
+    .replace(/^- (.+)$/gm, '<div style="padding-left: 20px;">&#x2022; $1</div>')
+    .replace(/^> (.+)$/gm, '<blockquote style="border-left: 3px solid var(--nexus); padding-left: 16px; color: var(--text-secondary); margin: 8px 0;">$1</blockquote>')
+    .replace(/^---$/gm, '<hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;">')
+    .replace(/\n/g, '<br>');
+}
+
+function formatNote(type) {
+  const ta = document.getElementById('note-content');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const text = ta.value;
+  let prefix = '';
+  switch(type) {
+    case 'bold': prefix = '**'; break; case 'italic': prefix = '*'; break;
+    case 'code': prefix = '`'; break; case 'h1': prefix = '# '; break;
+    case 'h2': prefix = '## '; break; case 'h3': prefix = '### '; break;
+    case 'ul': prefix = '- '; break; case 'ol': prefix = '1. '; break;
+    case 'check': prefix = '- [ ] '; break; case 'quote': prefix = '> '; break;
+    case 'divider': prefix = '\n---\n'; break;
+  }
+  if (type === 'divider') { ta.value = text.slice(0, start) + prefix + text.slice(end); }
+  else {
+    const selected = text.slice(start, end);
+    ta.value = text.slice(0, start) + prefix + selected + (type !== 'check' && type !== 'quote' && type !== 'ul' && type !== 'ol' && type !== 'h1' && type !== 'h2' && type !== 'h3' ? prefix : '') + text.slice(end);
+  }
+  ta.focus();
+  document.getElementById('save-status').textContent = 'Editing...';
+}
+
+function saveNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const content = document.getElementById('note-content').value.trim();
+  if (!title) { showToast('Please add a title'); return; }
+  const now = Date.now();
+  if (state.editingNoteId) {
+    const note = state.notes.find(n => n.id === state.editingNoteId);
+    if (!note.versions) note.versions = [];
+    note.versions.push({ content: note.content, title: note.title, savedAt: now });
+    if (note.versions.length > 5) note.versions.shift(); // FILO: free tier = 5
+    note.title = title; note.content = content; note.updatedAt = now;
+    document.getElementById('save-status').textContent = 'Saved! ' + note.versions.length + ' versions';
+  } else {
+    state.notes.push({ id: generateId(), title, content, createdAt: now, updatedAt: now, favorite: false, versions: [] });
+    document.getElementById('save-status').textContent = 'Created!';
+  }
+  saveNotes(); renderNotes(); renderRecentNotes(); closeNoteEditor(); showToast('Note saved');
+}
+
+function deleteNote(id) {
+  state.notes = state.notes.filter(n => n.id !== id);
+  saveNotes(); renderNotes(); renderRecentNotes(); closeNoteEditor(); showToast('Note deleted');
+}
+
+function toggleNoteFav(id) {
+  const note = state.notes.find(n => n.id === id);
+  if (note) { note.favorite = !note.favorite; saveNotes(); renderNotes(); showToast(note.favorite ? 'Added to favorites' : 'Removed from favorites'); }
+}
+
+function filterNotes() { renderNotes(); }
+
+function exportNote(id) {
+  const note = state.notes.find(n => n.id === (id || state.viewingNoteId || state.editingNoteId));
+  if (!note) { showToast('No note to export'); return; }
+  const blob = new Blob([`# ${note.title}\n\n${note.content}\n\n---\nExported from Nexus on ${new Date().toLocaleDateString()}`], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${note.title.replace(/\s+/g, '-').toLowerCase()}.md`;
+  a.click();
+  showToast('Exported as Markdown');
+}
+
+// ==================== VERSION HISTORY ====================
+function showVersionHistory(id) {
+  const note = state.notes.find(n => n.id === id);
+  if (!note) return;
+  const content = document.getElementById('version-history-content');
+  const versions = note.versions || [];
+  content.innerHTML = `
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Showing ${versions.length} saved version${versions.length !== 1 ? 's' : ''} for "${escHtml(note.title)}". Free tier keeps last 5.</p>
+    <div class="version-list">
+      <div class="version-item" onclick="restoreVersion('${id}', -1)"><span class="ver">LIVE</span><span style="flex:1;font-size:13px;">Current version</span><span class="time">Now</span></div>
+      ${versions.slice().reverse().map((v, i) => `
+        <div class="version-item" onclick="restoreVersion('${id}', ${versions.length - 1 - i})">
+          <span class="ver">v${versions.length - i}</span>
+          <span style="flex:1;font-size:13px;">${escHtml(v.title || note.title)}</span>
+          <span class="time">${timeAgo(v.savedAt)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.getElementById('version-modal').classList.add('show');
+}
+
+function restoreVersion(noteId, versionIdx) {
+  const note = state.notes.find(n => n.id === noteId);
+  if (!note) return;
+  if (versionIdx === -1) { showToast('Already on latest version'); return; }
+  if (note.versions && note.versions[versionIdx]) {
+    note.content = note.versions[versionIdx].content;
+    note.title = note.versions[versionIdx].title || note.title;
+    note.updatedAt = Date.now();
+    saveNotes(); renderNotes(); renderRecentNotes();
+    closeVersionHistory(); showToast('Version restored');
+  }
+}
+
+function closeVersionHistory() { document.getElementById('version-modal').classList.remove('show'); }
+
+// ==================== TASKS ====================
+function saveTasks() { localStorage.setItem('nexus_tasks', JSON.stringify(state.tasks)); }
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.tasks.push({ id: generateId(), text, priority: document.getElementById('task-priority').value, completed: false, createdAt: Date.now() });
+  input.value = ''; saveTasks(); renderTasks(); showToast('Task added');
+}
+
+function toggleTask(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) task.completed = !task.completed;
+  saveTasks(); renderTasks();
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveTasks(); renderTasks(); showToast('Task deleted');
+}
+
+function renderTasks() {
+  const total = state.tasks.length;
+  const done = state.tasks.filter(t => t.completed).length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-active').textContent = total - done;
+  document.getElementById('stat-done').textContent = done;
+
+  const list = document.getElementById('task-list');
+  if (!state.tasks.length) { list.innerHTML = '<div class="empty-state"><div class="icon">&#x2705;</div><h3>No tasks yet</h3><p>Add your first task above.</p></div>'; return; }
+
+  const sorted = [...state.tasks].sort((a, b) => { if (a.completed !== b.completed) return a.completed ? 1 : -1; return b.createdAt - a.createdAt; });
+  list.innerHTML = sorted.map(task => `
+    <div class="task-item ${task.completed ? 'completed' : ''}">
+      <button class="task-check ${task.completed ? 'done' : ''}" onclick="toggleTask('${task.id}')">&#x2713;</button>
+      <div class="task-body"><h4>${escHtml(task.text)}</h4><div class="task-meta">${timeAgo(task.createdAt)}</div></div>
+      <span class="task-priority ${task.priority}">${task.priority}</span>
+      <button class="task-delete" onclick="deleteTask('${task.id}')">&#x1F5D1;</button>
+    </div>
+  `).join('');
+}
+
+// ==================== CHAT ====================
+function saveChat() { localStorage.setItem('nexus_channels', JSON.stringify(state.channels)); }
+
+function renderOverviewChat() {
+  const el = document.getElementById('overview-chat');
+  const msgs = state.channels.general.slice(-5);
+  el.innerHTML = msgs.map(msg => `
+    <div class="chat-msg"><div class="chat-avatar">${msg.initials}</div><div class="chat-content"><div class="name">${escHtml(msg.user)}</div><div class="text">${formatMessageText(msg.text)}</div><div class="time">${timeAgo(msg.time)}</div></div></div>
+  `).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderFullChat() {
+  const el = document.getElementById('chat-full-messages');
+  const msgs = state.channels[state.activeChannel] || [];
+  el.innerHTML = msgs.map((msg, i) => `
+    <div class="chat-full-msg">
+      <div class="chat-avatar">${msg.initials}</div>
+      <div>
+        <div class="name">${escHtml(msg.user)}</div>
+        <div class="text">${formatMessageText(msg.text)}</div>
+        <div class="time">${timeAgo(msg.time)}</div>
+        ${msg.reactions && msg.reactions.length ? `<div class="msg-reactions">${msg.reactions.map(r => `<span class="msg-reaction ${r.active ? 'active' : ''}" onclick="toggleReaction('${state.activeChannel}', ${i}, '${r.emoji}')">${r.emoji} <span class="count">${r.count}</span></span>`).join('')}<span class="msg-reaction" onclick="showEmojiForReaction(${i})">+</span></div>` : ''}
+      </div>
+      <div class="msg-actions"><button class="msg-action-btn" onclick="addReaction('${state.activeChannel}', ${i})">&#x1F60A;</button><button class="msg-action-btn" onclick="replyTo('${state.activeChannel}', ${i})">&#x21A9;&#xFE0F;</button>${msg.user === state.user.name ? `<button class="msg-action-btn" onclick="editMessage('${state.activeChannel}', ${i})">&#x270F;&#xFE0F;</button><button class="msg-action-btn" onclick="deleteMessage('${state.activeChannel}', ${i})">&#x1F5D1;</button>` : ''}</div>
+    </div>
+  `).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function formatMessageText(text) {
+  return escHtml(text).replace(/`([^`]+)`/g, '<code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: JetBrains Mono, monospace; font-size: 12px;">$1</code>').replace(/\n/g, '<br>');
+}
+
+function sendQuickChat() {
+  const input = document.getElementById('quick-chat-input');
+  const text = input.value.trim(); if (!text) return;
+  const msg = { user: state.user.name, initials: state.user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2), text, time: Date.now(), reactions: [] };
+  state.channels.general.push(msg); input.value = ''; saveChat(); renderOverviewChat(); renderFullChat();
+}
+
+function handleChatInput(e) { if (e.key === 'Enter') sendFullChat(); }
+
+function sendFullChat() {
+  const input = document.getElementById('full-chat-input');
+  const text = input.value.trim(); if (!text) return;
+  const msg = { user: state.user.name, initials: state.user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2), text, time: Date.now(), reactions: [] };
+  state.channels[state.activeChannel].push(msg);
+  input.value = ''; input.placeholder = `Message #${state.activeChannel}...`;
+  saveChat(); renderOverviewChat(); renderFullChat();
+  simulateTyping();
+}
+
+function addReaction(channel, msgIdx) {
+  const emojis = ['&#x1F44D;', '&#x1F777;&#xFE0F;', '&#x1F389;', '&#x1F525;', '&#x1F440;', '&#x2764;&#xFE0F;'];
+  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+  const msg = state.channels[channel][msgIdx];
+  if (!msg.reactions) msg.reactions = [];
+  const existing = msg.reactions.find(r => r.emoji === emoji);
+  if (existing) { existing.count++; existing.active = true; }
+  else { msg.reactions.push({ emoji, count: 1, active: true }); }
+  saveChat(); renderFullChat();
+}
+
+function toggleReaction(channel, msgIdx, emoji) {
+  const msg = state.channels[channel][msgIdx];
+  const reaction = msg.reactions.find(r => r.emoji === emoji);
+  if (reaction) { reaction.active = !reaction.active; reaction.count += reaction.active ? 1 : -1; if (reaction.count <= 0) msg.reactions = msg.reactions.filter(r => r.emoji !== emoji); }
+  saveChat(); renderFullChat();
+}
+
+function replyTo(channel, msgIdx) {
+  const msg = state.channels[channel][msgIdx];
+  const input = document.getElementById('full-chat-input');
+  input.value = `> ${msg.text.substring(0, 50)}${msg.text.length > 50 ? '...' : ''}\n`;
+  input.focus();
+}
+
+function editMessage(channel, msgIdx) {
+  const msg = state.channels[channel][msgIdx];
+  const newText = prompt('Edit message:', msg.text);
+  if (newText !== null && newText.trim()) { msg.text = newText.trim(); msg.edited = true; saveChat(); renderFullChat(); showToast('Message edited'); }
+}
+
+function deleteMessage(channel, msgIdx) {
+  if (confirm('Delete this message?')) {
+    state.channels[channel].splice(msgIdx, 1);
+    saveChat(); renderFullChat(); showToast('Message deleted');
+  }
+}
+
+function showEmojiForReaction(msgIdx) { showToast('Use the + button to add reactions'); }
+
+function setupChannelSwitching() {
+  document.querySelectorAll('.channel-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
+      item.classList.add('active');
+      state.activeChannel = item.dataset.channel;
+      document.getElementById('chat-channel-name').textContent = state.activeChannel;
+      document.getElementById('full-chat-input').placeholder = `Message #${state.activeChannel}...`;
       renderFullChat();
-      renderNotifications();
-      renderRecentNotes();
-      renderCalendar();
-      updateWelcome();
-      startMusicProgress();
-      setupNavigation();
-      setupSearch();
-      setupSettings();
-      setupChannelSwitching();
-    }
-
-    // ==================== NAVIGATION ====================
-    function setupNavigation() {
-      document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => navigateTo(btn.dataset.page));
-      });
-    }
-
-    function navigateTo(page) {
-      state.currentPage = page;
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
-      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-      const target = document.getElementById(`page-${page}`);
-      if (target) target.classList.add('active');
-    }
-
-    // ==================== NOTES ====================
-    function saveNotes() {
-      localStorage.setItem('nexus_notes', JSON.stringify(state.notes));
-    }
-
-    function renderNotes() {
-      const list = document.getElementById('notes-list');
-      if (!state.notes.length) {
-        list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4DD;</div><h3>No notes yet</h3><p>Create your first note to get started.</p></div>';
-        return;
-      }
-      list.innerHTML = state.notes.map(note => `
-        <div class="note-item">
-          <div class="note-icon">&#x1F4C4;</div>
-          <div class="note-details">
-            <h4>${escHtml(note.title)}</h4>
-            <span>${timeAgo(note.updatedAt)}</span>
-          </div>
-          <button class="note-menu" onclick="deleteNote('${note.id}')">&#x2715;</button>
-        </div>
-      `).join('');
-    }
-
-    function renderRecentNotes() {
-      const el = document.getElementById('recent-notes');
-      const recent = state.notes.slice(-4).reverse();
-      if (!recent.length) {
-        el.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center; font-size: 13px;">No notes yet</div>';
-        return;
-      }
-      el.innerHTML = recent.map(note => `
-        <div class="note-item">
-          <div class="note-icon">&#x1F4C4;</div>
-          <div class="note-details">
-            <h4>${escHtml(note.title)}</h4>
-            <span>${timeAgo(note.updatedAt)}</span>
-          </div>
-          <button class="note-menu" onclick="deleteNote('${note.id}')">&#x2715;</button>
-        </div>
-      `).join('');
-    }
-
-    function openNoteEditor(noteId) {
-      const editor = document.getElementById('note-editor');
-      editor.classList.add('show');
-      if (noteId) {
-        const note = state.notes.find(n => n.id === noteId);
-        state.editingNoteId = noteId;
-        document.getElementById('note-title').value = note.title;
-        document.getElementById('note-content').value = note.content;
-      } else {
-        state.editingNoteId = null;
-        document.getElementById('note-title').value = '';
-        document.getElementById('note-content').value = '';
-      }
-      document.getElementById('note-title').focus();
-    }
-
-    function closeNoteEditor() {
-      document.getElementById('note-editor').classList.remove('show');
-      state.editingNoteId = null;
-    }
-
-    function saveNote() {
-      const title = document.getElementById('note-title').value.trim();
-      const content = document.getElementById('note-content').value.trim();
-      if (!title) { showToast('Please add a title'); return; }
-
-      if (state.editingNoteId) {
-        const note = state.notes.find(n => n.id === state.editingNoteId);
-        note.title = title;
-        note.content = content;
-        note.updatedAt = Date.now();
-      } else {
-        state.notes.push({
-          id: generateId(),
-          title,
-          content,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        });
-      }
-
-      saveNotes();
-      renderNotes();
-      renderRecentNotes();
-      closeNoteEditor();
-      showToast('Note saved');
-    }
-
-    function deleteNote(id) {
-      state.notes = state.notes.filter(n => n.id !== id);
-      saveNotes();
-      renderNotes();
-      renderRecentNotes();
-      showToast('Note deleted');
-    }
-
-    // ==================== TASKS ====================
-    function saveTasks() {
-      localStorage.setItem('nexus_tasks', JSON.stringify(state.tasks));
-    }
-
-    function addTask() {
-      const input = document.getElementById('task-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const priority = document.getElementById('task-priority').value;
-      state.tasks.push({
-        id: generateId(),
-        text,
-        priority,
-        completed: false,
-        createdAt: Date.now()
-      });
-
-      input.value = '';
-      saveTasks();
-      renderTasks();
-      showToast('Task added');
-    }
-
-    function toggleTask(id) {
-      const task = state.tasks.find(t => t.id === id);
-      if (task) task.completed = !task.completed;
-      saveTasks();
-      renderTasks();
-    }
-
-    function deleteTask(id) {
-      state.tasks = state.tasks.filter(t => t.id !== id);
-      saveTasks();
-      renderTasks();
-      showToast('Task deleted');
-    }
-
-    function renderTasks() {
-      const list = document.getElementById('task-list');
-      const total = state.tasks.length;
-      const done = state.tasks.filter(t => t.completed).length;
-      const active = total - done;
-
-      document.getElementById('stat-total').textContent = total;
-      document.getElementById('stat-active').textContent = active;
-      document.getElementById('stat-done').textContent = done;
-
-      if (!state.tasks.length) {
-        list.innerHTML = '<div class="empty-state"><div class="icon">&#x2705;</div><h3>No tasks yet</h3><p>Add your first task above.</p></div>';
-        return;
-      }
-
-      const sorted = [...state.tasks].sort((a, b) => {
-        if (a.completed !== b.completed) return a.completed ? 1 : -1;
-        return b.createdAt - a.createdAt;
-      });
-
-      list.innerHTML = sorted.map(task => `
-        <div class="task-item ${task.completed ? 'completed' : ''}">
-          <button class="task-check ${task.completed ? 'done' : ''}" onclick="toggleTask('${task.id}')">&#x2713;</button>
-          <div class="task-body">
-            <h4>${escHtml(task.text)}</h4>
-            <div class="task-meta">${timeAgo(task.createdAt)}</div>
-          </div>
-          <span class="task-priority ${task.priority}">${task.priority}</span>
-          <button class="task-delete" onclick="deleteTask('${task.id}')">&#x1F5D1;</button>
-        </div>
-      `).join('');
-    }
-
-    // ==================== CHAT ====================
-    function saveChat() {
-      localStorage.setItem('nexus_chat', JSON.stringify(state.chatMessages));
-      localStorage.setItem('nexus_channels', JSON.stringify(state.channels));
-    }
-
-    function renderOverviewChat() {
-      const el = document.getElementById('overview-chat');
-      el.innerHTML = state.chatMessages.map(msg => `
-        <div class="chat-msg">
-          <div class="chat-avatar" style="background: ${msg.gradient || 'linear-gradient(135deg, var(--nexus), var(--purple))'}">${msg.initials}</div>
-          <div class="chat-content">
-            <div class="name">${escHtml(msg.user)}</div>
-            <div class="text">${escHtml(msg.text)}</div>
-            <div class="time">${timeAgo(msg.time)}</div>
-          </div>
-        </div>
-      `).join('');
-      el.scrollTop = el.scrollHeight;
-    }
-
-    function renderFullChat() {
-      const el = document.getElementById('chat-full-messages');
-      const messages = state.channels[state.activeChannel] || [];
-      el.innerHTML = messages.map(msg => `
-        <div class="chat-full-msg">
-          <div class="chat-avatar">${msg.initials}</div>
-          <div>
-            <div class="name">${escHtml(msg.user)}</div>
-            <div class="text">${escHtml(msg.text)}</div>
-            <div class="time">${timeAgo(msg.time)}</div>
-          </div>
-        </div>
-      `).join('');
-      el.scrollTop = el.scrollHeight;
-    }
-
-    function sendQuickChat() {
-      const input = document.getElementById('quick-chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const msg = { user: 'Alex', initials: 'AK', text, time: Date.now(), gradient: 'linear-gradient(135deg, var(--nexus), var(--purple))' };
-      state.chatMessages.push(msg);
-      state.channels.general.push({ user: 'Alex', initials: 'AK', text, time: Date.now() });
-
-      input.value = '';
-      saveChat();
-      renderOverviewChat();
-      renderFullChat();
-    }
-
-    function sendFullChat() {
-      const input = document.getElementById('full-chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const msg = { user: 'Alex', initials: 'AK', text, time: Date.now() };
-      state.channels[state.activeChannel].push(msg);
-      state.chatMessages.push({ ...msg, gradient: 'linear-gradient(135deg, var(--nexus), var(--purple))' });
-
-      input.value = '';
-      input.placeholder = `Message #${state.activeChannel}...`;
-      saveChat();
-      renderOverviewChat();
-      renderFullChat();
-    }
-
-    function setupChannelSwitching() {
-      document.querySelectorAll('.channel-item').forEach(item => {
-        item.addEventListener('click', () => {
-          document.querySelectorAll('.channel-item').forEach(c => c.classList.remove('active'));
-          item.classList.add('active');
-          state.activeChannel = item.dataset.channel;
-          document.getElementById('chat-channel-name').textContent = state.activeChannel;
-          renderFullChat();
-        });
-      });
-    }
-
-    // ==================== NOTIFICATIONS ====================
-    function renderNotifications() {
-      const list = document.getElementById('notif-list');
-      const unreadCount = state.notifications.filter(n => n.unread).length;
-      const dot = document.getElementById('notif-dot');
-      dot.style.display = unreadCount ? 'block' : 'none';
-
-      list.innerHTML = state.notifications.map((n, i) => `
-        <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markNotifRead(${i})">
-          <div class="notif-icon ${n.icon}">${n.icon === 'msg' ? '&#x1F4AC;' : n.icon === 'commit' ? '&#x1F4BB;' : '&#x1F4CB;'}</div>
-          <div class="notif-body">
-            <p>${escHtml(n.text)}</p>
-            <span>${escHtml(n.time)}</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function markNotifRead(index) {
-      state.notifications[index].unread = false;
-      renderNotifications();
-    }
-
-    function clearNotifications() {
-      state.notifications.forEach(n => n.unread = false);
-      renderNotifications();
-      showToast('All notifications marked as read');
-    }
-
-    // ==================== SETTINGS ====================
-    function setupSettings() {
-      document.getElementById('settings-btn').addEventListener('click', openSettings);
-      document.getElementById('notif-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.getElementById('notif-dropdown').classList.toggle('show');
-      });
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('#notif-btn')) {
-          document.getElementById('notif-dropdown').classList.remove('show');
-        }
-      });
-    }
-
-    function openSettings() {
-      document.getElementById('settings-modal').classList.add('show');
-    }
-
-    function closeSettings() {
-      document.getElementById('settings-modal').classList.remove('show');
-    }
-
-    function saveSettings() {
-      const name = document.getElementById('setting-name').value.trim();
-      if (name) {
-        document.getElementById('user-greeting').textContent = name;
-        document.querySelector('.user-btn span').textContent = name;
-      }
-      closeSettings();
-      showToast('Settings saved');
-    }
-
-    // ==================== SEARCH ====================
-    function setupSearch() {
-      const input = document.getElementById('search-input');
-      const results = document.getElementById('search-results');
-
-      input.addEventListener('input', () => {
-        const query = input.value.trim().toLowerCase();
-        if (!query) { results.classList.remove('show'); return; }
-
-        const matches = [];
-        state.notes.forEach(n => {
-          if (n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query)) {
-            matches.push({ icon: '&#x1F4DD;', title: n.title, type: 'Note', page: 'notes' });
-          }
-        });
-        state.tasks.forEach(t => {
-          if (t.text.toLowerCase().includes(query)) {
-            matches.push({ icon: '&#x1F4CB;', title: t.text, type: 'Task', page: 'tasks' });
-          }
-        });
-
-        const channels = ['general', 'dev', 'design', 'random'];
-        channels.forEach(ch => {
-          (state.channels[ch] || []).forEach(msg => {
-            if (msg.text.toLowerCase().includes(query)) {
-              matches.push({ icon: '&#x1F4AC;', title: `${msg.user}: ${msg.text.substring(0, 40)}...`, type: `#${ch}`, page: 'chats' });
-            }
-          });
-        });
-
-        if (!matches.length) {
-          results.innerHTML = '<div style="padding: 16px; color: var(--text-muted); text-align: center;">No results found</div>';
-        } else {
-          results.innerHTML = matches.slice(0, 10).map(m => `
-            <div class="search-result-item" onclick="navigateTo('${m.page}'); document.getElementById('search-results').classList.remove('show'); document.getElementById('search-input').value = '';">
-              <span class="icon">${m.icon}</span>
-              <span class="title">${escHtml(m.title)}</span>
-              <span class="type">${escHtml(m.type)}</span>
-            </div>
-          `).join('');
-        }
-        results.classList.add('show');
-      });
-
-      input.addEventListener('blur', () => {
-        setTimeout(() => results.classList.remove('show'), 200);
-      });
-    }
-
-    // ==================== MUSIC ====================
-    function togglePlay() {
-      state.music.isPlaying = !state.music.isPlaying;
-      document.getElementById('play-btn').textContent = state.music.isPlaying ? '&#x23F8;' : '&#x25B6;';
-      showToast(state.music.isPlaying ? 'Now playing' : 'Music paused');
-    }
-
-    function startMusicProgress() {
-      setInterval(() => {
-        if (!state.music.isPlaying) return;
-        const track = state.music.tracks[state.music.currentTrack];
-        state.music.progress = Math.min(100, state.music.progress + (100 / track.duration));
-        updateMusicUI();
-        if (state.music.progress >= 100) nextTrack();
-      }, 1000);
-    }
-
-    function updateMusicUI() {
-      const track = state.music.tracks[state.music.currentTrack];
-      const currentSec = Math.floor((state.music.progress / 100) * track.duration);
-      const min = Math.floor(currentSec / 60);
-      const sec = String(currentSec % 60).padStart(2, '0');
-      const totalMin = Math.floor(track.duration / 60);
-      const totalSec = String(track.duration % 60).padStart(2, '0');
-
-      document.getElementById('track-name').textContent = track.name;
-      document.getElementById('track-artist').textContent = track.artist;
-      document.getElementById('music-current').textContent = `${min}:${sec}`;
-      document.getElementById('music-total').textContent = `${totalMin}:${totalSec}`;
-      document.getElementById('progress-fill').style.width = `${state.music.progress}%`;
-    }
-
-    function seekMusic(e) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      state.music.progress = ((e.clientX - rect.left) / rect.width) * 100;
-      updateMusicUI();
-    }
-
-    function nextTrack() {
-      state.music.currentTrack = (state.music.currentTrack + 1) % state.music.tracks.length;
-      state.music.progress = 0;
-      updateMusicUI();
-      showToast(`Now playing: ${state.music.tracks[state.music.currentTrack].name}`);
-    }
-
-    function prevTrack() {
-      state.music.currentTrack = (state.music.currentTrack - 1 + state.music.tracks.length) % state.music.tracks.length;
-      state.music.progress = 0;
-      updateMusicUI();
-      showToast(`Now playing: ${state.music.tracks[state.music.currentTrack].name}`);
-    }
-
-    // ==================== CALENDAR ====================
-    function renderCalendar() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const today = now.getDate();
-
-      document.getElementById('calendar-title').textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-      const grid = document.getElementById('calendar-grid');
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      let html = days.map(d => `<div class="cal-day-header">${d}</div>`).join('');
-
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const prevDays = new Date(year, month, 0).getDate();
-
-      const sampleEvents = {
-        3: [{ text: 'Sprint Planning', cls: 'blue' }],
-        7: [{ text: 'Code Review', cls: 'green' }],
-        14: [{ text: 'Team Sync', cls: 'purple' }, { text: 'Deploy v2.0', cls: 'blue' }],
-        21: [{ text: 'Design Review', cls: 'green' }],
-        28: [{ text: 'Release', cls: 'blue' }]
-      };
-
-      for (let i = 0; i < firstDay; i++) {
-        html += `<div class="cal-day other-month"><div class="num">${prevDays - firstDay + 1 + i}</div></div>`;
-      }
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = d === today;
-        const events = sampleEvents[d] || [];
-        html += `<div class="cal-day ${isToday ? 'today' : ''}">
-          <div class="num">${d}</div>
-          ${events.map(e => `<div class="cal-event ${e.cls}">${e.text}</div>`).join('')}
-        </div>`;
-      }
-
-      grid.innerHTML = html;
-    }
-
-    // ==================== VOICE ====================
-    function joinVoice(channel) {
-      document.querySelectorAll('.voice-channel').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.voice-channel').forEach(c => {
-        if (c.querySelector('.voice-channel-name')?.textContent === channel) c.classList.add('active');
-      });
-      showToast(`Joined ${channel}`);
-    }
-
-    // ==================== UTILITIES ====================
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('active');
-      setTimeout(() => toast.classList.remove('active'), 2500);
-    }
-
-    function generateId() {
-      return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-    }
-
-    function escHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function timeAgo(timestamp) {
-      const seconds = Math.floor((Date.now() - timestamp) / 1000);
-      if (seconds < 60) return 'Just now';
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes} min ago`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      const days = Math.floor(hours / 24);
-      if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
-      return new Date(timestamp).toLocaleDateString();
-    }
-
-    function updateWelcome() {
-      const now = new Date();
-      const hour = now.getHours();
-      const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-      const unread = state.notifications.filter(n => n.unread).length;
-      const activeTasks = state.tasks.filter(t => !t.completed).length;
-      document.getElementById('welcome-sub').textContent =
-        `You have ${unread} unread notification${unread !== 1 ? 's' : ''} and ${activeTasks} active task${activeTasks !== 1 ? 's' : ''}.`;
-    }
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        document.getElementById('search-input').focus();
-      }
-      if (e.key === 'Escape') {
-        closeSettings();
-        document.getElementById('notif-dropdown').classList.remove('show');
-        document.getElementById('search-results').classList.remove('show');
-      }
     });
+  });
+}
 
-    // Initialize
-    init();
-  </script>
+// Typing indicator simulation
+function simulateTyping() {
+  const el = document.getElementById('typing-indicator');
+  const users = ['Sarah', 'Mike', 'Emma'];
+  const user = users[Math.floor(Math.random() * users.length)];
+  el.innerHTML = `${user} is typing<span class="typing-dots"><span></span><span></span><span></span></span>`;
+  setTimeout(() => { el.innerHTML = ''; }, 3000);
+}
+
+// ==================== EMOJI PICKER ====================
+function buildEmojiPicker() {
+  const emojis = ['&#x1F600;', '&#x1F602;', '&#x1F60D;', '&#x1F60E;', '&#x1F60A;', '&#x1F642;', '&#x1F914;', '&#x1F631;', '&#x1F62E;', '&#x1F634;', '&#x1F44D;', '&#x1F44E;', '&#x1F44F;', '&#x1F64C;', '&#x1F91D;', '&#x270A;', '&#x1F389;', '&#x1F525;', '&#x2764;&#xFE0F;', '&#x1F499;', '&#x1F49A;', '&#x1F49C;', '&#x1F9E1;', '&#x2764;&#xFE0F;&#x200D;&#x1F525;', '&#x1F440;', '&#x1F4AC;', '&#x1F4AD;', '&#x1F4A1;', '&#x2705;', '&#x274C;', '&#x26A1;', '&#x1F308;'];
+  document.getElementById('emoji-picker').innerHTML = `<div class="emoji-grid">${emojis.map(e => `<button class="emoji-btn" onclick="insertEmoji('${e}')">${e}</button>`).join('')}</div>`;
+}
+
+function toggleEmojiPicker() { document.getElementById('emoji-picker').classList.toggle('show'); }
+
+function insertEmoji(emoji) {
+  const input = document.getElementById('full-chat-input');
+  input.value += emoji;
+  input.focus();
+  document.getElementById('emoji-picker').classList.remove('show');
+}
+
+// ==================== FILES ====================
+function saveFiles() { localStorage.setItem('nexus_files', JSON.stringify(state.files)); }
+
+function renderFiles() {
+  const grid = document.getElementById('file-grid');
+  const defaultFiles = [
+    { name: 'project-specs.pdf', icon: '&#x1F4C4;', size: '2.4 MB', date: '2 hours ago' },
+    { name: 'mockup-v2.png', icon: '&#x1F5BC;&#xFE0F;', size: '1.1 MB', date: 'Yesterday' },
+    { name: 'api-docs.json', icon: '&#x1F4C7;', size: '15 KB', date: '3 days ago' },
+    { name: 'analytics.xlsx', icon: '&#x1F4CA;', size: '890 KB', date: '1 week ago' },
+    { name: 'demo-recording.mp4', icon: '&#x1F3AC;', size: '45 MB', date: '2 weeks ago' },
+    { name: 'jingle.mp3', icon: '&#x1F3B5;', size: '3.2 MB', date: '1 month ago' }
+  ];
+  const allFiles = [...state.files, ...defaultFiles];
+  grid.innerHTML = allFiles.map(f => `
+    <div class="file-card"><div class="file-actions"><button class="msg-action-btn" onclick="showToast('Download started')">&#x2B07;</button><button class="msg-action-btn" onclick="showToast('Link copied')">&#x1F517;</button></div><div class="icon">${f.icon}</div><div class="name">${escHtml(f.name)}</div><div class="meta">${f.size} &#x2022; ${f.date}</div></div>
+  `).join('');
+}
+
+function setupFileDrop() {
+  const zone = document.getElementById('file-drop-zone');
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+}
+
+function simulateFileUpload() {
+  const names = ['screenshot.png', 'notes.txt', 'design.fig', 'data.csv', 'presentation.pptx'];
+  const name = names[Math.floor(Math.random() * names.length)];
+  const icons = { png: '&#x1F5BC;&#xFE0F;', txt: '&#x1F4C4;', fig: '&#x1F3A8;', csv: '&#x1F4CA;', pptx: '&#x1F4CA;' };
+  const ext = name.split('.').pop();
+  state.files.unshift({ name, icon: icons[ext] || '&#x1F4C4;', size: `${(Math.random() * 5).toFixed(1)} MB`, date: 'Just now' });
+  saveFiles(); renderFiles(); showToast(`Uploaded ${name}`);
+}
+
+function handleFiles(fileList) {
+  Array.from(fileList).forEach(f => {
+    const ext = f.name.split('.').pop();
+    const icons = { png: '&#x1F5BC;&#xFE0F;', jpg: '&#x1F5BC;&#xFE0F;', pdf: '&#x1F4C4;', txt: '&#x1F4C4;', js: '&#x1F4C7;', ts: '&#x1F4C7;', zip: '&#x1F4E6;' };
+    state.files.unshift({ name: f.name, icon: icons[ext] || '&#x1F4C4;', size: formatFileSize(f.size), date: 'Just now' });
+  });
+  saveFiles(); renderFiles(); showToast(`${fileList.length} file(s) uploaded`);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+// ==================== CODE EDITOR ====================
+function saveCodeFiles() { localStorage.setItem('nexus_code_files', JSON.stringify(state.codeFiles)); }
+
+function renderCodeFileTree() {
+  const tree = document.getElementById('code-file-tree');
+  tree.innerHTML = state.codeFiles.map((f, i) => `
+    <div class="file-tree-item ${state.activeCodeFile === i ? 'active' : ''}" onclick="openCodeFile(${i})">
+      <span class="indent"></span>
+      <span>${getFileIcon(f.name)}</span>
+      <span>${escHtml(f.name)}</span>
+    </div>
+  `).join('');
+}
+
+function getFileIcon(name) {
+  const ext = name.split('.').pop();
+  const icons = { js: '&#x1F7E8;', ts: '&#x1F535;', prisma: '&#x1F7E3;', html: '&#x1F7E0;', css: '&#x1F534;', json: '&#x1F7E2;', md: '&#x1F4C4;' };
+  return icons[ext] || '&#x1F4C4;';
+}
+
+function openCodeFile(idx) {
+  state.activeCodeFile = idx;
+  const file = state.codeFiles[idx];
+  document.getElementById('code-filename').textContent = file.path + file.name;
+  document.getElementById('code-editor').value = file.content;
+  document.getElementById('code-lang').textContent = getLanguage(file.name);
+  document.getElementById('code-status').textContent = 'Editing';
+  renderCodeFileTree();
+}
+
+function getLanguage(name) {
+  const ext = name.split('.').pop();
+  const langs = { js: 'JavaScript', ts: 'TypeScript', prisma: 'Prisma', html: 'HTML', css: 'CSS', json: 'JSON', md: 'Markdown' };
+  return langs[ext] || 'Plain Text';
+}
+
+function saveCodeFile() {
+  if (state.activeCodeFile === null) { showToast('No file selected'); return; }
+  state.codeFiles[state.activeCodeFile].content = document.getElementById('code-editor').value;
+  saveCodeFiles();
+  document.getElementById('code-status').textContent = 'Saved at ' + new Date().toLocaleTimeString();
+  showToast('File saved');
+}
+
+function addCodeFile() {
+  const name = prompt('File name (e.g., utils.js):');
+  if (!name) return;
+  state.codeFiles.push({ name, path: 'src/', content: `// ${name}\n` });
+  saveCodeFiles(); renderCodeFileTree(); showToast(`Created ${name}`);
+}
+
+// ==================== VOICE ====================
+function renderVoiceChannels() {
+  const grid = document.getElementById('voice-grid');
+  const channels = [
+    { name: 'General', users: 3, active: true },
+    { name: 'Coding Room', users: 1, active: false },
+    { name: 'Music Lounge', users: 0, active: false },
+    { name: 'Quick Sync', users: 2, active: false }
+  ];
+  grid.innerHTML = channels.map(ch => `
+    <div class="voice-card ${ch.active ? 'active' : ''}" onclick="joinVoice('${ch.name}')">
+      <h3><span class="voice-dot" style="background: ${ch.active ? 'var(--green)' : 'var(--text-muted)'}; display: inline-block; width: 10px; height: 10px; border-radius: 50%;"></span> ${ch.name}</h3>
+      <div class="users">${ch.users} user${ch.users !== 1 ? 's' : ''} connected</div>
+      <button class="btn-primary join-btn" style="width: 100%;">${ch.active ? 'Connected' : 'Join'}</button>
+    </div>
+  `).join('');
+}
+
+function joinVoice(channel) {
+  document.querySelectorAll('.voice-channel').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.voice-channel').forEach(c => { if (c.querySelector('.voice-channel-name')?.textContent === channel) c.classList.add('active'); });
+  renderVoiceChannels();
+  showToast(`Joined ${channel}`);
+}
+
+// ==================== CALENDAR ====================
+function renderCalendar() {
+  const now = state.calendarDate;
+  const year = now.getFullYear(), month = now.getMonth(), today = new Date().getDate();
+  document.getElementById('calendar-title').textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const grid = document.getElementById('calendar-grid');
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  let html = days.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const events = { 3: [{ text: 'Sprint Planning', cls: 'blue' }], 7: [{ text: 'Code Review', cls: 'green' }], 14: [{ text: 'Team Sync', cls: 'purple' }, { text: 'Deploy v2.0', cls: 'blue' }], 21: [{ text: 'Design Review', cls: 'green' }], 28: [{ text: 'Release', cls: 'blue' }] };
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day other-month"><div class="num">${prevDays - firstDay + 1 + i}</div></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today;
+    const evts = events[d] || [];
+    html += `<div class="cal-day ${isToday ? 'today' : ''}"><div class="num">${d}</div>${evts.map(e => `<div class="cal-event ${e.cls}">${e.text}</div>`).join('')}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function changeMonth(delta) {
+  state.calendarDate.setMonth(state.calendarDate.getMonth() + delta);
+  renderCalendar();
+}
+
+// ==================== MEMBERS ====================
+function renderMembers() {
+  const grid = document.getElementById('members-grid');
+  const members = [
+    { name: 'Alex', initials: 'AK', role: 'Owner', status: 'online', gradient: 'linear-gradient(135deg, var(--nexus), var(--purple))' },
+    { name: 'Sarah', initials: 'SM', role: 'Admin', status: 'online', gradient: 'linear-gradient(135deg, var(--green), var(--cyan))' },
+    { name: 'Mike', initials: 'MK', role: 'Member', status: 'idle', gradient: 'linear-gradient(135deg, var(--orange), var(--purple))' },
+    { name: 'Emma', initials: 'EJ', role: 'Member', status: 'online', gradient: 'linear-gradient(135deg, var(--cyan), var(--green))' },
+    { name: 'John', initials: 'JD', role: 'Viewer', status: 'dnd', gradient: 'linear-gradient(135deg, var(--purple), var(--red))' },
+    { name: 'Lisa', initials: 'LW', role: 'Member', status: 'online', gradient: 'linear-gradient(135deg, var(--yellow), var(--orange))' }
+  ];
+  grid.innerHTML = members.map(m => `
+    <div class="member-card">
+      <div class="avatar" style="background: ${m.gradient};">${m.initials}<span class="member-status ${m.status}" style="width: 14px; height: 14px; border-width: 3px;"></span></div>
+      <div class="info"><div class="name">${m.name}</div><div class="role">${m.role} &#x2022; ${m.status === 'online' ? 'Online' : m.status === 'idle' ? 'Idle' : m.status === 'dnd' ? 'Do Not Disturb' : 'Offline'}</div></div>
+      ${m.role !== 'Owner' ? `<select onchange="showToast('Role updated')"><option ${m.role === 'Admin' ? 'selected' : ''}>Admin</option><option ${m.role === 'Member' ? 'selected' : ''}>Member</option><option ${m.role === 'Viewer' ? 'selected' : ''}>Viewer</option><option>Remove</option></select>` : '<span style="font-size: 11px; color: var(--yellow);">&#x1F451;</span>'}
+    </div>
+  `).join('');
+}
+
+// ==================== ACTIVITY FEED ====================
+function renderActivityFeed() {
+  const el = document.getElementById('activity-feed');
+  const activities = [
+    { icon: '&#x1F4BB;', bg: 'var(--green-50)', text: 'Alex pushed 3 commits to backend-api', time: '5 min ago' },
+    { icon: '&#x1F4DD;', bg: 'var(--nexus-50)', text: 'Sarah created "API Design Notes"', time: '1 hour ago' },
+    { icon: '&#x1F4AC;', bg: 'var(--purple-50)', text: 'Mike replied in #dev', time: '2 hours ago' },
+    { icon: '&#x1F4CB;', bg: 'var(--orange-50)', text: 'Alex completed "Setup Prisma schema"', time: '3 hours ago' },
+    { icon: '&#x1F4C1;', bg: 'var(--cyan-50)', text: 'Emma uploaded mockup-v2.png', time: 'Yesterday' }
+  ];
+  el.innerHTML = activities.map(a => `
+    <div class="activity-item">
+      <div class="activity-icon" style="background: ${a.bg};">${a.icon}</div>
+      <div class="activity-body"><p>${a.text}</p><div class="time">${a.time}</div></div>
+    </div>
+  `).join('');
+}
+
+// ==================== NOTIFICATIONS ====================
+function renderNotifications() {
+  const list = document.getElementById('notif-list');
+  const unread = state.notifications.filter(n => n.unread).length;
+  document.getElementById('notif-dot').style.display = unread ? 'block' : 'none';
+  document.getElementById('chat-badge').textContent = unread;
+  list.innerHTML = state.notifications.map((n, i) => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markNotifRead(${i})">
+      <div class="notif-icon ${n.icon}">${n.icon === 'msg' ? '&#x1F4AC;' : n.icon === 'commit' ? '&#x1F4BB;' : '&#x1F4CB;'}</div>
+      <div class="notif-body"><p>${escHtml(n.text)}</p><span>${escHtml(n.time)}</span></div>
+    </div>
+  `).join('');
+}
+
+function markNotifRead(i) { state.notifications[i].unread = false; renderNotifications(); }
+function clearNotifications() { state.notifications.forEach(n => n.unread = false); renderNotifications(); showToast('All notifications marked as read'); }
+
+// ==================== MODALS ====================
+function setupModals() {
+  document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-modal').classList.add('show'));
+  document.getElementById('shortcuts-btn').addEventListener('click', () => document.getElementById('shortcuts-modal').classList.add('show'));
+  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+  document.getElementById('notif-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('notif-dropdown').classList.toggle('show'); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('#notif-btn')) document.getElementById('notif-dropdown').classList.remove('show'); if (!e.target.closest('#emoji-btn') && !e.target.closest('.emoji-picker')) document.getElementById('emoji-picker').classList.remove('show'); });
+}
+
+function closeSettings() { document.getElementById('settings-modal').classList.remove('show'); }
+function saveSettings() {
+  const name = document.getElementById('setting-name').value.trim();
+  if (name) { state.user.name = name; state.user.email = document.getElementById('setting-email').value.trim(); localStorage.setItem('nexus_user', JSON.stringify(state.user)); setupUser(); updateWelcome(); }
+  closeSettings(); showToast('Settings saved');
+}
+function closeShortcuts() { document.getElementById('shortcuts-modal').classList.remove('show'); }
+
+// ==================== COMMAND PALETTE ====================
+function openCmdPalette() {
+  document.getElementById('cmd-palette').classList.add('show');
+  document.getElementById('cmd-input').value = '';
+  document.getElementById('cmd-input').focus();
+  filterCommands();
+}
+
+function closeCmdPalette() { document.getElementById('cmd-palette').classList.remove('show'); }
+
+function filterCommands() {
+  const query = document.getElementById('cmd-input').value.trim().toLowerCase();
+  const commands = [
+    { icon: '&#x1F3E0;', label: 'Go to Overview', page: 'overview', shortcut: '' },
+    { icon: '&#x1F4AC;', label: 'Go to Chats', page: 'chats', shortcut: '' },
+    { icon: '&#x1F4DD;', label: 'Go to Notes', page: 'notes', shortcut: '' },
+    { icon: '&#x1F4CB;', label: 'Go to Tasks', page: 'tasks', shortcut: '' },
+    { icon: '&#x1F4BB;', label: 'Go to Code Editor', page: 'code', shortcut: '' },
+    { icon: '&#x1F4C1;', label: 'Go to Files', page: 'files', shortcut: '' },
+    { icon: '&#x1F50A;', label: 'Go to Voice', page: 'voice', shortcut: '' },
+    { icon: '&#x1F4C5;', label: 'Go to Calendar', page: 'calendar', shortcut: '' },
+    { icon: '&#x1F465;', label: 'Go to Members', page: 'members', shortcut: '' },
+    { icon: '&#x1F4DD;', label: 'New Note', action: 'newNote', shortcut: 'Ctrl+N' },
+    { icon: '&#x2699;&#xFE0F;', label: 'Open Settings', action: 'settings', shortcut: '' },
+    { icon: '&#x2328;&#xFE0F;', label: 'Keyboard Shortcuts', action: 'shortcuts', shortcut: '' },
+    { icon: state.theme === 'dark' ? '&#x2600;&#xFE0F;' : '&#x1F319;', label: `Switch to ${state.theme === 'dark' ? 'Light' : 'Dark'} Mode`, action: 'theme', shortcut: 'Ctrl+D' },
+    { icon: '&#x1F3B5;', label: state.music.isPlaying ? 'Pause Music' : 'Play Music', action: 'music', shortcut: '' }
+  ];
+
+  // Add notes to commands
+  state.notes.forEach(n => { commands.push({ icon: '&#x1F4C4;', label: n.title, action: 'note:' + n.id, shortcut: 'Note' }); });
+
+  const filtered = query ? commands.filter(c => c.label.toLowerCase().includes(query)) : commands;
+  document.getElementById('cmd-results').innerHTML = filtered.slice(0, 12).map((c, i) => `
+    <div class="cmd-item ${i === 0 ? 'selected' : ''}" onclick="executeCommand('${c.page || c.action || ''}')">
+      <span class="icon">${c.icon}</span><span class="label">${escHtml(c.label)}</span>${c.shortcut ? `<span class="shortcut">${c.shortcut}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function executeCommand(action) {
+  closeCmdPalette();
+  if (action.startsWith('note:')) { navigateTo('notes'); viewNote(action.replace('note:', '')); }
+  else if (action === 'newNote') { navigateTo('notes'); setTimeout(openNoteEditor, 100); }
+  else if (action === 'settings') { document.getElementById('settings-modal').classList.add('show'); }
+  else if (action === 'shortcuts') { document.getElementById('shortcuts-modal').classList.add('show'); }
+  else if (action === 'theme') { toggleTheme(); }
+  else if (action === 'music') { togglePlay(); }
+  else if (action) { navigateTo(action); }
+}
+
+// ==================== KEYBOARD SHORTCUTS ====================
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
+    if (e.key === 'Escape') { closeSettings(); closeShortcuts(); closeCmdPalette(); closeVersionHistory(); document.getElementById('notif-dropdown').classList.remove('show'); document.getElementById('search-results').classList.remove('show'); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'n' && !e.target.closest('input, textarea')) { e.preventDefault(); navigateTo('notes'); setTimeout(openNoteEditor, 100); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 's' && document.getElementById('note-editor').classList.contains('show')) { e.preventDefault(); saveNote(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'd') { e.preventDefault(); toggleTheme(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'b' && !e.target.closest('input, textarea')) { e.preventDefault(); toggleSidebar(); }
+  });
+  document.getElementById('cmd-palette').addEventListener('click', (e) => { if (e.target.id === 'cmd-palette') closeCmdPalette(); });
+}
+
+// ==================== SEARCH ====================
+function setupSearch() {
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  input.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase();
+    if (!query) { results.classList.remove('show'); return; }
+    const matches = [];
+    state.notes.forEach(n => { if (n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query)) matches.push({ icon: '&#x1F4DD;', title: n.title, type: 'Note', page: 'notes', action: 'note:' + n.id }); });
+    state.tasks.forEach(t => { if (t.text.toLowerCase().includes(query)) matches.push({ icon: '&#x1F4CB;', title: t.text, type: 'Task', page: 'tasks' }); });
+    Object.keys(state.channels).forEach(ch => {
+      state.channels[ch].forEach(msg => { if (msg.text.toLowerCase().includes(query)) matches.push({ icon: '&#x1F4AC;', title: `${msg.user}: ${msg.text.substring(0, 40)}`, type: `#${ch}`, page: 'chats' }); });
+    });
+    state.codeFiles.forEach(f => { if (f.name.toLowerCase().includes(query)) matches.push({ icon: '&#x1F4C7;', title: f.name, type: 'File', page: 'code' }); });
+
+    results.innerHTML = matches.length ? matches.slice(0, 10).map(m => `
+      <div class="search-result-item" onclick="executeCommand('${m.action || m.page}'); document.getElementById('search-results').classList.remove('show'); document.getElementById('search-input').value = '';">
+        <span class="icon">${m.icon}</span><span class="title">${escHtml(m.title)}</span><span class="type">${escHtml(m.type)}</span>
+      </div>
+    `).join('') : '<div style="padding: 16px; color: var(--text-muted); text-align: center;">No results found</div>';
+    results.classList.add('show');
+  });
+  input.addEventListener('blur', () => setTimeout(() => results.classList.remove('show'), 200));
+}
+
+// ==================== MUSIC ====================
+function togglePlay() {
+  state.music.isPlaying = !state.music.isPlaying;
+  document.getElementById('play-btn').textContent = state.music.isPlaying ? '&#x23F8;' : '&#x25B6;';
+  showToast(state.music.isPlaying ? 'Now playing' : 'Music paused');
+}
+
+function startMusicProgress() {
+  setInterval(() => {
+    if (!state.music.isPlaying) return;
+    const track = state.music.tracks[state.music.currentTrack];
+    state.music.progress = Math.min(100, state.music.progress + (100 / track.duration));
+    updateMusicUI();
+    if (state.music.progress >= 100) nextTrack();
+  }, 1000);
+}
+
+function updateMusicUI() {
+  const track = state.music.tracks[state.music.currentTrack];
+  const currentSec = Math.floor((state.music.progress / 100) * track.duration);
+  const min = Math.floor(currentSec / 60), sec = String(currentSec % 60).padStart(2, '0');
+  const totalMin = Math.floor(track.duration / 60), totalSec = String(track.duration % 60).padStart(2, '0');
+  document.getElementById('track-name').textContent = track.name;
+  document.getElementById('track-artist').textContent = track.artist;
+  document.getElementById('music-current').textContent = `${min}:${sec}`;
+  document.getElementById('music-total').textContent = `${totalMin}:${totalSec}`;
+  document.getElementById('progress-fill').style.width = `${state.music.progress}%`;
+}
+
+function seekMusic(e) { const rect = e.currentTarget.getBoundingClientRect(); state.music.progress = ((e.clientX - rect.left) / rect.width) * 100; updateMusicUI(); }
+function nextTrack() { state.music.currentTrack = (state.music.currentTrack + 1) % state.music.tracks.length; state.music.progress = 0; updateMusicUI(); showToast(`Now playing: ${state.music.tracks[state.music.currentTrack].name}`); }
+function prevTrack() { state.music.currentTrack = (state.music.currentTrack - 1 + state.music.tracks.length) % state.music.tracks.length; state.music.progress = 0; updateMusicUI(); showToast(`Now playing: ${state.music.tracks[state.music.currentTrack].name}`); }
+
+// ==================== UTILITIES ====================
+function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(() => toast.classList.remove('active'), 2500); }
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+function escHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+function timeAgo(ts) { const s = Math.floor((Date.now() - ts) / 1000); if (s < 60) return 'Just now'; const m = Math.floor(s / 60); if (m < 60) return `${m}m ago`; const h = Math.floor(m / 60); if (h < 24) return `${h}h ago`; const d = Math.floor(h / 24); if (d < 7) return `${d}d ago`; return new Date(ts).toLocaleDateString(); }
+
+function updateWelcome() {
+  const now = new Date(), hour = now.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const unread = state.notifications.filter(n => n.unread).length;
+  const active = state.tasks.filter(t => !t.completed).length;
+  document.getElementById('welcome-sub').textContent = `${greeting}! You have ${unread} unread notification${unread !== 1 ? 's' : ''} and ${active} active task${active !== 1 ? 's' : ''}.`;
+}
+
+// Auto-save notes every 30s
+setInterval(() => {
+  if (document.getElementById('note-editor').classList.contains('show') && state.editingNoteId) {
+    const content = document.getElementById('note-content').value;
+    const note = state.notes.find(n => n.id === state.editingNoteId);
+    if (note && content !== note.content) {
+      note.content = content; note.updatedAt = Date.now();
+      saveNotes(); renderRecentNotes();
+      document.getElementById('save-status').textContent = 'Auto-saved ' + new Date().toLocaleTimeString();
+    }
+  }
+}, 30000);
+
+init();
+</script>
 </body>
 </html>
