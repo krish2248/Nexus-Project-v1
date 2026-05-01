@@ -1,0 +1,575 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH (NextAuth.js compatible)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
+  createdNotes    Note[]
+  createdMessages Message[]
+  createdFiles    FileLibraryItem[]
+  notifications   Notification[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// WORKSPACES
+// ============================================
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User            @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members     WorkspaceMember[]
+  spaces      Space[]
+  notes       Note[]
+  projects    Project[]
+  files       FileLibraryItem[]
+  notifications Notification[]
+  subscriptions Subscription[]
+  featureGates WorkspaceFeatureGate[]
+
+  @@index([slug])
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        Role     @default(MEMBER)
+  joinedAt    DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model WorkspaceFeatureGate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  feature     String
+  enabled     Boolean  @default(false)
+  limit       Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, feature])
+}
+
+// ============================================
+// SPACES & CHANNELS (Discord-like)
+// ============================================
+
+model Space {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  icon        String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  channels    Channel[]
+  voiceRooms  VoiceRoom[]
+
+  @@index([workspaceId])
+}
+
+model Channel {
+  id          String   @id @default(cuid())
+  spaceId     String
+  name        String
+  type        ChannelType @default(TEXT)
+  topic       String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@index([spaceId])
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+}
+
+// ============================================
+// NOTES
+// ============================================
+
+model Note {
+  id          String   @id @default(cuid())
+  workspaceId String
+  title       String
+  content     Json?    // Block-based content (Tiptap/Yjs compatible)
+  icon        String?
+  parentId    String?  // For nested folders/notes
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  parent      Note?        @relation("NoteHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Note[]       @relation("NoteHierarchy")
+  versions    NoteVersion[]
+  comments    NoteComment[]
+
+  @@index([workspaceId])
+  @@index([parentId])
+}
+
+model NoteVersion {
+  id        String   @id @default(cuid())
+  noteId    String
+  content   Json
+  createdAt DateTime @default(now())
+  createdById String?
+
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+}
+
+model NoteComment {
+  id        String   @id @default(cuid())
+  noteId    String
+  content   String
+  blockId   String?  // Which block this comment references
+  resolved  Boolean  @default(false)
+  createdById String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  replies   NoteCommentReply[]
+
+  @@index([noteId])
+}
+
+model NoteCommentReply {
+  id        String   @id @default(cuid())
+  commentId String
+  content   String
+  createdById String
+  createdAt DateTime @default(now())
+
+  comment   NoteComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// PROJECTS & FILES (GitHub-like)
+// ============================================
+
+model Project {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  files       ProjectFile[]
+
+  @@index([workspaceId])
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  path      String   // e.g., "src/components/Button.tsx"
+  content   String?
+  language  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions  FileVersion[]
+  comments  FileComment[]
+
+  @@unique([projectId, path])
+  @@index([projectId])
+}
+
+model FileVersion {
+  id         String   @id @default(cuid())
+  fileId     String
+  content    String
+  commitMsg  String?
+  createdAt  DateTime @default(now())
+
+  file       ProjectFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@index([fileId])
+}
+
+model FileComment {
+  id        String   @id @default(cuid())
+  fileId    String
+  content   String
+  line      Int?     // Line number for line-level comments
+  resolved  Boolean  @default(false)
+  createdById String
+  createdAt DateTime @default(now())
+
+  file      ProjectFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  replies   FileCommentReply[]
+
+  @@index([fileId])
+}
+
+model FileCommentReply {
+  id        String   @id @default(cuid())
+  commentId String
+  content   String
+  createdById String
+  createdAt DateTime @default(now())
+
+  comment   FileComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// FILE LIBRARY (Uploads)
+// ============================================
+
+model FileLibraryItem {
+  id          String   @id @default(cuid())
+  workspaceId String
+  uploadedById String
+  fileName    String
+  originalName String
+  mimeType    String
+  size        Int      // bytes
+  r2Key       String   // Cloudflare R2 object key
+  url         String   // Public/private URL
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploadedBy  User      @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId])
+}
+
+// ============================================
+// MESSAGES (Chat)
+// ============================================
+
+model Message {
+  id         String   @id @default(cuid())
+  channelId  String
+  content    String
+  authorId   String
+  editedAt   DateTime?
+  deletedAt  DateTime?
+  parentId   String?  // For thread replies
+  pinned     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  channel    Channel          @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author     User             @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  parent     Message?         @relation("MessageThread", fields: [parentId], references: [id], onDelete: SetNull)
+  replies    Message[]        @relation("MessageThread")
+  reactions  MessageReaction[]
+  mentions   MessageMention[]
+
+  @@index([channelId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+model MessageMention {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+// ============================================
+// DIRECT MESSAGES
+// ============================================
+
+model DirectMessage {
+  id        String   @id @default(cuid())
+  senderId  String
+  receiverId String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model GroupDM {
+  id        String   @id @default(cuid())
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members   GroupDMMember[]
+  messages  GroupDMMessage[]
+}
+
+model GroupDMMember {
+  id        String   @id @default(cuid())
+  groupDmId String
+  userId    String
+  joinedAt  DateTime @default(now())
+
+  groupDm   GroupDM  @relation(fields: [groupDmId], references: [id], onDelete: Cascade)
+
+  @@unique([groupDmId, userId])
+}
+
+model GroupDMMessage {
+  id        String   @id @default(cuid())
+  groupDmId String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  groupDm   GroupDM  @relation(fields: [groupDmId], references: [id], onDelete: Cascade)
+
+  @@index([groupDmId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ============================================
+// VOICE/VIDEO (LiveKit)
+// ============================================
+
+model VoiceRoom {
+  id        String   @id @default(cuid())
+  spaceId   String
+  name      String
+  type      VoiceRoomType @default(PERSISTENT)
+  liveKitRoomName String?
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  space     Space          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  sessions  VoiceSession[]
+
+  @@index([spaceId])
+}
+
+enum VoiceRoomType {
+  PERSISTENT
+  ON_DEMAND
+}
+
+model VoiceSession {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+
+  room      VoiceRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String?
+  type        NotificationType
+  title       String
+  message     String
+  link        String?
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt(sort: Desc)])
+}
+
+enum NotificationType {
+  MENTION
+  REPLY
+  TASK_ASSIGNMENT
+  INVITE
+  FILE_UPLOAD
+  COMMENT
+  VOICE_CALL
+}
+
+// ============================================
+// SUBSCRIPTIONS (Stripe)
+// ============================================
+
+model Subscription {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  stripeCustomerId String  @unique
+  stripeSubscriptionId String? @unique
+  status          SubscriptionStatus @default(INACTIVE)
+  plan            SubscriptionPlan @default(FREE)
+  currentPeriodEnd DateTime?
+  cancelAtPeriodEnd Boolean @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+// ============================================
+// TASKS
+// ============================================
+
+model Task {
+  id          String   @id @default(cuid())
+  workspaceId String
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  assigneeId  String?
+  createdById String
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([status])
+  @@index([assigneeId])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
