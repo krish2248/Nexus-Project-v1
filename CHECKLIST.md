@@ -15,37 +15,37 @@
 - [x] Add API.md documentation
 - [x] Create initial UI mockup (Nexus.html)
 - [x] Create comprehensive CHECKLIST.md
-- [ ] Set up pnpm workspaces monorepo
-- [ ] Configure Turborepo (turbo.json)
-- [ ] Set up Docker environment (docker-compose.yml)
-- [ ] Add .env.example with all variables
+- [x] Set up pnpm workspaces monorepo
+- [x] Configure Turborepo (turbo.json)
+- [x] Set up Docker environment (docker-compose.yml)
+- [x] Add .env.example with all variables
 
 ### 1.2 Database Schema (Prisma)
-- [ ] Initialize Prisma in packages/db
-- [ ] Design User model
-- [ ] Design Account model
-- [ ] Design Session model (NextAuth compatible)
-- [ ] Design Workspace model
-- [ ] Design WorkspaceMember model with Role enum
-- [ ] Design Space model
-- [ ] Design Channel model
-- [ ] Design Note model
-- [ ] Design NoteVersion model (FILO cap)
-- [ ] Design Project model
-- [ ] Design ProjectFile model
-- [ ] Design FileVersion model (FILO cap)
-- [ ] Design Message model
-- [ ] Design DirectMessage model
-- [ ] Design GroupDM model
-- [ ] Design GroupDMMessage model
-- [ ] Design VoiceRoom model
-- [ ] Design VoiceSession model
-- [ ] Design Notification model
-- [ ] Design Subscription model
-- [ ] Design WorkspaceFeatureGate model
-- [ ] Design FileLibraryItem model
+- [x] Initialize Prisma in packages/db
+- [x] Design User model
+- [x] Design Account model
+- [x] Design Session model (NextAuth compatible)
+- [x] Design Workspace model
+- [x] Design WorkspaceMember model with Role enum
+- [x] Design Space model
+- [x] Design Channel model
+- [x] Design Note model
+- [x] Design NoteVersion model (FILO cap)
+- [x] Design Project model
+- [x] Design ProjectFile model
+- [x] Design FileVersion model (FILO cap)
+- [x] Design Message model
+- [x] Design DirectMessage model
+- [x] Design GroupDM model
+- [x] Design GroupDMMessage model
+- [x] Design VoiceRoom model
+- [x] Design VoiceSession model
+- [x] Design Notification model
+- [x] Design Subscription model
+- [x] Design WorkspaceFeatureGate model
+- [x] Design FileLibraryItem model
 - [ ] Run first migration: `prisma migrate dev --name init`
-- [ ] Create seed.ts with test data
+- [x] Create seed.ts with test data
 
 ### 1.3 Authentication (NextAuth.js)
 - [ ] Install NextAuth v4
