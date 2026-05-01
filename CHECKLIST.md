@@ -125,6 +125,25 @@
 - [x] Add responsive mobile support
 - [x] Add localStorage persistence for all data
 
+### 1.11 Frontend Feature Completion (index.html)
+- [x] Onboarding/first-run flow
+- [x] Light/Dark theme toggle with persistence
+- [x] Command palette (Ctrl+K) for quick navigation & actions
+- [x] Full keyboard shortcut system (Ctrl+N, Ctrl+S, Ctrl+D, Ctrl+B, Esc)
+- [x] Code editor page with file tree, syntax-aware editing, and save
+- [x] Drag-and-drop file upload zone + simulated file library
+- [x] Emoji picker, message reactions, reply threading
+- [x] Message edit/delete in chat
+- [x] Simulated typing indicators in chat
+- [x] Note version history (FILO cap: 5 versions) + restore
+- [x] Markdown formatting toolbar for notes
+- [x] Note export to Markdown (.md download)
+- [x] Workspace members management with role selectors
+- [x] Activity feed on dashboard
+- [x] Responsive mobile layout with collapsible sidebar & backdrop
+- [x] Auto-save notes every 30 seconds
+- [x] GitHub Pages deployment live
+
 ---
 
 ## Phase 2: Core Features (Days 43-98)
