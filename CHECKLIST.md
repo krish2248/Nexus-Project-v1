@@ -48,12 +48,12 @@
 - [x] Create seed.ts with test data
 
 ### 1.3 Authentication (NextAuth.js)
-- [ ] Install NextAuth v4
-- [ ] Configure CredentialsProvider with email/password
-- [ ] Set up bcrypt password hashing
-- [ ] Configure PrismaAdapter
-- [ ] Set up JWT strategy with session callback
-- [ ] Create /api/auth/register endpoint
+- [x] Install NextAuth v5 (Auth.js)
+- [x] Configure CredentialsProvider with email/password
+- [x] Set up bcrypt password hashing
+- [x] Configure PrismaAdapter
+- [x] Set up JWT strategy with session callback
+- [x] Create /api/auth/register endpoint
 - [ ] Test: register → login → session → logout cycle
 
 ### 1.4 Invite System
@@ -67,9 +67,9 @@
 - [ ] Handle already-member edge case
 
 ### 1.5 Role-Based Access Control
-- [ ] Build requireAuth middleware
-- [ ] Build requireWorkspaceMember middleware
-- [ ] Build requireRole middleware
+- [x] Build requireAuth middleware
+- [x] Build requireWorkspaceMember middleware
+- [x] Build requireRole middleware
 - [ ] Apply middleware to all workspace routes
 - [ ] Test role-level access control
 - [ ] Add rate limiting on auth endpoints
