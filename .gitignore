@@ -17,3 +17,33 @@ desktop.ini
 tmp/
 temp/
 *.tmp
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Prisma
+prisma/migrations/
+
+# Turbo
+.turbo/
+
+# IDE
+*.code-workspace
+
+# Docker volumes
+postgres_data/
+redis_data/

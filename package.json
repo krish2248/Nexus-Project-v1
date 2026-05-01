@@ -1,0 +1,21 @@
+{
+  "name": "nexus",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:generate": "turbo --filter=@nexus/db db:generate",
+    "db:migrate": "turbo --filter=@nexus/db db:migrate",
+    "db:studio": "turbo --filter=@nexus/db db:studio",
+    "db:seed": "turbo --filter=@nexus/db db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "packageManager": "pnpm@10.0.0"
+}
