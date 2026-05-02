@@ -30,6 +30,8 @@ model User {
   createdMessages Message[]
   createdFiles    FileLibraryItem[]
   notifications   Notification[]
+
+  invitesCreated  Invite[]     @relation("InviteCreator")
 }
 
 model Account {
@@ -97,6 +99,7 @@ model Workspace {
   notifications Notification[]
   subscriptions Subscription[]
   featureGates WorkspaceFeatureGate[]
+  invites      Invite[]
 
   @@index([slug])
 }
@@ -128,6 +131,29 @@ model WorkspaceFeatureGate {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, feature])
+}
+
+// ============================================
+// INVITES
+// ============================================
+
+model Invite {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  workspaceId String
+  createdBy   String
+  expiresAt   DateTime
+  email       String?
+  used        Boolean  @default(false)
+  usedAt      DateTime?
+  acceptedBy  String?
+  createdAt   DateTime @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator     User      @relation("InviteCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  @@index([token])
+  @@index([workspaceId])
 }
 
 // ============================================
